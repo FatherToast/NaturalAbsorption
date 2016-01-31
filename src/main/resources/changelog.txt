@@ -1,0 +1,15 @@
+
+    - Fixed hide_armor_bar working even when replace_armor is disabled.
+1.2.1
+    - Improved the shield updating system.
+    - New option to enable absorption from armor rating even if armor is not disabled.
+    - New option to hide the armor bar when armor is disabled.
+    - New option to use compatibility recipe (so people can't smelt enchanted books for piles of gold).
+1.2
+    - The item used to craft books of absorption is now configurable.
+    - You can now set a global cap to limit the effects of combining natural absorption with the absorption enchantment.
+1.1
+    - Added "Absorption" enchantment.
+    - New armor override option to make armor give absorption instead of damage reduction (disabled by default).
+1.0
+    - Released!

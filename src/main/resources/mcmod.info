@@ -1,0 +1,16 @@
+[
+{
+  "modid": "NaturalAbsorption",
+  "name": "Natural Absorption",
+  "description": "Provides the player with a regenerating shield, intended for play with no health regen (or very slow regen). Also can be configured to replace armor's damage reduction with absorption.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://www.minecraftforum.net/topic/1153874-/",
+  "updateUrl": "",
+  "authorList": ["FatherToast"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
