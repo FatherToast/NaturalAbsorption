@@ -1,6 +1,6 @@
 [
 {
-  "modid": "NaturalAbsorption",
+  "modid": "natural_absorption",
   "name": "Natural Absorption",
   "description": "Provides the player with a regenerating shield, intended for play with no health regen (or very slow regen). Also can be configured to replace armor's damage reduction with absorption.",
   "version": "${version}",

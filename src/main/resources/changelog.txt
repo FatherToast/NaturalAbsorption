@@ -1,5 +1,14 @@
-
-    - Fixed hide_armor_bar working even when replace_armor is disabled.
+1.2.2
+    - Fixed vanilla absorption desync when moving between dimensions.
+    - Fixed hide_armor_bar working when _replace_armor is not enabled.
+    - Armor replacement changes (only affect you if you enable _replace_armor):
+      - Armor is now only damaged by damage dealt to your absorption shield (not to your health) by default.
+      - Armor takes double damage by default.
+      - Armor can now be configured to not take damage from some sources (still all sources by default).
+    - Made the Book of Absorption its own item.
+    - Added additional information and localization keys for the Book of Absorption's tooltip.
+    - Absorption enchantment uses new "rarity" and "treasure" system instead of enchant weight.
+    - Absorption enchantment can now be restricted to normally appearing on a specific armor slot.
 1.2.1
     - Improved the shield updating system.
     - New option to enable absorption from armor rating even if armor is not disabled.

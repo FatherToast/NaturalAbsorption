@@ -1,138 +1,397 @@
 package toast.naturalAbsorption;
 
-import java.util.HashMap;
-import java.util.Random;
+import java.util.Arrays;
 
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+import net.minecraftforge.oredict.OreDictionary;
 
 /**
- * This helper class automatically creates, stores, and retrieves properties.
- * Supported data types:
- * String, boolean, int, double
- * 
- * Any property can be retrieved as an Object or String.
- * Any non-String property can also be retrieved as any other non-String property.
- * Retrieving a number as a boolean will produce a randomized output depending on the value.
+ * This helper class loads, stores, and retrieves config options.
  */
-public abstract class Properties {
-    // Mapping of all properties in the mod to their values.
-    private static final HashMap<String, Object> map = new HashMap();
-    // Common category names.
-    public static final String GENERAL = "_general";
-    public static final String ARMOR = "armor";
-    public static final String ENCHANT = "enchantment";
-    public static final String RECOVERY = "recovery";
-    public static final String UPGRADES = "upgrades";
+public class Properties {
 
-    // Initializes these properties.
-    public static void init(Configuration config) {
-        config.load();
+	public static Properties get() {
+		return Properties.INSTANCE;
+	}
+	public static void load(Configuration configuration) {
+		Properties.config = configuration;
+        Properties.config.load();
+        Properties.INSTANCE = new Properties();
+        Properties.config.save();
+		Properties.config = null;
+	}
 
-        Properties.add(config, Properties.GENERAL, "death_penalty", 4.0, "The amount of natural absorption a player loses with each death. Will not reduce below \'min_absorption\'. Default is 4.0.");
-        Properties.add(config, Properties.GENERAL, "global_max_absorption", Double.POSITIVE_INFINITY, "The total maximum absorption a player may obtain through natural, enchant, and/or armor replacement absorption. Absorption from potions is unaffected. (Set to Infinity for no max.) Default is Infinity.");
-        Properties.add(config, Properties.GENERAL, "max_absorption", 20.0, "The maximum natural absorption a player may obtain. Default is 20.0.");
-        Properties.add(config, Properties.GENERAL, "min_absorption", 8.0, "A player will not drop below this much natural absorption due to death penalty. Default is 8.0.");
-        Properties.add(config, Properties.GENERAL, "recover_on_spawn", true, "If true, players will start out and respawn with full absorption shields (instead of 0). Default is true.");
-        Properties.add(config, Properties.GENERAL, "starting_absorption", 4.0, "The amount of natural absorption a player starts with. Default is 4.0.");
 
-        Properties.add(config, Properties.ARMOR, "_replace_armor", false, "If true, player armor will provide max absorption instead of damage reduction (does not work well without passive recovery enabled). Default is false.");
-        Properties.add(config, Properties.ARMOR, "hide_armor_bar", true, "If true, the armor bar will not be rendered when \"replace_armor\" is enabled. Default is true.");
-        Properties.add(config, Properties.ARMOR, "multiplier", 1.0, "If \"_replace_armor\" or \"multiplier_override\" is enabled, this is the amount of max absorption that armor grants per armor point. Default is 1.0.");
-        Properties.add(config, Properties.ARMOR, "multiplier_override", false, "If true, players will gain absorption from their armor, even if \"replace_armor\" is disabled. Default is false.");
+	public final GENERAL GENERAL = new GENERAL();
+	public class GENERAL extends PropertyCategory {
+		@Override
+		public String name() { return "_general"; }
+		@Override
+		protected String comment() {
+			return "General and/or miscellaneous options.\n"
+				+ "All absorption amounts are in half hearts.";
+		}
 
-        Properties.add(config, Properties.ENCHANT, "id", 216, "The enchantment id for the absorption enchantment. Set to 0 to disable the enchantment entirely. Default is 216.");
-        Properties.add(config, Properties.ENCHANT, "weight", 2, "The weight for the absorption enchantment. In other words, the higher this is, the more likely you are to get it when enchanting. Default is 2.\nReference weights: Protection=10, Fire/Projectile/Fall Protection=5, Blast Protection=2, Thorns=1.");
-        Properties.add(config, Properties.ENCHANT, "potency", 4.0, "Max absorption gained for each rank of the absorption enchantment. Default is 4.0.");
-        Properties.add(config, Properties.ENCHANT, "potency_base", 2.0, "Max absorption gained for for having at least one rank of the absorption enchantment (in addition to the potency). Default is 2.0.");
-        Properties.add(config, Properties.ENCHANT, "potency_max", 20.0, "The most max absorbtion that can be gained from the absorption enchantment. Set this to -1 for no limit. Default is 20.0.");
-        Properties.add(config, Properties.ENCHANT, "stacking", true, "If false, only the highest level absorption enchantment will be counted. Otherwise, all equipped absorption enchantments are added together. Default is true.");
+        public final boolean DEBUG = this.prop("_debug_mode", false,
+        	"If true, the mod will start up in debug mode.");
 
-        Properties.add(config, Properties.RECOVERY, "recover_delay", 200, "The amount of time (in ticks) a player must go without taking damage before his/her absorption shield begins to recover. If this is less than 0, players will not naturally recover lost absorption shields. Default is 200.");
-        Properties.add(config, Properties.RECOVERY, "recover_rate", 0.1, "The amount of absorption health regenerated each tick while recovering. Default is 0.1.");
-        Properties.add(config, Properties.RECOVERY, "update_time", 5, "The number of ticks between shield recovery updates. Default is 5.");
+        public final float DEATH_PENALTY = this.prop("death_penalty", 4.0F,
+        	"The amount of natural absorption a player loses with each death. Will not reduce below \'min_absorption\'.");
 
-        Properties.add(config, Properties.UPGRADES, "absorption_gain", 4.0, "The amount of maximum absorption gained when a book of absorption is used. Default is 4.0.");
-        Properties.add(config, Properties.UPGRADES, "compatible_recipe", false, "If true, the recipe will be registered differently, which will hide it from mods (including recipe guides). Only use this for compatibility reasons. Default is false.");
-        Properties.add(config, Properties.UPGRADES, "level_cost", 30, "The number of levels required to use a book of absorption. Default is 30.");
-        Properties.add(config, Properties.UPGRADES, "recipe", 3, "The recipe for making a book of absorption. Default is 3.\n 0 - cannot be crafted\n 1 - book + item\n 2 - book surrounded by 4 items\n 3 - book surrounded by 8 items");
-        Properties.add(config, Properties.UPGRADES, "recipe_alt", false, "If true, a book and quill will be required to craft a book of absorption instead of a regular book. Default is false.");
-        Properties.add(config, Properties.UPGRADES, "recipe_item", "golden_apple", "The item id of the item required in the absorption book recipe. Default is golden_apple.");
-        Properties.add(config, Properties.UPGRADES, "recipe_item_damage", 0, "The item damage required for the item in the recipe. 32767 will match any damage value. Default is 0 (regular golden apple; 1 is epic).");
+        public final float GLOBAL_MAX_SHIELD = this.prop("global_max_absorption", Float.POSITIVE_INFINITY,
+        	"The total maximum absorption a player may obtain through natural, enchant, and/or armor replacement absorption.\n"
+        	+ "Does not include max absorption gained from potions.");
 
-        config.addCustomCategoryComment(Properties.GENERAL, "General and/or miscellaneous options.\nAll absorption amounts are in half hearts.");
-        config.addCustomCategoryComment(Properties.ARMOR, "Options related to armor replacement.");
-        config.addCustomCategoryComment(Properties.ENCHANT, "Options for the Absorption enchantment.");
-        config.addCustomCategoryComment(Properties.RECOVERY, "Options relating to absorption shield recovery.");
-        config.addCustomCategoryComment(Properties.UPGRADES, "Options related to upgrading your absorption shield.");
-        config.save();
+        public final float MAX_SHIELD = this.prop("max_absorption", 20.0F,
+        	"The maximum natural absorption a player may obtain.\n"
+        	+ "Does not include max absorption gained from potions or armor.");
+
+        public final float MIN_SHIELD = this.prop("min_absorption", 8.0F,
+        	"A player will not drop below this much natural absorption due to death penalty.");
+
+        public final boolean RECOVER_ON_SPAWN = this.prop("recover_on_spawn", true,
+        	"If true, players will start out and respawn with full absorption shields (instead of 0).");
+
+        public final float STARTING_SHIELD = this.prop("starting_absorption", 4.0F,
+        	"The amount of natural absorption a new player starts with.");
+
+    };
+
+	public final ARMOR ARMOR = new ARMOR();
+	public class ARMOR extends PropertyCategory {
+		@Override
+		public String name() { return "armor"; }
+		@Override
+		protected String comment() {
+			return "Options related to armor replacement.\n"
+				+ "This part of the mod is disabled by default; enable \"_replace_armor\" to activate it.";
+		}
+
+		public final boolean REPLACE_ARMOR = this.prop("_replace_armor", false,
+			"If true, player armor will provide max absorption instead of damage reduction.");
+
+		public final boolean FRIENDLY_DURABILITY = this.prop("durability_friendly", true,
+			"If true, armor will only take durability damage based on damage dealt to your absorption when \"_replace_armor\" is enabled.");
+
+		public final float DURABILITY_MULT = this.prop("durability_multiplier", 2.0F,
+        	"The multiplier applied to durability damage when \"_replace_armor\" is enabled.");
+
+        public final String DURABILITY_TRIGGER = this.prop("durability_trigger", "all",
+        	"How armor durability is damaged when \"_replace_armor\" is enabled.\n"
+        	+ " all     - all damage\n"
+        	+ " vanilla - only damage normally affected by armor\n"
+        	+ " hits    - all damage except damage-over-time effects (poison, burning, etc.)",
+        	"all", "vanilla", "hits");
+
+		public final boolean HIDE_ARMOR_BAR = this.prop("hide_armor_bar", true,
+			"If true, the armor bar will not be rendered when \"_replace_armor\" is enabled.");
+
+		public final float MULTIPLIER = this.prop("multiplier", 1.0F,
+			"If \"_replace_armor\" or \"multiplier_override\" is enabled, this is the amount of max absorption that armor grants per armor point.\n"
+			+ "Limited by \"global_max_absorption\".");
+
+		public final boolean MULTIPLIER_OVERRIDE = this.prop("multiplier_override", false,
+			"If true, players will gain absorption from their armor, even if \"_replace_armor\" is not enabled.\n"
+			+ "Note that this does not enable the armor durability controls.");
+
     }
 
-    // Gets the mod's random number generator.
-    public static Random random() {
-        return _NaturalAbsorption.random;
+	public final ENCHANT ENCHANT = new ENCHANT();
+	public class ENCHANT extends PropertyCategory {
+		@Override
+		public String name() { return "enchantment"; }
+		@Override
+		protected String comment() {
+			return "Options for the Absorption enchantment.";
+		}
+
+		public final boolean BOOKS = this.prop("books", true,
+			"If false, the Absorption enchantment will not be allowed on books.");
+
+		public final int ID = this.prop("id", 216,
+			"The enchantment id for the Absorption enchantment. Set to 0 to disable the enchantment entirely.\n"
+			+ "This is for savegame data only. The id is \"" + ModNaturalAbsorption.MODID + ":" + "absorption" + "\" for practical purposes.",
+			PropertyCategory.RINT_SRT_POS);
+
+		public final float POTENCY = this.prop("potency", 4.0F,
+			"Max absorption gained for each rank of the Absorption enchantment.");
+
+        public final float POTENCY_BASE = this.prop("potency_base", 2.0F,
+        	"Max absorption gained for for having at least one rank of the Absorption enchantment. A negative value reduces the effect of the first rank(s).",
+        	PropertyCategory.RFLT_ALL);
+
+        public final float POTENCY_MAX = this.prop("potency_max", 20.0F,
+        	"The limit on max absorbtion that can be gained from Absorption enchantments on a single player.");
+
+        public final String RARITY = this.prop("rarity", "rare",
+        	"The rarity of the Absorption enchantment. Relates to how often it is selected when enchanting a valid item.",
+    		"common", "uncommon", "rare", "very_rare");
+
+        public final String SLOT = this.prop("slot", "any",
+        	"The slot the Absorption enchantment is normally applicable to. Will still work on any armor piece if force-applied (e.g., creative mode anvil).",
+        	"any", "head", "chest", "legs", "feet");
+
+        public final boolean STACKING = this.prop("stacking", true,
+        	"If false, only the highest level Absorption enchantment will be counted. Otherwise, all equipped Absorption enchantments are added together.");
+
+        public final boolean TREASURE = this.prop("treasure", false,
+        	"If true, the Absorption enchantment will not be generated by enchanting tables.");
+
     }
 
-    // Passes to the mod.
-    public static void debugException(String message) {
-        _NaturalAbsorption.debugException(message);
+	public final RECOVERY RECOVERY = new RECOVERY();
+	public class RECOVERY extends PropertyCategory {
+		@Override
+		public String name() { return "recovery"; }
+		@Override
+		protected String comment() {
+			return "Options relating to absorption shield recovery.";
+		}
+
+		public final int DELAY = this.prop("recover_delay", 8 * 20,
+			"The amount of time (in ticks) a player must go without taking damage before thier absorption shield begins to recover. (20 ticks = 1 second)\n"
+			+ "If this is less than 0, players will not naturally recover lost absorption shields.",
+			PropertyCategory.RINT_TOKEN_NEG);
+
+		public final float RATE = this.prop("recover_rate", 0.1F,
+			"The amount of absorption health regenerated each tick while recovering. (0.1 health/tick = 1 heart/second)");
+
+		public final int UPDATE_TIME = this.prop("update_time", 5,
+        	"The number of ticks between shield recovery updates. (20 ticks = 1 second)",
+			PropertyCategory.RINT_POS1);
+
     }
 
-    // Loads the property as the specified value.
-    public static void add(Configuration config, String category, String field, String defaultValue, String comment) {
-        Properties.map.put(category + "@" + field, config.get(category, field, defaultValue, comment).getString());
+	public final UPGRADES UPGRADES = new UPGRADES();
+	public class UPGRADES extends PropertyCategory {
+		@Override
+		public String name() { return "upgrades"; }
+		@Override
+		protected String comment() {
+			return "Options related to upgrading your natural absorption shield.";
+		}
+
+		public final float ABSORPTION_GAIN = this.prop("absorption_gain", 4.0F,
+			"The amount of max natural absorption gained when a book of absorption is used.");
+
+		public final int LEVEL_COST = this.prop("level_cost", 20,
+        	"The number of levels required to use a book of absorption.");
+
+        public final int RECIPE = this.prop("recipe", 3,
+        	"The recipe for making a book of absorption.\n"
+        	+ " 0 - cannot be crafted\n"
+        	+ " 1 - book + item (shapeless)\n"
+        	+ " 2 - book surrounded by 4 items\n"
+        	+ " 3 - book surrounded by 8 items",
+        	0, 3);
+
+        public final boolean RECIPE_ALT = this.prop("recipe_alt", true,
+        	"If true, a book and quill will be required to craft a book of absorption instead of a regular book.");
+
+        public final String RECIPE_ITEM = this.prop("recipe_item", Item.REGISTRY.getNameForObject(Items.GOLDEN_APPLE).toString(),
+        	"The item id of the item required in the absorption book recipe.", "mod_id:item_name");
+
+        public final int RECIPE_ITEM_DAMAGE = this.prop("recipe_item_damage", 0,
+        	"The item damage required for the item in the recipe. " + OreDictionary.WILDCARD_VALUE + " will match any damage value.",
+        	PropertyCategory.RINT_SRT_POS);
+
     }
 
-    public static void add(Configuration config, String category, String field, int defaultValue, String comment) {
-        Properties.map.put(category + "@" + field, Integer.valueOf(config.get(category, field, defaultValue, comment).getInt(defaultValue)));
-    }
 
-    public static void add(Configuration config, String category, String field, boolean defaultValue, String comment) {
-        Properties.map.put(category + "@" + field, Boolean.valueOf(config.get(category, field, defaultValue, comment).getBoolean(defaultValue)));
-    }
+	private static Configuration config;
+	private static Properties INSTANCE;
 
-    public static void add(Configuration config, String category, String field, double defaultValue, String comment) {
-        Properties.map.put(category + "@" + field, Double.valueOf(config.get(category, field, defaultValue, comment).getDouble(defaultValue)));
-    }
+    // Contains basic implementations for all config option types, along with some useful constants.
+	private static abstract class PropertyCategory {
 
-    // Gets the Object property.
-    public static Object getProperty(String category, String field) {
-        return Properties.map.get(category + "@" + field);
-    }
+		/** Range: { -INF, INF } */
+		protected static final double[] RDBL_ALL = { Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY };
+		/** Range: { 0.0, INF } */
+		protected static final double[] RDBL_POS = { 0.0, Double.POSITIVE_INFINITY };
+		/** Range: { 0.0, 1.0 } */
+		protected static final double[] RDBL_ONE = { 0.0, 1.0 };
 
-    // Gets the value of the property (instead of an Object representing it).
-    public static String getString(String category, String field) {
-        return Properties.getProperty(category, field).toString();
-    }
+		/** Range: { -INF, INF } */
+		protected static final float[] RFLT_ALL = { Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY };
+		/** Range: { 0.0, INF } */
+		protected static final float[] RFLT_POS = { 0.0F, Float.POSITIVE_INFINITY };
+		/** Range: { 0.0, 1.0 } */
+		protected static final float[] RFLT_ONE = { 0.0F, 1.0F };
 
-    public static boolean getBoolean(String category, String field) {
-        Object property = Properties.getProperty(category, field);
-        if (property instanceof Boolean)
-            return ((Boolean) property).booleanValue();
-        if (property instanceof Integer)
-            return Properties.random().nextInt( ((Number) property).intValue()) == 0;
-        if (property instanceof Double)
-            return Properties.random().nextDouble() < ((Number) property).doubleValue();
-        Properties.debugException("Tried to get boolean for invalid property! @" + property == null ? "(null)" : property.getClass().getName());
-        return false;
-    }
+		/** Range: { MIN, MAX } */
+		protected static final int[] RINT_ALL = { Integer.MIN_VALUE, Integer.MAX_VALUE };
+		/** Range: { -1, MAX } */
+		protected static final int[] RINT_TOKEN_NEG = { -1, Integer.MAX_VALUE };
+		/** Range: { 0, MAX } */
+		protected static final int[] RINT_POS0 = { 0, Integer.MAX_VALUE };
+		/** Range: { 1, MAX } */
+		protected static final int[] RINT_POS1 = { 1, Integer.MAX_VALUE };
+		/** Range: { 0, SRT } */
+		protected static final int[] RINT_SRT_POS = { 0, Short.MAX_VALUE };
+		/** Range: { 0, 255 } */
+		protected static final int[] RINT_BYT_UNS = { 0, 0xff };
+		/** Range: { 0, 127 } */
+		protected static final int[] RINT_BYT_POS = { 0, Byte.MAX_VALUE };
 
-    public static int getInt(String category, String field) {
-        Object property = Properties.getProperty(category, field);
-        if (property instanceof Number)
-            return ((Number) property).intValue();
-        if (property instanceof Boolean)
-            return ((Boolean) property).booleanValue() ? 1 : 0;
-        Properties.debugException("Tried to get int for invalid property! @" + property == null ? "(null)" : property.getClass().getName());
-        return 0;
-    }
+		public PropertyCategory() {
+	        Properties.config.addCustomCategoryComment(this.name(), this.comment());
+		}
 
-    public static double getDouble(String category, String field) {
-        Object property = Properties.getProperty(category, field);
-        if (property instanceof Number)
-            return ((Number) property).doubleValue();
-        if (property instanceof Boolean)
-            return ((Boolean) property).booleanValue() ? 1.0 : 0.0;
-        Properties.debugException("Tried to get double for invalid property! @" + property == null ? "(null)" : property.getClass().getName());
-        return 0.0;
-    }
+		public abstract String name();
+		protected abstract String comment();
+
+		protected double[] defaultDblRange() {
+			return PropertyCategory.RDBL_POS;
+		}
+		protected float[] defaultFltRange() {
+			return PropertyCategory.RFLT_POS;
+		}
+		protected int[] defaultIntRange() {
+			return PropertyCategory.RINT_POS0;
+		}
+
+		protected boolean prop(String key, boolean defaultValue, String comment) {
+	    	return this.cprop(key, defaultValue, comment).getBoolean();
+	    }
+		protected Property cprop(String key, boolean defaultValue, String comment) {
+	    	comment = this.amendComment(comment, "Boolean", defaultValue, new Object[] { true, false });
+	    	return Properties.config.get(this.name(), key, defaultValue, comment);
+	    }
+
+		protected boolean[] prop(String key, boolean[] defaultValues, String comment) {
+	    	return this.cprop(key, defaultValues, comment).getBooleanList();
+	    }
+		protected Property cprop(String key, boolean[] defaultValues, String comment) {
+	    	comment = this.amendComment(comment, "Boolean_Array", Arrays.asList(defaultValues).toArray(), new Object[] { true, false });
+	    	return Properties.config.get(this.name(), key, defaultValues, comment);
+	    }
+
+		protected int prop(String key, int defaultValue, String comment) {
+	    	return this.cprop(key, defaultValue, comment).getInt();
+	    }
+		protected int prop(String key, int defaultValue, String comment, int... range) {
+	    	return this.cprop(key, defaultValue, comment, range).getInt();
+	    }
+		protected Property cprop(String key, int defaultValue, String comment) {
+	    	return this.cprop(key, defaultValue, comment, this.defaultIntRange());
+	    }
+		protected Property cprop(String key, int defaultValue, String comment, int... range) {
+	    	comment = this.amendComment(comment, "Integer", defaultValue, range[0], range[1]);
+	    	return Properties.config.get(this.name(), key, defaultValue, comment, range[0], range[1]);
+	    }
+
+		protected int[] prop(String key, int[] defaultValues, String comment) {
+	    	return this.cprop(key, defaultValues, comment).getIntList();
+	    }
+		protected int[] prop(String key, int[] defaultValues, String comment, int... range) {
+	    	return this.cprop(key, defaultValues, comment, range).getIntList();
+	    }
+		protected Property cprop(String key, int[] defaultValues, String comment) {
+	    	return this.cprop(key, defaultValues, comment, this.defaultIntRange());
+	    }
+		protected Property cprop(String key, int[] defaultValues, String comment, int... range) {
+	    	comment = this.amendComment(comment, "Integer_Array", Arrays.asList(defaultValues).toArray(), range[0], range[1]);
+	    	return Properties.config.get(this.name(), key, defaultValues, comment, range[0], range[1]);
+	    }
+
+		protected float prop(String key, float defaultValue, String comment) {
+	    	return (float) this.cprop(key, defaultValue, comment).getDouble();
+	    }
+	    protected float prop(String key, float defaultValue, String comment, float... range) {
+	    	return (float) this.cprop(key, defaultValue, comment, range).getDouble();
+	    }
+	    protected Property cprop(String key, float defaultValue, String comment) {
+	    	return this.cprop(key, defaultValue, comment, this.defaultFltRange());
+	    }
+	    protected Property cprop(String key, float defaultValue, String comment, float... range) {
+	    	comment = this.amendComment(comment, "Float", defaultValue, range[0], range[1]);
+	    	return Properties.config.get(this.name(), key, this.prettyFloatToDouble(defaultValue), comment, this.prettyFloatToDouble(range[0]), this.prettyFloatToDouble(range[1]));
+	    }
+
+		protected double prop(String key, double defaultValue, String comment) {
+	    	return this.cprop(key, defaultValue, comment).getDouble();
+	    }
+	    protected double prop(String key, double defaultValue, String comment, double... range) {
+	    	return this.cprop(key, defaultValue, comment, range).getDouble();
+	    }
+	    protected Property cprop(String key, double defaultValue, String comment) {
+	    	return this.cprop(key, defaultValue, comment, this.defaultDblRange());
+	    }
+	    protected Property cprop(String key, double defaultValue, String comment, double... range) {
+	    	comment = this.amendComment(comment, "Double", defaultValue, range[0], range[1]);
+	    	return Properties.config.get(this.name(), key, defaultValue, comment, range[0], range[1]);
+	    }
+
+	    protected double[] prop(String key, double[] defaultValues, String comment) {
+	    	return this.cprop(key, defaultValues, comment).getDoubleList();
+	    }
+	    protected double[] prop(String key, double[] defaultValues, String comment, double... range) {
+	    	return this.cprop(key, defaultValues, comment, range).getDoubleList();
+	    }
+	    protected Property cprop(String key, double[] defaultValues, String comment) {
+	    	return this.cprop(key, defaultValues, comment, this.defaultDblRange());
+	    }
+	    protected Property cprop(String key, double[] defaultValues, String comment, double... range) {
+	    	comment = this.amendComment(comment, "Double_Array", Arrays.asList(defaultValues).toArray(), range[0], range[1]);
+	    	return Properties.config.get(this.name(), key, defaultValues, comment, range[0], range[1]);
+	    }
+
+	    protected String prop(String key, String defaultValue, String comment, String valueDescription) {
+	    	return this.cprop(key, defaultValue, comment, valueDescription).getString();
+	    }
+	    protected String prop(String key, String defaultValue, String comment, String... validValues) {
+	    	return this.cprop(key, defaultValue, comment, validValues).getString();
+	    }
+	    protected Property cprop(String key, String defaultValue, String comment, String valueDescription) {
+	    	comment = this.amendComment(comment, "String", defaultValue, valueDescription);
+	    	return Properties.config.get(this.name(), key, defaultValue, comment, new String[0]);
+	    }
+	    protected Property cprop(String key, String defaultValue, String comment, String... validValues) {
+	    	comment = this.amendComment(comment, "String", defaultValue, validValues);
+	    	return Properties.config.get(this.name(), key, defaultValue, comment, validValues);
+	    }
+
+	    private String amendComment(String comment, String type, Object[] defaultValues, String description) {
+	    	return this.amendComment(comment, type, this.toReadable(defaultValues), description);
+	    }
+	    private String amendComment(String comment, String type, Object[] defaultValues, Object min, Object max) {
+	    	return this.amendComment(comment, type, this.toReadable(defaultValues), min, max);
+	    }
+	    private String amendComment(String comment, String type, Object[] defaultValues, Object[] validValues) {
+	    	return this.amendComment(comment, type, this.toReadable(defaultValues), validValues);
+	    }
+	    private String amendComment(String comment, String type, Object defaultValue, String description) {
+	    	return new StringBuilder(comment).append("\n   >> ").append(type).append(":[ ")
+	    		.append("Value={ ").append(description).append(" }, Default=").append(defaultValue)
+	    		.append(" ]").toString();
+	    }
+	    private String amendComment(String comment, String type, Object defaultValue, Object min, Object max) {
+	    	return new StringBuilder(comment).append("\n   >> ").append(type).append(":[ ")
+	    		.append("Range={ ").append(min).append(", ").append(max).append(" }, Default=").append(defaultValue)
+	    		.append(" ]").toString();
+	    }
+	    private String amendComment(String comment, String type, Object defaultValue, Object[] validValues) {
+	    	if (validValues.length < 2) throw new IllegalArgumentException("Attempted to create config with no options!");
+
+	    	return new StringBuilder(comment).append("\n   >> ").append(type).append(":[ ")
+	    		.append("Valid_Values={ ").append(this.toReadable(validValues)).append(" }, Default=").append(defaultValue)
+	    		.append(" ]").toString();
+	    }
+
+	    private double prettyFloatToDouble(float f) {
+	    	return Double.parseDouble(Float.toString(f));
+	    }
+	    private String toReadable(Object[] array) {
+	    	if (array.length <= 0) return "";
+
+	    	StringBuilder commentBuilder = new StringBuilder();
+    		for (Object value : array) {
+    			commentBuilder.append(value).append(", ");
+    		}
+    		return commentBuilder.substring(0, commentBuilder.length() - 2).toString();
+	    }
+	}
 }
