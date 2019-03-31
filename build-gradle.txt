@@ -1,0 +1,4 @@
+
+version = "1.0.0_for_mc1.12.2"
+group = "fathertoast.naturalabsorption"
+archivesBaseName = "naturalabsorption"

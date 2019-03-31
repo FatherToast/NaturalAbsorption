@@ -1,0 +1,66 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+  },
+  "criteria": {
+    "has_apple": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:apple"
+          }
+        ]
+      }
+    },
+    "has_golden_apple": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:golden_apple"
+          }
+        ]
+      }
+    },
+    "has_book": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:book"
+          }
+        ]
+      }
+    },
+    "has_writable_book": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:writable_book"
+          }
+        ]
+      }
+    },
+    "has_the_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "naturalabsorption:book_absorption"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_apple",
+      "has_golden_apple",
+      "has_book",
+      "has_writable_book",
+      "has_the_item"
+    ]
+  ]
+}

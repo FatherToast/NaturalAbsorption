@@ -1,6 +1,0 @@
-{
-    "parent": "natural_absorption:item/simple_item",
-    "textures": {
-        "layer0": "minecraft:items/book_enchanted"
-    }
-}
