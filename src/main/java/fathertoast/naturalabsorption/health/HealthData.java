@@ -166,6 +166,11 @@ class HealthData
 			recovered = Config.get( ).ABSORPTION_HEALTH.RECOVER_RATE * Config.get( ).GENERAL.UPDATE_TIME;
 		}
 		
+		// Handle hunger cost restrictions
+		if( owner.getFoodStats( ).getFoodLevel( ) < Config.get( ).ABSORPTION_HEALTH.HUNGER_REQUIRED ) {
+			return;
+		}
+		
 		// Recover absorption health, if needed
 		float effectiveCapacity = getEffectiveCapacity( );
 		float currentAbsorption = owner.getAbsorptionAmount( );
@@ -181,7 +186,14 @@ class HealthData
 			}
 			
 			// Add absorption recovery
-			owner.setAbsorptionAmount( Math.min( effectiveCapacity, currentAbsorption + recovered ) );
+			
+			float newAbsorption = Math.min( effectiveCapacity, currentAbsorption + recovered );
+			owner.setAbsorptionAmount( newAbsorption );
+			
+			// consume hunger if needed
+			if ( newAbsorption - currentAbsorption > 0 && Config.get( ).ABSORPTION_HEALTH.HUNGER_COST > 0 ) {
+				owner.getFoodStats( ).addExhaustion( ( newAbsorption - currentAbsorption ) * Config.get( ).ABSORPTION_HEALTH.HUNGER_COST );
+			}
 		}
 	}
 	
