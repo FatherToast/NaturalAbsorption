@@ -6,6 +6,7 @@ import fathertoast.naturalabsorption.config.*;
 import fathertoast.naturalabsorption.health.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -67,9 +68,16 @@ class ItemAbsorptionBook extends Item
 				//noinspection ConstantConditions
 				player.addStat( StatList.getObjectUseStats( this ) );
 			}
+			
+			// play sound to show success
+	        player.playSound( SoundEvents.ENTITY_PLAYER_LEVELUP, 1f, 1f );
+	        
 			return ActionResult.newResult( EnumActionResult.SUCCESS, book );
 		}
 		
+		// tell the player why right click failed
+    	player.sendStatusMessage( new TextComponentTranslation( "item.naturalabsorption.book_absorption.not_enough_levels", levelCost ), true );
+    	
 		return ActionResult.newResult( EnumActionResult.FAIL, book );
 	}
 	

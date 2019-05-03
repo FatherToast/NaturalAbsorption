@@ -7,5 +7,6 @@ item.naturalabsorption.book_absorption.tooltip.max=Max Absorption
 item.naturalabsorption.book_absorption.tooltip.cost=Cost: %d levels
 item.naturalabsorption.book_absorption.tooltip.canuse=Right click to use
 item.naturalabsorption.book_absorption.tooltip.nouse=You can't use this
+item.naturalabsorption.book_absorption.not_enough_levels=Requires at least %s levels to use
 
 enchantment.naturalabsorption.absorption=Absorption
