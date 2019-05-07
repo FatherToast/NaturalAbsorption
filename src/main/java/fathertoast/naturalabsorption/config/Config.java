@@ -135,6 +135,17 @@ class Config
 			"starting_absorption", 4.0F,
 			"The amount of natural absorption a new player starts with."
 		);
+		
+		public final float HUNGER_COST = prop(
+			"hunger_cost", 0F,
+			"The amount of hunger or saturation drained for each point of absorption health regenerated.\n" +
+			"Players can't lose more than 10 points of hunger or saturation at a time in this way."
+		) * 4.0F; // Conversion from hunger/health to exhaustion/health
+		
+		public final int HUNGER_REQUIRED = prop(
+			"hunger_required", 0,
+			"Players need to have at least this much hunger to regenerate absorption health."
+		);
 	}
 	
 	public final ABSORPTION_UPGRADES ABSORPTION_UPGRADES = new ABSORPTION_UPGRADES( );
