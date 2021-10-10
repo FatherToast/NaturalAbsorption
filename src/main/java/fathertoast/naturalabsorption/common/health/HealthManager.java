@@ -1,61 +1,48 @@
-package fathertoast.naturalabsorption.health;
+package fathertoast.naturalabsorption.common.health;
 
-import fathertoast.naturalabsorption.*;
-import fathertoast.naturalabsorption.config.*;
-import fathertoast.naturalabsorption.item.*;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
-import net.minecraft.item.ItemFood;
+import fathertoast.naturalabsorption.MessageCapacity;
+import fathertoast.naturalabsorption.ObfuscationHelper;
+import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
-import net.minecraft.world.WorldServer;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public
-class HealthManager
-{
+public class HealthManager {
 	// Set of all currently altered damage sources.
 	private static final Set< DamageSource > MODDED_SOURCES = new HashSet<>( );
 	
 	// Returns true if the given damage source is modified to ignore armor.
-	private static
-	boolean isSourceModified( DamageSource source ) { return MODDED_SOURCES.contains( source ); }
+	private static boolean isSourceModified( DamageSource source ) { return MODDED_SOURCES.contains( source ); }
 	
 	// Modifies a source to ignore armor.
-	private static
-	void modifySource( DamageSource source )
-	{
-		if( source.isUnblockable( ) )
+	private static void modifySource( DamageSource source ) {
+		if( source.isBypassInvul( ) )
 			return;
 		ObfuscationHelper.DamageSource_isUnblockable.set( source, true );
 	}
 	
 	// Undoes any modification done to a damage source.
-	private static
-	void unmodifySource( DamageSource source )
-	{
+	private static void unmodifySource( DamageSource source ) {
 		ObfuscationHelper.DamageSource_isUnblockable.set( source, false );
 		MODDED_SOURCES.remove( source );
 	}
 	
 	// Undoes all modification done to all damage sources.
 	@SuppressWarnings( "WeakerAccess" )
-	public static
-	void clearSources( )
-	{
+	public static void clearSources( ) {
 		for( DamageSource source : MODDED_SOURCES ) {
 			ObfuscationHelper.DamageSource_isUnblockable.set( source, false );
 		}
@@ -63,31 +50,27 @@ class HealthManager
 	}
 	
 	/** @return The absorption capacity granted by equipment. */
-	public static
-	float getArmorAbsorption( EntityPlayer player )
-	{
+	public static float getArmorAbsorption( PlayerEntity player ) {
 		float bonus = 0.0F;
 		
 		// From armor
 		if( Config.get( ).ARMOR.REPLACE_ARMOR || Config.get( ).ARMOR.ARMOR_MULT_OVERRIDE ) {
-			bonus += Config.get( ).ARMOR.ARMOR_MULT * player.getTotalArmorValue( );
+			bonus += Config.get( ).ARMOR.ARMOR_MULT * player.getArmorCoverPercentage( );
 		}
 		
 		// From enchantments
 		if( Config.get( ).ENCHANTMENT.ENABLED ) {
-			bonus += EnchantmentAbsorption.getBonusCapacity( player );
+			bonus += AbsorptionEnchantment.getBonusCapacity( player );
 		}
 		
 		return bonus;
 	}
 	
 	/** @return The absorption capacity granted by potion effects. */
-	public static
-	float getPotionAbsorption( EntityPlayer player )
-	{
-		PotionEffect absorptionPotion = player.getActivePotionEffect( MobEffects.ABSORPTION );
-		if( absorptionPotion != null ) {
-			return 4 * (absorptionPotion.getAmplifier( ) + 1);
+	public static float getPotionAbsorption( PlayerEntity player ) {
+		if ( player.hasEffect( Effects.ABSORPTION ) ) {
+			EffectInstance absorptionPotion = player.getEffect( Effects.ABSORPTION );
+			return 4 * ( absorptionPotion.getAmplifier( ) + 1 );
 		}
 		return 0.0F;
 	}
@@ -105,9 +88,7 @@ class HealthManager
 	 * @param event The event data.
 	 */
 	@SubscribeEvent( priority = EventPriority.NORMAL )
-	public
-	void onServerTick( TickEvent.ServerTickEvent event )
-	{
+	public void onServerTick( TickEvent.ServerTickEvent event ) {
 		if( event.phase == TickEvent.Phase.END ) {
 			// Counter for cache cleanup.
 			if( ++cleanupCounter >= 600 ) {
@@ -119,20 +100,25 @@ class HealthManager
 			// Counter for player shield update.
 			if( ++updateCounter >= Config.get( ).GENERAL.UPDATE_TIME ) {
 				updateCounter = 0;
-				WorldServer[] worlds = FMLCommonHandler.instance( ).getMinecraftServerInstance( ).worlds;
-				for( WorldServer world : worlds ) {
+
+				// TODO
+				/*
+				ServerWorld[] worlds = something.getAllServerWorlds();
+				for( ServerWorld world : worlds ) {
 					if( world != null ) {
 						if( Config.get( ).NORMAL_HEALTH.ENABLED && Config.get( ).NORMAL_HEALTH.DISABLE_GAMERULE_REGEN ) {
 							world.getGameRules( ).setOrCreateGameRule( "naturalRegeneration", "false" );
 						}
 						
-						for( EntityPlayer player : new ArrayList<>( world.playerEntities ) ) {
+						for( PlayerEntity player : new ArrayList<>( world.playerEntities ) ) {
 							if( player != null && player.isEntityAlive( ) ) {
 								HealthData.get( player ).update( );
 							}
 						}
 					}
 				}
+
+				 */
 			}
 		}
 	}
@@ -145,15 +131,14 @@ class HealthManager
 	 * @param event The event data.
 	 */
 	@SubscribeEvent( priority = EventPriority.NORMAL )
-	public
-	void onItemUseFinish( LivingEntityUseItemEvent.Finish event )
-	{
-		if( event.getEntityLiving( ) instanceof EntityPlayer && !event.getEntityLiving( ).world.isRemote ) {
+	public void onItemUseFinish( LivingEntityUseItemEvent.Finish event ) {
+		if( event.getEntityLiving( ) instanceof PlayerEntity && !event.getEntityLiving( ).level.isClientSide ) {
 			if( Config.get( ).NORMAL_HEALTH.ENABLED && Config.get( ).NORMAL_HEALTH.FOOD_HEALING > 0.0F ) {
 				// Apply healing from food
 				ItemStack stack = event.getItem( );
-				if( !stack.isEmpty( ) && stack.getItem( ) instanceof ItemFood ) {
-					int hungerRestore = ((ItemFood) stack.getItem( )).getHealAmount( stack );
+				if( !stack.isEmpty( ) && stack.getItem( ).getFoodProperties( ) != null ) {
+					int hungerRestore = stack.getItem( ).getFoodProperties( ).getNutrition( );
+
 					if( hungerRestore > 0 ) {
 						event.getEntityLiving( ).heal( hungerRestore * Config.get( ).NORMAL_HEALTH.FOOD_HEALING );
 					}
@@ -170,11 +155,9 @@ class HealthManager
 	 * @param event The event data.
 	 */
 	@SubscribeEvent( priority = EventPriority.NORMAL )
-	public
-	void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event )
-	{
-		if( !event.player.world.isRemote && !event.isEndConquered( ) ) {
-			HealthData data = HealthData.get( event.player );
+	public void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event ) {
+		if( !event.getPlayer().level.isClientSide && !event.isEndConquered( ) ) {
+			HealthData data = HealthData.get( event.getPlayer( ) );
 			
 			// Apply death penalty
 			if( Config.get( ).ABSORPTION_HEALTH.ENABLED && Config.get( ).ABSORPTION_HEALTH.DEATH_PENALTY > 0.0F && data.getAbsorptionCapacity( ) > Config.get( ).ABSORPTION_HEALTH.DEATH_PENALTY_LIMIT ) {
@@ -206,11 +189,9 @@ class HealthManager
 	 * @param event The event data.
 	 */
 	@SubscribeEvent( priority = EventPriority.NORMAL )
-	public
-	void onJoinWorld( EntityJoinWorldEvent event )
-	{
-		if( !event.getWorld( ).isRemote && event.getEntity( ) instanceof EntityPlayer ) {
-			EntityPlayer player = (EntityPlayer) event.getEntity( );
+	public void onJoinWorld( EntityJoinWorldEvent event ) {
+		if( !event.getWorld( ).isClientSide && event.getEntity( ) instanceof PlayerEntity ) {
+			PlayerEntity player = (PlayerEntity) event.getEntity( );
 			
 			// An effort to fix the vanilla bug with absorption not updating properly
 			float absorptionHealth = player.getAbsorptionAmount( );
@@ -230,11 +211,9 @@ class HealthManager
 	 * @param event The event data.
 	 */
 	@SubscribeEvent( priority = EventPriority.LOWEST )
-	public
-	void onLivingHurt( LivingHurtEvent event )
-	{
-		if( event.getEntityLiving( ) instanceof EntityPlayer && !event.getEntityLiving( ).world.isRemote ) {
-			HealthData data = HealthData.get( (EntityPlayer) event.getEntityLiving( ) );
+	public void onLivingHurt( LivingHurtEvent event ) {
+		if( event.getEntityLiving( ) instanceof PlayerEntity && !event.getEntityLiving( ).level.isClientSide ) {
+			HealthData data = HealthData.get( (PlayerEntity) event.getEntityLiving( ) );
 			
 			// Interrupt recovery
 			data.startRecoveryDelay( );
@@ -242,12 +221,12 @@ class HealthManager
 			// Handle armor replacement, if enabled
 			if( Config.get( ).ABSORPTION_HEALTH.ENABLED && Config.get( ).ARMOR.REPLACE_ARMOR ) {
 				// Force damage to ignore armor
-				if( !event.getSource( ).isUnblockable( ) ) {
+				if( !event.getSource( ).isBypassArmor( ) ) {
 					modifySource( event.getSource( ) );
 				}
 				// Degrade armor
 				if( event.getAmount( ) > Config.get( ).ARMOR.DURABILITY_THRESHOLD &&
-				    !event.getSource( ).canHarmInCreative( ) && !"thorns".equalsIgnoreCase( event.getSource( ).damageType ) ) {
+				    !event.getSource( ).isBypassInvul( ) && !"thorns".equalsIgnoreCase( event.getSource( ).getMsgId( ) ) ) {
 					
 					switch( Config.get( ).ARMOR.DURABILITY_TRIGGER ) {
 						case NONE:
@@ -269,9 +248,7 @@ class HealthManager
 	}
 	
 	// Determines whether a damage source is damage-over-time.
-	private
-	boolean isSourceDamageOverTime( DamageSource source, float amount )
-	{
+	private boolean isSourceDamageOverTime( DamageSource source, float amount ) {
 		return source == DamageSource.MAGIC && amount <= 1.0F || // Poison damage
 		       source == DamageSource.WITHER || source == DamageSource.ON_FIRE ||
 		       source == DamageSource.IN_FIRE || source == DamageSource.LAVA ||
@@ -281,10 +258,8 @@ class HealthManager
 	}
 	
 	// Used to degrade armor durability when armor damage reduction is disabled.
-	private
-	void damageArmor( LivingHurtEvent event )
-	{
-		EntityPlayer player = (EntityPlayer) event.getEntityLiving( );
+	private void damageArmor( LivingHurtEvent event ) {
+		PlayerEntity player = (PlayerEntity) event.getEntityLiving( );
 		
 		float durabilityDamage = event.getAmount( );
 		
@@ -296,8 +271,8 @@ class HealthManager
 		durabilityDamage *= Config.get( ).ARMOR.DURABILITY_MULT;
 		
 		// Degrade armor durability
-		if( !event.getSource( ).canHarmInCreative( ) && durabilityDamage > 0.0F ) {
-			player.inventory.damageArmor( durabilityDamage );
+		if( !event.getSource( ).isBypassInvul( ) && durabilityDamage > 0.0F ) {
+			player.inventory.hurtArmor( event.getSource(), durabilityDamage );
 		}
 	}
 	

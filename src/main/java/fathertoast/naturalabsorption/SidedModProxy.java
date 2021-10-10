@@ -1,17 +1,16 @@
 package fathertoast.naturalabsorption;
 
-import fathertoast.naturalabsorption.health.*;
-import net.minecraft.entity.player.EntityPlayer;
+import fathertoast.naturalabsorption.common.health.HealthManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.common.MinecraftForge;
 
 public abstract
 class SidedModProxy
 {
 	public abstract
-	float getAbsorptionCapacity( EntityPlayer player );
+	float getAbsorptionCapacity( PlayerEntity player );
 	
-	public
-	EntityPlayer getPlayer( ) { return null; }
+	public PlayerEntity getPlayer( ) { return null; }
 	
 	public
 	void registerRenderers( ) { }

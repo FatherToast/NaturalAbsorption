@@ -1,22 +1,18 @@
 package fathertoast.naturalabsorption;
 
 import fathertoast.naturalabsorption.client.*;
-import fathertoast.naturalabsorption.health.*;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 
 public
 class MessageCapacity implements IMessage
 {
 	public static
-	void sendFor( EntityPlayer player )
+	void sendFor( PlayerEntity player )
 	{
-		if( player instanceof EntityPlayerMP ) {
-			NaturalAbsorptionMod.network( ).sendTo( new MessageCapacity( player ), (EntityPlayerMP) player );
+		if( player instanceof ServerPlayerEntity ) {
+			NaturalAbsorptionMod.network( ).sendTo( new MessageCapacity( player ), (ServerPlayerEntity) player );
 		}
 	}
 	

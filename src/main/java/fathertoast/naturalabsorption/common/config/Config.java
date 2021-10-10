@@ -1,12 +1,8 @@
-package fathertoast.naturalabsorption.config;
+package fathertoast.naturalabsorption.common.config;
 
 import fathertoast.naturalabsorption.*;
-import fathertoast.naturalabsorption.health.*;
-import fathertoast.naturalabsorption.item.*;
+import fathertoast.naturalabsorption.common.health.HealthManager;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
 

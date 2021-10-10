@@ -1,23 +1,14 @@
 package fathertoast.naturalabsorption;
 
-import fathertoast.naturalabsorption.config.*;
-import fathertoast.naturalabsorption.item.*;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public
-class ModObjects
-{
-	public static final Item BOOK_ABSORPTION = addInfo( "book_absorption", CreativeTabs.COMBAT, new ItemAbsorptionBook( ) );
-	
-	public static final Enchantment ENCHANTMENT_ABSORPTION = addInfo( "absorption", new EnchantmentAbsorption( ) );
+public class ModObjects {
 	
 	@SuppressWarnings( "ConstantConditions" )
 	private static final ResourceLocation ADV_BOOK_RECIPE = new ResourceLocation(
@@ -87,15 +78,15 @@ class ModObjects
 	public
 	enum EnchantArmorType
 	{
-		ALL( EnumEnchantmentType.ARMOR ),
-		HEAD( EnumEnchantmentType.ARMOR_HEAD ),
-		CHEST( EnumEnchantmentType.ARMOR_CHEST ),
-		LEGS( EnumEnchantmentType.ARMOR_LEGS ),
-		FEET( EnumEnchantmentType.ARMOR_FEET );
+		ALL( EnchantmentType.ARMOR ),
+		HEAD( EnchantmentType.ARMOR_HEAD ),
+		CHEST( EnchantmentType.ARMOR_CHEST ),
+		LEGS( EnchantmentType.ARMOR_LEGS ),
+		FEET( EnchantmentType.ARMOR_FEET );
 		
-		public final EnumEnchantmentType parentValue;
+		public final EnchantmentType parentValue;
 		
-		EnchantArmorType( EnumEnchantmentType parent ) { parentValue = parent; }
+		EnchantArmorType( EnchantmentType parent ) { parentValue = parent; }
 	}
 	
 	@SuppressWarnings( "unused" )
