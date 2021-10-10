@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="MIT License"
+issueTrackerURL="https://github.com/FatherToast/NaturalAbsorption/issues"
+
+[[mods]]
+modId="naturalabsorption"
+version="${file.jarVersion}"
+displayName="Natural Absorption"
+logoFile="logo.png"
+credits="Sarinsa (some code stuff)"
+authors="FatherToast"
+description='''
+Puts the vanilla mechanic 'absorption' to use as a regenerating health buffer. Additionally adds options to disable and/or limit health regeneration.
+'''
+
+[[dependencies.naturalabsorption]]
+modId="forge"
+mandatory=true
+versionRange="[36.1.4,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.naturalabsorption]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.16.5,1.17)"
+ordering="NONE"
+side="BOTH"
