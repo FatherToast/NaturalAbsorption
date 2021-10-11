@@ -1,7 +1,10 @@
 package fathertoast.naturalabsorption.common.config;
 
-import fathertoast.naturalabsorption.*;
 import fathertoast.naturalabsorption.common.health.HealthManager;
+import fathertoast.naturalabsorption.common.item.recipe.RecipeStyle;
+import fathertoast.naturalabsorption.common.recipe.condition.BookRecipeCondition;
+import fathertoast.naturalabsorption.common.util.EnchantArmorType;
+import fathertoast.naturalabsorption.common.util.EnchantmentRarity;
 import net.minecraft.block.Block;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Logger;
@@ -13,19 +16,14 @@ import java.util.HashSet;
 /**
  * This helper class manages and stores references to user-defined configurations.
  */
-public
-class Config
-{
+public class Config {
 	// Returns the main config.
-	public static
-	Config get( )
+	public static Config get( )
 	{
 		return Config.INSTANCE;
 	}
 	
-	public static
-	void load( Logger logger, String fileName, File configDir )
-	{
+	public static void load( Logger logger, String fileName, File configDir ) {
 		Config.log = logger;
 		Config.log.info( "Loading configs..." );
 		long startTime = System.nanoTime( );
@@ -197,8 +195,8 @@ class Config
 			0.0F, Float.MAX_VALUE
 		);
 		
-		public final RecipeStyle.Type RECIPE = prop(
-			"recipe", RecipeStyle.Type.CROSS,
+		public final BookRecipeCondition.Type RECIPE = prop(
+			"recipe", BookRecipeCondition.Type.CROSS,
 			"The recipe for making a Book of Absorption.\n" +
 			"  none     - <no recipe>\n" +
 			"  simple   - aB  (book + apple, shapeless)\n" +
@@ -352,13 +350,13 @@ class Config
 			"The limit on max absorbtion that can be gained from Absorption enchantments on a single player."
 		);
 		
-		public final ModObjects.EnchantRarity RARITY = prop(
-			"rarity", ModObjects.EnchantRarity.RARE,
+		public final EnchantmentRarity RARITY = prop(
+			"rarity", EnchantmentRarity.RARE,
 			"The rarity of the Absorption enchantment. Relates to how often it is selected when enchanting a valid item."
 		);
 		
-		public final ModObjects.EnchantArmorType SLOT = prop(
-			"slot", ModObjects.EnchantArmorType.ALL,
+		public final EnchantArmorType SLOT = prop(
+			"slot", EnchantArmorType.ALL,
 			"The slot the Absorption enchantment is normally applicable to. Will still work on any armor piece\n" +
 			"if force-applied (e.g., creative mode anvil)."
 		);
@@ -446,7 +444,7 @@ class Config
 	}
 	
 	
-	static         Logger        log;
+	static Logger log;
 	// Config file currently being loaded. Null when not loading any file.
 	private static Configuration configLoading;
 	private static Config        INSTANCE;

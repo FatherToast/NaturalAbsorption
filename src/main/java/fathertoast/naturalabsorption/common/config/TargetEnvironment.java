@@ -1,4 +1,4 @@
-package fathertoast.naturalabsorption.config;
+package fathertoast.naturalabsorption.common.config;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
@@ -10,12 +10,9 @@ import net.minecraft.world.biome.Biome;
  * Note: this class has a natural ordering that is inconsistent with equals.
  */
 @SuppressWarnings( { "WeakerAccess", "unused" } )
-public abstract
-class TargetEnvironment implements Comparable< TargetEnvironment >
-{
-	public static
-	TargetEnvironment read( String line )
-	{
+public abstract class TargetEnvironment implements Comparable< TargetEnvironment > {
+
+	public static TargetEnvironment read( String line ) {
 		// Get the value parameter
 		String[] itemList = line.split( "=", 2 );
 		float    value;
@@ -56,17 +53,14 @@ class TargetEnvironment implements Comparable< TargetEnvironment >
 	private final int   priority;
 	private final float value;
 	
-	TargetEnvironment( int scope, float val )
-	{
+	TargetEnvironment( int scope, float val ) {
 		priority = scope;
 		value = val;
 	}
 	
-	public
-	float getValue( ) { return value; }
+	public float getValue( ) { return value; }
 	
-	public abstract
-	boolean applies( EnvironmentListConfig.LocationInfo location );
+	public abstract boolean applies( EnvironmentListConfig.LocationInfo location );
 	
 	@Override
 	public
@@ -76,23 +70,18 @@ class TargetEnvironment implements Comparable< TargetEnvironment >
 	public
 	String toString( ) { return "=" + value; }
 	
-	public static
-	class TargetBiome extends TargetEnvironment
-	{
+	public static class TargetBiome extends TargetEnvironment {
 		private final ResourceLocation registryName;
-		private final int              intId;
+		private final int intId;
 		
 		// Used to make on-demand targets
-		public
-		TargetBiome( Biome biome, float val )
-		{
+		public TargetBiome( Biome biome, float val ) {
 			super( -1, val );
 			registryName = biome.getRegistryName( );
 			intId = Biome.REGISTRY.getIDForObject( biome );
 		}
 		
-		TargetBiome( int scope, float val, String biomeId )
-		{
+		TargetBiome( int scope, float val, String biomeId ) {
 			super( scope, val );
 			
 			Biome biome = Biome.REGISTRY.getObject( new ResourceLocation( biomeId ) );
@@ -129,8 +118,7 @@ class TargetEnvironment implements Comparable< TargetEnvironment >
 		
 		@Override
 		public
-		boolean applies( EnvironmentListConfig.LocationInfo location )
-		{
+		boolean applies( EnvironmentListConfig.LocationInfo location ) {
 			return registryName != null ?
 			       registryName.equals( location.biomeName ) :
 			       intId == Biome.REGISTRY.getIDForObject( location.biome );
@@ -141,21 +129,16 @@ class TargetEnvironment implements Comparable< TargetEnvironment >
 		String toString( ) { return "biome/" + registryName + super.toString( ); }
 	}
 	
-	public static
-	class TargetBiomeGroup extends TargetEnvironment
-	{
+	public static class TargetBiomeGroup extends TargetEnvironment {
 		private final String registryNamePrefix;
 		
 		// Used to make on-demand targets
-		public
-		TargetBiomeGroup( String prefix, float val )
-		{
+		public TargetBiomeGroup( String prefix, float val ) {
 			super( -1, val );
 			registryNamePrefix = new ResourceLocation( prefix ).toString( );
 		}
 		
-		TargetBiomeGroup( int scope, float val, String biomeId )
-		{
+		TargetBiomeGroup( int scope, float val, String biomeId ) {
 			super( scope, val );
 			if( biomeId.isEmpty( ) ) {
 				Config.log.warn( "Detected empty biome group string 'biome/*' - this matches all biomes in the 'minecraft:' namespace. " +
@@ -165,34 +148,26 @@ class TargetEnvironment implements Comparable< TargetEnvironment >
 		}
 		
 		@Override
-		public
-		boolean applies( EnvironmentListConfig.LocationInfo location )
-		{
+		public boolean applies( EnvironmentListConfig.LocationInfo location ) {
 			return location.biomeName.toString( ).startsWith( registryNamePrefix );
 		}
 		
-		@Override
-		public
+		@Override public
 		String toString( ) { return "biome/" + registryNamePrefix + "*" + super.toString( ); }
 	}
 	
-	public static
-	class TargetDimension extends TargetEnvironment
-	{
+	public static class TargetDimension extends TargetEnvironment {
 		private final String dimensionName;
 		private final int    intId;
 		
 		// Used to make on-demand targets
-		public
-		TargetDimension( DimensionType dimensionType, float val )
-		{
+		public TargetDimension( DimensionType dimensionType, float val ) {
 			super( -1, val );
 			dimensionName = dimensionType.getName( );
 			intId = dimensionType.getId( );
 		}
 		
-		TargetDimension( int scope, float val, String dimensionId )
-		{
+		TargetDimension( int scope, float val, String dimensionId ) {
 			super( scope, val );
 			
 			DimensionType dimType = null;
@@ -239,16 +214,13 @@ class TargetEnvironment implements Comparable< TargetEnvironment >
 		}
 		
 		@Override
-		public
-		boolean applies( EnvironmentListConfig.LocationInfo location )
-		{
+		public boolean applies( EnvironmentListConfig.LocationInfo location ) {
 			return dimensionName != null && location.dimType != null ?
 			       dimensionName.equals( location.dimType.getName( ) ) :
 			       intId == location.dimId;
 		}
 		
 		@Override
-		public
-		String toString( ) { return "dimension/" + dimensionName + super.toString( ); }
+		public String toString( ) { return "dimension/" + dimensionName + super.toString( ); }
 	}
 }

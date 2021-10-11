@@ -1,4 +1,4 @@
-package fathertoast.naturalabsorption.config;
+package fathertoast.naturalabsorption.common.config;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;

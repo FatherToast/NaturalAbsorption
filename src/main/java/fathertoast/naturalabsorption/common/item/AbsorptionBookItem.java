@@ -4,7 +4,9 @@ import fathertoast.naturalabsorption.*;
 import fathertoast.naturalabsorption.client.*;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.health.HealthData;
+import fathertoast.naturalabsorption.common.health.HealthManager;
 import fathertoast.naturalabsorption.common.util.References;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -48,7 +50,7 @@ class AbsorptionBookItem extends Item {
 		
 		ItemStack book = player.getItemInHand( hand );
 		
-		float currentCap = NaturalAbsorptionMod.sidedProxy.getAbsorptionCapacity( player );
+		float currentCap = HealthManager.getAbsorptionCapacity( player );
 		int   levelCost  = getLevelCost( currentCap );
 		
 		boolean isCreative = player.isCreative();
@@ -60,8 +62,7 @@ class AbsorptionBookItem extends Item {
 			if( !world.isClientSide ) {
 				HealthData data = HealthData.get( player );
 				data.setAbsorptionCapacity( currentCap + Config.get( ).ABSORPTION_UPGRADES.CAPACITY_GAIN );
-				
-				//noinspection ConstantConditions
+
 				player.awardStat( Stats.ITEM_USED.get( this ) );
 			}
 			
@@ -80,9 +81,10 @@ class AbsorptionBookItem extends Item {
 	@Override
 	@OnlyIn( value = Dist.CLIENT)
 	public void appendHoverText( ItemStack stack, World world, List<ITextComponent> tooltip, ITooltipFlag flag ) {
-		float capacity = ClientProxy.clientAbsorptionCapacity;
+		float capacity = RenderEventHandler.ABSORPTION_CAPACITY;
+
 		if( capacity >= 0.0F ) {
-			PlayerEntity player = NaturalAbsorptionMod.sidedProxy.getPlayer( );
+			PlayerEntity player = Minecraft.getInstance().player;
 			
 			final float maxCapacity = Config.get( ).ABSORPTION_UPGRADES.MAXIMUM;
 			float gainOnUse   = Config.get( ).ABSORPTION_UPGRADES.CAPACITY_GAIN;

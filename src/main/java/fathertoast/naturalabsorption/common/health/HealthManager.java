@@ -1,10 +1,11 @@
 package fathertoast.naturalabsorption.common.health;
 
-import fathertoast.naturalabsorption.MessageCapacity;
 import fathertoast.naturalabsorption.ObfuscationHelper;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
+import fathertoast.naturalabsorption.common.network.NetworkHelper;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
@@ -21,26 +22,31 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class HealthManager {
-	// Set of all currently altered damage sources.
+
+	/** Set of all currently altered damage sources. */
 	private static final Set< DamageSource > MODDED_SOURCES = new HashSet<>( );
+
+	public static float getAbsorptionCapacity( PlayerEntity player ) {
+		return HealthData.get( player ).getAbsorptionCapacity( );
+	}
 	
-	// Returns true if the given damage source is modified to ignore armor.
+	/** Returns true if the given damage source is modified to ignore armor. */
 	private static boolean isSourceModified( DamageSource source ) { return MODDED_SOURCES.contains( source ); }
 	
-	// Modifies a source to ignore armor.
+	/** Modifies a source to ignore armor. */
 	private static void modifySource( DamageSource source ) {
 		if( source.isBypassInvul( ) )
 			return;
 		ObfuscationHelper.DamageSource_isUnblockable.set( source, true );
 	}
 	
-	// Undoes any modification done to a damage source.
+	/** Undoes any modification done to a damage source. */
 	private static void unmodifySource( DamageSource source ) {
 		ObfuscationHelper.DamageSource_isUnblockable.set( source, false );
 		MODDED_SOURCES.remove( source );
 	}
 	
-	// Undoes all modification done to all damage sources.
+	/** Undoes all modification done to all damage sources. */
 	@SuppressWarnings( "WeakerAccess" )
 	public static void clearSources( ) {
 		for( DamageSource source : MODDED_SOURCES ) {
@@ -199,7 +205,7 @@ public class HealthManager {
 			player.setAbsorptionAmount( absorptionHealth );
 			
 			// Initialize the client's absorption capacity
-			MessageCapacity.sendFor( player );
+			NetworkHelper.setAbsorptionCapacity( (ServerPlayerEntity) player, absorptionHealth );
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package fathertoast.naturalabsorption;
 
+import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.Logger;
@@ -7,84 +8,70 @@ import org.apache.logging.log4j.Logger;
 /**
  * Helper class for using the ObfuscationReflectionHelper.
  * <p>
- * Two names must be given for each field, the SRG name and the DEOBF name.
  */
 @SuppressWarnings( { "unused", "WeakerAccess" } )
 public
 class ObfuscationHelper< T, E >
 {
 	public static final ObfuscationHelper< DamageSource, Boolean > DamageSource_isUnblockable = new ObfuscationHelper<>(
-		DamageSource.class, "field_76374_o", "isUnblockable"
+		DamageSource.class, "bypassArmor"
 	);
 	
-	private static
-	Logger logger( ) { return NaturalAbsorptionMod.log( ); }
+	private static Logger logger( ) { return NaturalAbsorption.LOGGER; }
 	
 	private final Class< T > classToAccess;
-	private final String[]   names;
+	private final String name;
 	
 	private
-	ObfuscationHelper( Class< T > fieldClass, String srgName, String deobfName )
+	ObfuscationHelper( Class< T > fieldClass, String fieldName )
 	{
 		classToAccess = fieldClass;
-		names = new String[] { srgName, deobfName };
+		name = fieldName;
 	}
 	
-	public
-	void set( T instance, E value )
-	{
+	public void set( T instance, E value ) {
 		try {
-			ObfuscationReflectionHelper.setPrivateValue( classToAccess, instance, value, names );
+			ObfuscationReflectionHelper.setPrivateValue( classToAccess, instance, value, name );
 		}
 		catch( Exception ex ) {
-			logger( ).error( "Failed to set private value ({}#{}={})", classToAccess.getSimpleName( ), names[ 1 ], value, ex );
+			logger( ).error( "Failed to set private value ({}#{}={})", classToAccess.getSimpleName( ), name, value, ex );
 		}
 	}
 	
-	public
-	E get( T instance )
-	{
+	public E get( T instance ) {
 		try {
-			return ObfuscationReflectionHelper.getPrivateValue( classToAccess, instance, names );
+			return ObfuscationReflectionHelper.getPrivateValue( classToAccess, instance, name );
 		}
 		catch( Exception ex ) {
-			logger( ).error( "Failed to get private value ({}#{}==?)", classToAccess.getSimpleName( ), names[ 1 ], ex );
+			logger( ).error( "Failed to get private value ({}#{}==?)", classToAccess.getSimpleName( ), name, ex );
 		}
 		return null;
 	}
 	
-	public static
-	class Static< T, E >
-	{
+	public static class Static< T, E > {
 		private final Class< T > classToAccess;
-		private final String[]   names;
+		private final String   name;
 		
-		private
-		Static( Class< T > fieldClass, String srgName, String deobfName )
-		{
+		private Static( Class< T > fieldClass, String fieldName ) {
 			classToAccess = fieldClass;
-			names = new String[] { srgName, deobfName };
+			name = fieldName;
 		}
 		
-		public
-		void set( E value )
-		{
+		public void set( E value ) {
 			try {
-				ObfuscationReflectionHelper.setPrivateValue( classToAccess, null, value, names );
+				ObfuscationReflectionHelper.setPrivateValue( classToAccess, null, value, name );
 			}
 			catch( Exception ex ) {
-				logger( ).error( "Failed to set private static value ({}#{}={})", classToAccess.getSimpleName( ), names[ 1 ], value, ex );
+				logger( ).error( "Failed to set private static value ({}#{}={})", classToAccess.getSimpleName( ), name, value, ex );
 			}
 		}
 		
-		public
-		E get( )
-		{
+		public E get( ) {
 			try {
-				return ObfuscationReflectionHelper.getPrivateValue( classToAccess, null, names );
+				return ObfuscationReflectionHelper.getPrivateValue( classToAccess, null, name );
 			}
 			catch( Exception ex ) {
-				logger( ).error( "Failed to get private static value ({}#{}==?)", classToAccess.getSimpleName( ), names[ 1 ], ex );
+				logger( ).error( "Failed to get private static value ({}#{}==?)", classToAccess.getSimpleName( ), name, ex );
 			}
 			return null;
 		}

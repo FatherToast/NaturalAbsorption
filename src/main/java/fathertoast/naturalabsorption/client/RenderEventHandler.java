@@ -1,30 +1,29 @@
 package fathertoast.naturalabsorption.client;
 
-import fathertoast.naturalabsorption.*;
-import fathertoast.naturalabsorption.config.*;
-import fathertoast.naturalabsorption.health.*;
+import com.mojang.blaze3d.systems.RenderSystem;
+import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.health.HealthManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Random;
 
-public
-class RenderEventHandler
-{
-	private Random rand = new Random( );
+public class RenderEventHandler {
+
+	public static float ABSORPTION_CAPACITY = -1.0F;
+
+	private final Random rand = new Random( );
 	
 	/** Used with updateCounter to make the heart bar flash */
 	private long healthUpdateCounter;
@@ -56,62 +55,59 @@ class RenderEventHandler
 					renderAbsorptionCapacity( event );
 				}
 				catch( Exception ex ) {
-					NaturalAbsorptionMod.log( ).error( "Encountered exception during render tick", ex );
+					NaturalAbsorption.LOGGER.error( "Encountered exception during render tick", ex );
 					event.setCanceled( false ); // In case vanilla event was already canceled
 				}
 			}
 		}
 	}
 	
-	private
-	void renderAbsorptionCapacity( RenderGameOverlayEvent.Pre event )
-	{
-		ScaledResolution resolution = event.getResolution( );
+	private void renderAbsorptionCapacity( RenderGameOverlayEvent.Pre event ) {
+		int width = event.getWindow().getGuiScaledWidth();
+		int height = event.getWindow().getGuiScaledHeight();
 		
-		int width  = resolution.getScaledWidth( );
-		int height = resolution.getScaledHeight( );
+		RenderSystem.enableBlend( );
 		
-		GlStateManager.enableBlend( );
-		
-		EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft( ).getRenderViewEntity( );
-		if( player == null || ClientProxy.clientAbsorptionCapacity <= 0.0F ) {
+		PlayerEntity player = Minecraft.getInstance( ).player;
+
+		if( player == null || ABSORPTION_CAPACITY <= 0.0F ) {
 			return;
 		}
-		int updateCounter = Minecraft.getMinecraft( ).ingameGUI.getUpdateCounter( );
+		int updateCounter = Minecraft.getInstance( ).gui.getGuiTicks( );
 		
-		int     health    = MathHelper.ceil( player.getHealth( ) );
+		int health = MathHelper.ceil( player.getHealth( ) );
 		boolean highlight = healthUpdateCounter > (long) updateCounter && (healthUpdateCounter - (long) updateCounter) / 3L % 2L == 1L;
-		
-		if( health < playerHealth && player.hurtResistantTime > 0 ) {
-			lastSystemTime = Minecraft.getSystemTime( );
-			healthUpdateCounter = (long) (updateCounter + 20);
+
+		// TODO - inspect if player.hurtDuration is what we are actually looking for
+		if( health < playerHealth && player.hurtDuration > 0 ) {
+			lastSystemTime = System.currentTimeMillis( );
+			healthUpdateCounter = updateCounter + 20;
 		}
-		else if( health > playerHealth && player.hurtResistantTime > 0 ) {
-			lastSystemTime = Minecraft.getSystemTime( );
-			healthUpdateCounter = (long) (updateCounter + 10);
+		else if( health > playerHealth && player.hurtDuration > 0 ) {
+			lastSystemTime = System.currentTimeMillis( );
+			healthUpdateCounter = updateCounter + 10;
 		}
 		
-		if( Minecraft.getSystemTime( ) - lastSystemTime > 1000L ) {
+		if( System.currentTimeMillis( ) - lastSystemTime > 1000L ) {
 			playerHealth = health;
 			lastPlayerHealth = health;
-			lastSystemTime = Minecraft.getSystemTime( );
+			lastSystemTime = System.currentTimeMillis( );
 		}
 		
 		playerHealth = health;
 		int healthLast = lastPlayerHealth;
 		
-		IAttributeInstance attrMaxHealth = player.getEntityAttribute( SharedMonsterAttributes.MAX_HEALTH );
-		float              healthMax     = (float) attrMaxHealth.getAttributeValue( );
-		float              absorb        = MathHelper.ceil( player.getAbsorptionAmount( ) );
+		float maxHealth = (float) player.getAttributeValue( Attributes.MAX_HEALTH );
+		float absorb = MathHelper.ceil( player.getAbsorptionAmount( ) );
 		
 		// Calculate the effective absorption capacity
 		float absorbMax = Math.min(
-			ClientProxy.clientAbsorptionCapacity + HealthManager.getArmorAbsorption( player ),
+				ABSORPTION_CAPACITY + HealthManager.getArmorAbsorption( player ),
 			Config.get( ).ABSORPTION_HEALTH.GLOBAL_MAXIMUM
 		) + HealthManager.getPotionAbsorption( player );
 		
 		// Calculate number of hearts we want vs. number that vanilla would render
-		int extraHearts = MathHelper.ceil( (healthMax + absorbMax) / 2.0F ) - MathHelper.ceil( (healthMax + absorb) / 2.0F );
+		int extraHearts = MathHelper.ceil( (maxHealth + absorbMax) / 2.0F ) - MathHelper.ceil( (maxHealth + absorb) / 2.0F );
 		if( extraHearts <= 0 ) {
 			// All backgrounds will be handled normally, no need for render override
 			return;
@@ -121,33 +117,35 @@ class RenderEventHandler
 		// This allows us to not have to worry about adding more rows and such
 		event.setCanceled( true );
 		
-		int healthRows = MathHelper.ceil( (healthMax + absorbMax) / 2.0F / 10.0F );
+		int healthRows = MathHelper.ceil( (maxHealth + absorbMax) / 2.0F / 10.0F );
 		int rowHeight  = Math.max( 10 - (healthRows - 2), 3 );
 		
-		rand.setSeed( (long) (updateCounter * 312871) );
+		rand.setSeed( updateCounter * 312871L );
 		
 		int left = width / 2 - 91;
-		int top  = height - GuiIngameForge.left_height;
-		GuiIngameForge.left_height += (healthRows * rowHeight);
+		int top  = height - ForgeIngameGui.left_height;
+		ForgeIngameGui.left_height += (healthRows * rowHeight);
+
 		if( rowHeight != 10 ) {
-			GuiIngameForge.left_height += 10 - rowHeight;
+			ForgeIngameGui.left_height += 10 - rowHeight;
 		}
 		
 		int regen = -1;
-		if( player.isPotionActive( MobEffects.REGENERATION ) ) {
+		if( player.hasEffect( Effects.REGENERATION ) ) {
 			regen = updateCounter % 25;
 		}
 		
-		final int TOP        = 9 * (Minecraft.getMinecraft( ).world.getWorldInfo( ).isHardcoreModeEnabled( ) ? 5 : 0);
+		final int TOP = 9 * ( Minecraft.getInstance( ).level.getLevelData( ).isHardcore( ) ? 5 : 0 );
 		final int BACKGROUND = (highlight ? 25 : 16);
-		int       MARGIN     = 16;
-		if( player.isPotionActive( MobEffects.POISON ) )
+		int MARGIN = 16;
+
+		if( player.hasEffect( Effects.POISON ) )
 			MARGIN += 36;
-		else if( player.isPotionActive( MobEffects.WITHER ) )
+		else if( player.hasEffect( Effects.WITHER ) )
 			MARGIN += 72;
 		float absorbRemaining = absorb;
 		
-		for( int i = MathHelper.ceil( (healthMax + absorbMax) / 2.0F ) - 1; i >= 0; --i ) {
+		for( int i = MathHelper.ceil( (maxHealth + absorbMax) / 2.0F ) - 1; i >= 0; --i ) {
 			int row = MathHelper.ceil( (float) (i + 1) / 10.0F ) - 1;
 			int x   = left + i % 10 * 8;
 			int y   = top - row * rowHeight;
@@ -190,14 +188,11 @@ class RenderEventHandler
 					drawTexturedModalRect( x, y, MARGIN + 45, TOP, 9, 9 ); //5
 			}
 		}
-		
-		GlStateManager.disableBlend( );
+		RenderSystem.disableBlend( );
 	}
-	
+
 	@SuppressWarnings( "SameParameterValue" )
-	private
-	void drawTexturedModalRect( int x, int y, int textureX, int textureY, int width, int height )
-	{
+	private void drawTexturedModalRect( int x, int y, int textureX, int textureY, int width, int height ) {
 		// Standard gui z-level
 		final float zLevel = -90.0F;
 		
@@ -205,13 +200,13 @@ class RenderEventHandler
 		final float res = 1.0F / 256.0F;
 		
 		// Essentially copy/pasted from Gui.class
-		Tessellator   tessellator   = Tessellator.getInstance( );
-		BufferBuilder bufferbuilder = tessellator.getBuffer( );
-		bufferbuilder.begin( 7, DefaultVertexFormats.POSITION_TEX );
-		bufferbuilder.pos( (double) (x), (double) (y + height), (double) zLevel ).tex( (double) ((float) (textureX) * res), (double) ((float) (textureY + height) * res) ).endVertex( );
-		bufferbuilder.pos( (double) (x + width), (double) (y + height), (double) zLevel ).tex( (double) ((float) (textureX + width) * res), (double) ((float) (textureY + height) * res) ).endVertex( );
-		bufferbuilder.pos( (double) (x + width), (double) (y), (double) zLevel ).tex( (double) ((float) (textureX + width) * res), (double) ((float) (textureY) * res) ).endVertex( );
-		bufferbuilder.pos( (double) (x), (double) (y), (double) zLevel ).tex( (double) ((float) (textureX) * res), (double) ((float) (textureY) * res) ).endVertex( );
-		tessellator.draw( );
+		Tessellator tessellator = Tessellator.getInstance( );
+		BufferBuilder bufferBuilder = tessellator.getBuilder( );
+		bufferBuilder.begin( 7, DefaultVertexFormats.POSITION_TEX );
+		bufferBuilder.vertex(x, y + height, zLevel).uv( ((float) (textureX) * res), ((float) (textureY + height) * res) ).endVertex( );
+		bufferBuilder.vertex(x + width, y + height, zLevel).uv( ((float) (textureX + width) * res), ((float) (textureY + height) * res) ).endVertex( );
+		bufferBuilder.vertex(x + width, y, zLevel).uv( ((float) (textureX + width) * res), ((float) (textureY) * res) ).endVertex( );
+		bufferBuilder.vertex(x, y, zLevel).uv( ((float) (textureX) * res), ((float) (textureY) * res) ).endVertex( );
+		tessellator.end( );
 	}
 }

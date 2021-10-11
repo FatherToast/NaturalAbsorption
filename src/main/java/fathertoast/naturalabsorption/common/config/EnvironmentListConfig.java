@@ -1,4 +1,4 @@
-package fathertoast.naturalabsorption.config;
+package fathertoast.naturalabsorption.common.config;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;

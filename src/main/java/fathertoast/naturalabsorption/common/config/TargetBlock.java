@@ -1,29 +1,36 @@
-package fathertoast.naturalabsorption.config;
+package fathertoast.naturalabsorption.common.config;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 
+
+/**
+ *  TODO
+ *
+ *  This class is likely redundant now that
+ *  block metadata is no longer a thing, and
+ *  is not used to create block variants.
+ *
+ *  - Sarinsa
+ */
 @SuppressWarnings( { "WeakerAccess", "unused" } )
-public
-class TargetBlock
-{
+public class TargetBlock {
 	// Returns a new target block set from the string property.
-	public static
-	HashSet< TargetBlock > newBlockSet( String line )
-	{
+	public static HashSet< TargetBlock > newBlockSet( String line ) {
 		return TargetBlock.newBlockSet( line.split( "," ) );
 	}
 	
-	public static
-	HashSet< TargetBlock > newBlockSet( String[] targetableBlocks )
-	{
+	public static HashSet< TargetBlock > newBlockSet( String[] targetableBlocks ) {
 		HashSet< TargetBlock > blockSet = new HashSet< TargetBlock >( );
-		String[]               pair, modCheck;
-		TargetBlock            targetableBlock;
+		String[] pair, modCheck;
+		TargetBlock targetableBlock;
+
 		for( String target : targetableBlocks ) {
 			pair = target.split( " ", 2 );
 			if( pair.length > 1 ) {
@@ -51,31 +58,19 @@ class TargetBlock
 		}
 		return blockSet;
 	}
-	
-	static
-	IBlockState getStringAsBlock( String id )
-	{
-		Block block = Block.REGISTRY.getObject( new ResourceLocation( id ) );
-		if( block == Blocks.AIR ) {
-			try {
-				block = Block.getBlockById( Integer.parseInt( id ) );
-				if( block != Blocks.AIR ) {
-					Config.log.warn( "Usage of numerical block id! ({})", id );
-				}
-			}
-			catch( NumberFormatException numberformatexception ) {
-				// Do nothing
-			}
+
+	@Nullable
+	static BlockState getStringAsBlock( ResourceLocation id ) {
+		if ( ForgeRegistries.BLOCKS.containsKey( id ) ) {
+			return ForgeRegistries.BLOCKS.getValue( id ).defaultBlockState();
 		}
-		if( block == Blocks.AIR ) {
-			Config.log.error( "Missing or invalid block! ({})", id );
+		else {
+			Config.log.warn( "Could not find any blocks matching the id \"" + id.toString() + "\"" );
 		}
-		return block.getDefaultState( );
+		return null;
 	}
 	
-	private static
-	void addAllModBlocks( HashSet< TargetBlock > blockSet, String namespace )
-	{
+	private static void addAllModBlocks( HashSet< TargetBlock > blockSet, String namespace ) {
 		try {
 			TargetBlock targetableBlock;
 			for( ResourceLocation blockId : Block.REGISTRY.getKeys( ) ) {
@@ -101,28 +96,21 @@ class TargetBlock
 	// The metadata of the block to match (-1 matches all).
 	public final int   BLOCK_DATA;
 	
-	public
-	TargetBlock( Block block, int meta )
-	{
+	public TargetBlock( Block block, int meta ) {
 		this.BLOCK = block;
 		this.BLOCK_DATA = meta;
 	}
 	
-	public
-	TargetBlock( Block block )
-	{
+	public TargetBlock( Block block ) {
 		this( block, -1 );
 	}
 	
-	public
-	TargetBlock( IBlockState block, int meta )
-	{
+	public TargetBlock( BlockState block, int meta ) {
 		this( block.getBlock( ), meta );
 	}
 	
 	public
-	TargetBlock( IBlockState block )
-	{
+	TargetBlock( BlockState block ) {
 		this( block, block.getBlock( ).getMetaFromState( block ) );
 	}
 	
@@ -139,8 +127,7 @@ class TargetBlock
 	// equal if their metadata is the same or if either has 'wildcard' metadata.
 	@Override
 	public
-	boolean equals( Object obj )
-	{
+	boolean equals( Object obj ) {
 		if( obj instanceof TargetBlock && this.BLOCK.equals( ((TargetBlock) obj).BLOCK ) )
 			return this.BLOCK_DATA < 0 || ((TargetBlock) obj).BLOCK_DATA < 0 || this.BLOCK_DATA == ((TargetBlock) obj).BLOCK_DATA;
 		return false;

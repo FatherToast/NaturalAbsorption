@@ -2,6 +2,7 @@ package fathertoast.naturalabsorption.common.enchantment;
 
 import fathertoast.naturalabsorption.*;
 import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,11 +25,11 @@ class AbsorptionEnchantment extends Enchantment {
 		Iterable< ItemStack > equipment = player.getArmorSlots();
 
 			for( ItemStack itemStack : equipment ) {
-				absorbLevel += EnchantmentHelper.getItemEnchantmentLevel( ModObjects.ENCHANTMENT_ABSORPTION, itemStack );
+				absorbLevel += EnchantmentHelper.getItemEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), itemStack );
 			}
 		}
 		else {
-			absorbLevel = EnchantmentHelper.getEnchantmentLevel( ModObjects.ENCHANTMENT_ABSORPTION, player );
+			absorbLevel = EnchantmentHelper.getEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), player );
 		}
 		
 		// Calculate capacity to grant for level

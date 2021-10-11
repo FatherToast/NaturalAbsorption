@@ -2,8 +2,10 @@ package fathertoast.naturalabsorption.common.health;
 
 import fathertoast.naturalabsorption.*;
 import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.network.NetworkHelper;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
 
@@ -61,10 +63,12 @@ public class HealthData {
 		if( Config.get( ).ABSORPTION_HEALTH.ENABLED ) {
 			value = MathHelper.clamp( value, 0.0F, Config.get( ).ABSORPTION_UPGRADES.MAXIMUM );
 			if( capacityAbsp != value ) {
-				saveTag.putFloat( TAG_CAPACITY_ABSORPTION, value );
+				saveTag.putFloat(TAG_CAPACITY_ABSORPTION, value);
 				capacityAbsp = value;
-				
-				MessageCapacity.sendFor( owner );
+
+				if (this.owner instanceof ServerPlayerEntity) {
+					NetworkHelper.setAbsorptionCapacity((ServerPlayerEntity) this.owner, value);
+				}
 			}
 		}
 	}
