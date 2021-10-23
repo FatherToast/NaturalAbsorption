@@ -1,10 +1,9 @@
 package fathertoast.naturalabsorption.common.item;
 
-import fathertoast.naturalabsorption.*;
 import fathertoast.naturalabsorption.client.*;
 import fathertoast.naturalabsorption.common.config.Config;
-import fathertoast.naturalabsorption.common.health.HealthData;
-import fathertoast.naturalabsorption.common.health.HealthManager;
+import fathertoast.naturalabsorption.common.health.HeartData;
+import fathertoast.naturalabsorption.common.health.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
@@ -50,7 +49,7 @@ class AbsorptionBookItem extends Item {
 		
 		ItemStack book = player.getItemInHand( hand );
 		
-		float currentCap = HealthManager.getAbsorptionCapacity( player );
+		float currentCap = HeartManager.getNaturalAbsorption( player );
 		int   levelCost  = getLevelCost( currentCap );
 		
 		boolean isCreative = player.isCreative();
@@ -60,8 +59,8 @@ class AbsorptionBookItem extends Item {
 				player.giveExperienceLevels( -levelCost );
 			}
 			if( !world.isClientSide ) {
-				HealthData data = HealthData.get( player );
-				data.setAbsorptionCapacity( currentCap + Config.get( ).ABSORPTION_UPGRADES.CAPACITY_GAIN );
+				HeartData data = HeartData.get( player );
+				data.setNaturalAbsorption( currentCap + Config.get( ).ABSORPTION_UPGRADES.CAPACITY_GAIN );
 
 				player.awardStat( Stats.ITEM_USED.get( this ) );
 			}
@@ -81,7 +80,7 @@ class AbsorptionBookItem extends Item {
 	@Override
 	@OnlyIn( value = Dist.CLIENT)
 	public void appendHoverText( ItemStack stack, World world, List<ITextComponent> tooltip, ITooltipFlag flag ) {
-		float capacity = RenderEventHandler.ABSORPTION_CAPACITY;
+		float capacity = RenderEventHandler.PLAYER_NATURAL_ABSORPTION;
 
 		if( capacity >= 0.0F ) {
 			PlayerEntity player = Minecraft.getInstance().player;

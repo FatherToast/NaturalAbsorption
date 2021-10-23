@@ -9,7 +9,7 @@ public class CraftingUtil {
 
     public static void registerConditions( ) {
         for ( BookRecipeCondition.Type type : BookRecipeCondition.Type.values( )) {
-            CraftingHelper.register( new BookRecipeCondition.Serializer( new ResourceLocation( NaturalAbsorption.MOD_ID, type.getName() )));
+            CraftingHelper.register( new BookRecipeCondition.Serializer( new ResourceLocation( NaturalAbsorption.MOD_ID, type.getNAME() )));
         }
     }
 }

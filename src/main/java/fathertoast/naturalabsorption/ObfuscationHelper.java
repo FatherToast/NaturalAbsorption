@@ -17,7 +17,7 @@ class ObfuscationHelper< T, E >
 		DamageSource.class, "bypassArmor"
 	);
 	
-	private static Logger logger( ) { return NaturalAbsorption.LOGGER; }
+	private static Logger logger( ) { return NaturalAbsorption.LOG; }
 	
 	private final Class< T > classToAccess;
 	private final String name;

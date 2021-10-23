@@ -8,9 +8,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class NAItems {
-
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, NaturalAbsorption.MOD_ID);
-
-
-    public static final RegistryObject<Item> ABSORPTION_BOOK = ITEMS.register("absorption_book", AbsorptionBookItem::new);
+    
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create( ForgeRegistries.ITEMS, NaturalAbsorption.MOD_ID );
+    
+    public static final RegistryObject<Item> ABSORPTION_BOOK = ITEMS.register( "absorption_book", AbsorptionBookItem::new );
 }

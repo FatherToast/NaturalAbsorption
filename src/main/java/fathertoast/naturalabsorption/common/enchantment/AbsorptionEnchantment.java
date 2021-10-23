@@ -1,6 +1,5 @@
 package fathertoast.naturalabsorption.common.enchantment;
 
-import fathertoast.naturalabsorption.*;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import net.minecraft.enchantment.Enchantment;
@@ -11,68 +10,53 @@ import net.minecraft.item.ItemStack;
 
 public
 class AbsorptionEnchantment extends Enchantment {
-
-	private static final EquipmentSlotType[] VALID_SLOTS = {
-			EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD
-	};
-	
-	/** @return The absorption capacity granted by enchantments. */
-	public static float getBonusCapacity( PlayerEntity player ) {
-		// Calculate enchantment level
-		int absorbLevel = 0;
-
-		if( Config.get( ).ENCHANTMENT.STACKING ) {
-		Iterable< ItemStack > equipment = player.getArmorSlots();
-
-			for( ItemStack itemStack : equipment ) {
-				absorbLevel += EnchantmentHelper.getItemEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), itemStack );
-			}
-		}
-		else {
-			absorbLevel = EnchantmentHelper.getEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), player );
-		}
-		
-		// Calculate capacity to grant for level
-		if( absorbLevel > 0 ) {
-			return Math.min(
-				Config.get( ).ENCHANTMENT.POTENCY_BASE + Config.get( ).ENCHANTMENT.POTENCY * absorbLevel,
-				Config.get( ).ENCHANTMENT.POTENCY_MAX
-			);
-		}
-		return 0.0F;
-	}
-	
-	public AbsorptionEnchantment( ) {
-		super( Config.get( ).ENCHANTMENT.RARITY.parentValue, Config.get( ).ENCHANTMENT.SLOT.parentValue, VALID_SLOTS );
-	}
-	
-	/**
-	 * Returns the minimal value of enchantability needed on the enchantment level passed.
-	 */
-	/*
-	@Override
-	public int getMinEnchantability( int enchantmentLevel ) {
-		return Config.get( ).ENCHANTMENT.ENCHANTIBILITY_BASE + (enchantmentLevel - 1) * Config.get( ).ENCHANTMENT.ENCHANTIBILITY_PER_LEVEL;
-	}
-
-	 */
-	
-	/**
-	 * Returns the maximum value of enchantability needed on the enchantment level passed.
-	 */
-	/*
-	@Override
-	public int getMaxEnchantability( int enchantmentLevel ) { return getMinEnchantability( enchantmentLevel + 1 ); }
-
-	 */
-	
-	@Override
-	public int getMaxLevel( ) { return Config.get( ).ENCHANTMENT.MAXIMUM_LEVEL; }
-	
-	@Override
-	public
-	boolean isAllowedOnBooks( ) { return Config.get( ).ENCHANTMENT.BOOKS; }
-	
-	@Override
-	public boolean isTreasureOnly( ) { return Config.get( ).ENCHANTMENT.TREASURE; }
+    
+    private static final EquipmentSlotType[] VALID_SLOTS = {
+            EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD
+    };
+    
+    /** @return The maximum absorption granted by enchantments. */
+    public static float getMaxAbsorptionBonus( PlayerEntity player ) {
+        // Calculate enchantment level
+        int enchantLevel;
+        if( Config.EQUIPMENT.ENCHANTMENT.stacking.get() ) {
+            Iterable<ItemStack> equipment = player.getArmorSlots();
+            enchantLevel = 0;
+            for( ItemStack itemStack : equipment ) {
+                enchantLevel += EnchantmentHelper.getItemEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), itemStack );
+            }
+        }
+        else {
+            enchantLevel = EnchantmentHelper.getEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), player );
+        }
+        
+        // Calculate capacity to grant for level
+        if( enchantLevel > 0 ) {
+            return Math.max( 0.0F, (float) Math.min(
+                    Config.EQUIPMENT.ENCHANTMENT.potencyBase.get() + Config.EQUIPMENT.ENCHANTMENT.potencyPerLevel.get() * enchantLevel,
+                    Config.EQUIPMENT.ENCHANTMENT.potencyMax.get() ) );
+        }
+        return 0.0F;
+    }
+    
+    public AbsorptionEnchantment() {
+        super( Config.EQUIPMENT.ENCHANTMENT.rarity.get().parentValue, Config.EQUIPMENT.ENCHANTMENT.slot.get().parentValue, VALID_SLOTS );
+    }
+    
+    @Override
+    public int getMinCost( int level ) {
+        return Config.EQUIPMENT.ENCHANTMENT.costBase.get() + (level - 1) * Config.EQUIPMENT.ENCHANTMENT.costPerLevel.get();
+    }
+    
+    @Override
+    public int getMaxCost( int level ) { return getMinCost( level + 1 ); }
+    
+    @Override
+    public int getMaxLevel() { return Config.EQUIPMENT.ENCHANTMENT.levelMax.get(); }
+    
+    @Override
+    public boolean isAllowedOnBooks() { return Config.EQUIPMENT.ENCHANTMENT.allowOnBooks.get(); }
+    
+    @Override
+    public boolean isTreasureOnly() { return Config.EQUIPMENT.ENCHANTMENT.treasureOnly.get(); }
 }
