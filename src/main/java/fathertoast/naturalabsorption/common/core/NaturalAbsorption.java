@@ -1,5 +1,6 @@
 package fathertoast.naturalabsorption.common.core;
 
+import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.event.NAEventListener;
@@ -29,9 +30,10 @@ public class NaturalAbsorption {
     /** Our mod's packet handler; takes care of networking and sending messages. */
     @SuppressWarnings( "FieldCanBeLocal" )
     private final PacketHandler packetHandler = new PacketHandler();
-    
-    
+
     public NaturalAbsorption() {
+        Config.initialize();
+
         packetHandler.registerMessages();
         CraftingUtil.registerConditions();
         

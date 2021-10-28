@@ -15,6 +15,10 @@ class AbsorptionEnchantment extends Enchantment {
             EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD
     };
     
+    public AbsorptionEnchantment() {
+        super( Config.EQUIPMENT.ENCHANTMENT.rarity.get().parentValue, Config.EQUIPMENT.ENCHANTMENT.slot.get().parentValue, VALID_SLOTS );
+    }
+
     /** @return The maximum absorption granted by enchantments. */
     public static float getMaxAbsorptionBonus( PlayerEntity player ) {
         // Calculate enchantment level
@@ -29,7 +33,7 @@ class AbsorptionEnchantment extends Enchantment {
         else {
             enchantLevel = EnchantmentHelper.getEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), player );
         }
-        
+
         // Calculate capacity to grant for level
         if( enchantLevel > 0 ) {
             return Math.max( 0.0F, (float) Math.min(
@@ -37,10 +41,6 @@ class AbsorptionEnchantment extends Enchantment {
                     Config.EQUIPMENT.ENCHANTMENT.potencyMax.get() ) );
         }
         return 0.0F;
-    }
-    
-    public AbsorptionEnchantment() {
-        super( Config.EQUIPMENT.ENCHANTMENT.rarity.get().parentValue, Config.EQUIPMENT.ENCHANTMENT.slot.get().parentValue, VALID_SLOTS );
     }
     
     @Override

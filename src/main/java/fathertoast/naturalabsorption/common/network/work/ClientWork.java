@@ -14,8 +14,5 @@ public class ClientWork {
      */
     public static void handleNaturalAbsorptionUpdate( S2CSetNaturalAbsorption message ) {
         RenderEventHandler.PLAYER_NATURAL_ABSORPTION = message.naturalAbsorption;
-        if( Minecraft.getInstance().player != null ) {
-            HeartData.get( Minecraft.getInstance().player ).setNaturalAbsorption( message.naturalAbsorption );
-        }
     }
 }

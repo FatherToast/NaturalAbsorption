@@ -14,7 +14,7 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 public class NAEventListener {
     @SuppressWarnings( "ConstantConditions" )
     private static final ResourceLocation ADV_BOOK_RECIPE = NaturalAbsorption.resourceLoc(
-            "recipes/" + NAItems.ABSORPTION_BOOK.get().getRegistryName().getPath() );
+            "recipes/" + NAItems.ABSORPTION_BOOK.getId().getPath() );
     
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onAdvancement( AdvancementEvent event ) {
