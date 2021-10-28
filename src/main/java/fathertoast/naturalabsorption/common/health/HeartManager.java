@@ -26,7 +26,6 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -238,12 +237,14 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onJoinWorld( EntityJoinWorldEvent event ) {
         if( !event.getWorld().isClientSide && event.getEntity() instanceof PlayerEntity ) {
-            PlayerEntity player = (PlayerEntity) event.getEntity();
+            final PlayerEntity player = (PlayerEntity) event.getEntity();
+            final float absorptionHealth = player.getAbsorptionAmount();
             
             // An effort to fix the vanilla bug with absorption not updating properly
-            float absorptionHealth = player.getAbsorptionAmount();
+            /* This bug appears to have been fixed; remove this for now.
             player.setAbsorptionAmount( absorptionHealth + 0.01F );
             player.setAbsorptionAmount( absorptionHealth );
+            */
             
             // Initialize the client's absorption capacity
             NetworkHelper.setNaturalAbsorption( (ServerPlayerEntity) player, absorptionHealth );
