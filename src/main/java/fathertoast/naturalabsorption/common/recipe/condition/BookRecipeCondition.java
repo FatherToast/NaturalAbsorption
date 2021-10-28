@@ -3,6 +3,7 @@ package fathertoast.naturalabsorption.common.recipe.condition;
 import com.google.gson.JsonObject;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.health.HeartManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
@@ -26,17 +27,17 @@ public class BookRecipeCondition implements ICondition {
     private final ResourceLocation id;
     private final String styleName;
     
-    public BookRecipeCondition( String styleName ) {
-        this.id = NaturalAbsorption.resourceLoc( "recipe_style" );
-        this.styleName = styleName;
+    public BookRecipeCondition( String name ) {
+        id = NaturalAbsorption.resourceLoc( "recipe_style" );
+        styleName = name;
     }
     
     @Override
-    public ResourceLocation getID() { return this.id; }
+    public ResourceLocation getID() { return id; }
     
     @Override
     public boolean test() {
-        return Config.ABSORPTION.NATURAL.upgradeGain.get() > 0.0 &&
+        return HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.upgradeGain.get() > 0.0 &&
                 Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().equalsIgnoreCase( styleName );
     }
     
@@ -44,7 +45,7 @@ public class BookRecipeCondition implements ICondition {
         
         private final ResourceLocation id;
         
-        public Serializer( ResourceLocation id ) { this.id = id; }
+        public Serializer( ResourceLocation resourceLocation ) { id = resourceLocation; }
         
         @Override
         public void write( JsonObject json, BookRecipeCondition value ) { json.addProperty( "style_name", value.styleName ); }
@@ -55,6 +56,6 @@ public class BookRecipeCondition implements ICondition {
         }
         
         @Override
-        public ResourceLocation getID() { return this.id; }
+        public ResourceLocation getID() { return id; }
     }
 }
