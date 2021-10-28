@@ -105,8 +105,9 @@ public class HeartData {
     
     /** @return The player's max absorption not counting buffs, limited by the global max absorption config. */
     private float getSteadyStateMaxAbsorption() {
-        return Math.min( getNaturalAbsorption() + HeartManager.getEquipmentAbsorption( owner ),
-                (float) Config.ABSORPTION.GENERAL.globalMax.get() );
+        final float calculatedMax = getNaturalAbsorption() + HeartManager.getEquipmentAbsorption( owner );
+        return Config.ABSORPTION.GENERAL.globalMax.get() < 0.0F ? calculatedMax :
+                Math.min( calculatedMax, (float) Config.ABSORPTION.GENERAL.globalMax.get() );
     }
     
     /** @return The player's max absorption, from all sources combined. */
