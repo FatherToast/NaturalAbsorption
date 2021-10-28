@@ -1,12 +1,12 @@
 {
-  "item.naturalabsorption.book_absorption": "Book of Absorption",
+  "item.naturalabsorption.absorption_book": "Book of Absorption",
 
-  "item.naturalabsorption.book_absorption.tooltip.current": "Your absorption",
-  "item.naturalabsorption.book_absorption.tooltip.gain": "When used:",
-  "item.naturalabsorption.book_absorption.tooltip.max": "Max Absorption",
-  "item.naturalabsorption.book_absorption.tooltip.cost": "Cost: %d levels",
-  "item.naturalabsorption.book_absorption.tooltip.canuse": "Right click to use",
-  "item.naturalabsorption.book_absorption.tooltip.nouse": "You can't use this",
+  "item.naturalabsorption.absorption_book.tooltip.current": "Your absorption",
+  "item.naturalabsorption.absorption_book.tooltip.gain": "When used:",
+  "item.naturalabsorption.absorption_book.tooltip.max": "Max Absorption",
+  "item.naturalabsorption.absorption_book.tooltip.cost": "Cost: %d levels",
+  "item.naturalabsorption.absorption_book.tooltip.canuse": "Right click to use",
+  "item.naturalabsorption.absorption_book.tooltip.nouse": "You can't use this",
 
   "item.naturalabsorption.absorption_book.not_enough_levels": "Requires at least %s levels to use",
 

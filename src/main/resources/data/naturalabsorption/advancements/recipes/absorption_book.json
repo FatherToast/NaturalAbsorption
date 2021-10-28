@@ -48,7 +48,7 @@
       "conditions": {
         "items": [
           {
-            "item": "naturalabsorption:book_absorption"
+            "item": "naturalabsorption:absorption_book"
           }
         ]
       }

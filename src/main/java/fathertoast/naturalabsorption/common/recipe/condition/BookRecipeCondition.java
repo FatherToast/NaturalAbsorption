@@ -9,6 +9,8 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 
 public class BookRecipeCondition implements ICondition {
+
+    private static final ResourceLocation ID = NaturalAbsorption.resourceLoc("recipe_style");
     
     public enum Type {
         NONE( "none" ),
@@ -20,42 +22,36 @@ public class BookRecipeCondition implements ICondition {
         private final String NAME;
         
         Type( String name ) { NAME = name; }
-        
-        public String getNAME() { return NAME; }
     }
-    
-    private final ResourceLocation id;
+
     private final String styleName;
     
     public BookRecipeCondition( String name ) {
-        id = NaturalAbsorption.resourceLoc( "recipe_style" );
         styleName = name;
     }
     
     @Override
-    public ResourceLocation getID() { return id; }
+    public ResourceLocation getID( ) { return ID; }
     
     @Override
-    public boolean test() {
+    public boolean test( ) {
         return HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.upgradeGain.get() > 0.0 &&
-                Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().equalsIgnoreCase( styleName );
+                Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().equalsIgnoreCase( this.styleName );
     }
     
     public static class Serializer implements IConditionSerializer<BookRecipeCondition> {
         
-        private final ResourceLocation id;
-        
-        public Serializer( ResourceLocation resourceLocation ) { id = resourceLocation; }
+        public Serializer( ) { }
         
         @Override
-        public void write( JsonObject json, BookRecipeCondition value ) { json.addProperty( "style_name", value.styleName ); }
+        public void write( JsonObject json, BookRecipeCondition value ) { json.addProperty( "name", value.styleName ); }
         
         @Override
         public BookRecipeCondition read( JsonObject json ) {
-            return new BookRecipeCondition( json.getAsJsonPrimitive( "style_name" ).getAsString() );
+            return new BookRecipeCondition( json.getAsJsonPrimitive( "name" ).getAsString( ));
         }
         
         @Override
-        public ResourceLocation getID() { return id; }
+        public ResourceLocation getID( ) { return ID; }
     }
 }
