@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.stats.Stats;
@@ -33,7 +34,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class AbsorptionBookItem extends Item {
     
-    public AbsorptionBookItem() { super( new Item.Properties().stacksTo( 1 ) ); }
+    public AbsorptionBookItem() { super( new Item.Properties().tab( ItemGroup.TAB_COMBAT ).stacksTo( 1 ) ); }
     
     @SuppressWarnings( "WeakerAccess" )
     public static int getLevelCost( float capacity ) {
