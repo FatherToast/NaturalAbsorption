@@ -9,6 +9,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber( value = Dist.CLIENT, modid = NaturalAbsorption.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD )
 public class ClientRegister {
+
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
         MinecraftForge.EVENT_BUS.register( new RenderEventHandler() );

@@ -2,7 +2,7 @@ package fathertoast.naturalabsorption.common.util;
 
 public class References {
     
-    public static final String NOT_ENOUGH_LEVELS = "item.naturalabsorption.book_absorption.not_enough_levels";
+    public static final String NOT_ENOUGH_LEVELS = "item.naturalabsorption.absorption_book.not_enough_levels";
     
     public static final String BOOK_CURRENT = "item.naturalabsorption.absorption_book.tooltip.current";
     public static final String BOOK_GAIN = "item.naturalabsorption.absorption_book.tooltip.gain";
