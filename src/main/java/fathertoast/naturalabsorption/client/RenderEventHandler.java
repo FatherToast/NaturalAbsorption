@@ -8,6 +8,7 @@ import fathertoast.naturalabsorption.common.health.HeartManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -194,23 +195,37 @@ public class RenderEventHandler {
         RenderSystem.disableBlend();
     }
     
+    /**
+     * Renders a 2D texture in the GUI using the default depth (aka blitOffset) and texture resolution.
+     *
+     * @see net.minecraft.client.gui.AbstractGui#blit(MatrixStack, int, int, int, int, int, int)
+     */
     @SuppressWarnings( "SameParameterValue" )
-    private void blit( MatrixStack mStack, int x, int y, int textureX, int textureY, int width, int height ) {
-        final Matrix4f matrix = mStack.last().pose();
+    private static void blit( MatrixStack mStack, int x, int y, int u, int v, int width, int height ) {
+        final float resolution = 256.0F;
         
-        // Standard gui z-level
-        final float zLevel = -90.0F;
-        // We assume a square texture, so don't need separate u and v
-        final float res = 1.0F / 256.0F;
+        innerBlit( mStack.last().pose(), x, x + width, y, y + height,
+                (float) u / resolution, (float) (u + width) / resolution,
+                (float) v / resolution, (float) (v + height) / resolution );
+    }
+    
+    /**
+     * Renders a 2D texture in the GUI using the default depth (aka blitOffset) and texture resolution.
+     *
+     * @see net.minecraft.client.gui.AbstractGui#innerBlit(Matrix4f, int, int, int, int, int, float, float, float, float)
+     */
+    private static void innerBlit( Matrix4f matrix, float x0, float x1, float y0, float y1, float u0, float u1, float v0, float v1 ) {
+        final float z = -90;
         
-        // Essentially copy/pasted from Gui.class
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuilder();
-        bufferBuilder.begin( 7, DefaultVertexFormats.POSITION_TEX );
-        bufferBuilder.vertex( x, y + height, zLevel ).uv( ((float) (textureX) * res), ((float) (textureY + height) * res) ).endVertex();
-        bufferBuilder.vertex( x + width, y + height, zLevel ).uv( ((float) (textureX + width) * res), ((float) (textureY + height) * res) ).endVertex();
-        bufferBuilder.vertex( x + width, y, zLevel ).uv( ((float) (textureX + width) * res), ((float) (textureY) * res) ).endVertex();
-        bufferBuilder.vertex( x, y, zLevel ).uv( ((float) (textureX) * res), ((float) (textureY) * res) ).endVertex();
-        tessellator.end();
+        BufferBuilder bufferbuilder = Tessellator.getInstance().getBuilder();
+        bufferbuilder.begin( 7, DefaultVertexFormats.POSITION_TEX );
+        bufferbuilder.vertex( matrix, x0, y1, z ).uv( u0, v1 ).endVertex();
+        bufferbuilder.vertex( matrix, x1, y1, z ).uv( u1, v1 ).endVertex();
+        bufferbuilder.vertex( matrix, x1, y0, z ).uv( u1, v0 ).endVertex();
+        bufferbuilder.vertex( matrix, x0, y0, z ).uv( u0, v0 ).endVertex();
+        bufferbuilder.end();
+        //noinspection deprecation
+        RenderSystem.enableAlphaTest(); // Copied from base code
+        WorldVertexBufferUploader.end( bufferbuilder );
     }
 }
