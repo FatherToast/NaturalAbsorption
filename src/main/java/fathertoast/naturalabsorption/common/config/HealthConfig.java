@@ -49,7 +49,7 @@ public class HealthConfig extends Config.AbstractConfig {
             SPEC.newLine();
             
             recoveryMax = SPEC.define( new DoubleField( "recovery.maximum", 6.0, DoubleField.Range.ANY,
-                    "The maximum health a player may recover to from this mod's.",
+                    "The maximum health a player may recover to from this mod's regeneration.",
                     "This limit is ignored by potion effects. If this is set less than 0, the limit is disabled." ) );
             
             SPEC.newLine();
@@ -59,7 +59,7 @@ public class HealthConfig extends Config.AbstractConfig {
                     "to recover (20 ticks = 1 second). If this is set less than 0, players will not naturally recover lost health",
                     "from this mod." ) );
             recoveryRate = SPEC.define( new ScaledDoubleField.Rate( "recovery.rate", 0.25, DoubleField.Range.NON_NEGATIVE,
-                    "The amount of health regenerated each second while recovering.",
+                    "The amount of health regenerated each second while recovering (in half-hearts/second).",
                     "This ignores the vanilla health regeneration game rule." ) );
             
             SPEC.newLine();
@@ -69,7 +69,7 @@ public class HealthConfig extends Config.AbstractConfig {
             recoveryHungerCost = SPEC.define( new ScaledDoubleField( "recovery.hunger_cost", 1.0, 4.0, DoubleField.Range.NON_NEGATIVE,
                     // Converted to exhaustion/half-heart
                     "The amount of hunger drained for each health regenerated (in drumsticks/heart).",
-                    "Players can't lose more 1/2 drumstick per game tick or more than 5 drumsticks of hunger per recovery tick." ) );
+                    "Players can't lose over 1/2 drumstick per game tick or more than 5 drumsticks of hunger per recovery tick." ) );
             
             SPEC.newLine();
             
@@ -84,8 +84,7 @@ public class HealthConfig extends Config.AbstractConfig {
                     "eaten food." ) );
             //TODO Not yet implemented
             //"eaten food. Health is only granted for the hunger/saturation actually restored (no gain from over-eating)." ) );
-            foodHealingPerSaturation = SPEC.define( new DoubleField( "food_healing.per_saturation", 0.5, DoubleField.Range.NON_NEGATIVE,
-                    (String[]) null ) );
+            foodHealingPerSaturation = SPEC.define( new DoubleField( "food_healing.per_saturation", 0.5, DoubleField.Range.NON_NEGATIVE ) );
         }
     }
 }

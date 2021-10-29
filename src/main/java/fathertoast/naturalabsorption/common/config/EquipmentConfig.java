@@ -101,7 +101,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
                     vanillaCosts( "Feather Falling ", ProtectionEnchantment.Type.FALL ),
                     vanillaCosts( "Blast Protection", ProtectionEnchantment.Type.EXPLOSION ),
                     vanillaCosts( "Proj Protection ", ProtectionEnchantment.Type.PROJECTILE ) ) );
-            costPerLevel = SPEC.define( new IntField( "cost.per_level", 10, IntField.Range.NON_NEGATIVE, (String[]) null ) );
+            costPerLevel = SPEC.define( new IntField( "cost.per_level", 10, IntField.Range.NON_NEGATIVE ) );
         }
         
         private static String vanillaCosts( String name, ProtectionEnchantment.Type type ) {
@@ -117,6 +117,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
         public final BooleanField hideArmorBar;
         
         public final DoubleField armorMultiplier;
+        public final DoubleField armorRecovery;
         public final DoubleField armorToughnessMultiplier;
         public final DoubleField armorToughnessRecovery;
         
@@ -146,6 +147,8 @@ public class EquipmentConfig extends Config.AbstractConfig {
             
             armorMultiplier = SPEC.define( new DoubleField( "absorption_multiplier", 1.0, DoubleField.Range.NON_NEGATIVE,
                     "The amount of maximum absorption granted for each armor point (in hearts/shirt)." ) );
+            armorRecovery = SPEC.define( new DoubleField( "absorption_recovery", 0.0, DoubleField.Range.NON_NEGATIVE,
+                    "The increase in absorption recovery rate for each point of armor (per half-shirt)." ) );
             armorToughnessMultiplier = SPEC.define( new DoubleField( "toughness_absorption_multiplier", 0.0, DoubleField.Range.NON_NEGATIVE,
                     "The amount of maximum absorption granted for each armor toughness point (in hearts/shirt).",
                     "For reference, the maximum attainable toughness in vanilla is 12 (full netherite armor)." ) );

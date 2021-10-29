@@ -1,16 +1,14 @@
 package fathertoast.naturalabsorption.common.item;
 
-import fathertoast.naturalabsorption.client.*;
+import fathertoast.naturalabsorption.client.RenderEventHandler;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.health.HeartData;
 import fathertoast.naturalabsorption.common.health.HeartManager;
-import fathertoast.naturalabsorption.common.network.NetworkHelper;
 import fathertoast.naturalabsorption.common.util.References;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -41,7 +39,7 @@ public class AbsorptionBookItem extends Item {
     @SuppressWarnings( "WeakerAccess" )
     public static int getLevelCost( float capacity ) {
         return MathHelper.clamp(
-                (int) (Config.ABSORPTION.NATURAL.upgradeLevelCost.get() + Config.ABSORPTION.NATURAL.upgradeLevelCostPerPoint.get() * capacity),
+                (int) (Config.ABSORPTION.NATURAL.upgradeLevelCostBase.get() + Config.ABSORPTION.NATURAL.upgradeLevelCostPerPoint.get() * capacity),
                 0, Config.ABSORPTION.NATURAL.upgradeLevelCostMax.get()
         );
     }
@@ -53,35 +51,34 @@ public class AbsorptionBookItem extends Item {
             return super.use( world, player, hand );
         }
         final boolean isCreative = player.isCreative();
-        final ItemStack book = player.getItemInHand(hand);
-
-        if ( !world.isClientSide ) {
-
-            final float currentCap = HeartManager.getNaturalAbsorption(player);
-            final int levelCost = getLevelCost(currentCap);
-
-            if (currentCap < Config.ABSORPTION.NATURAL.maximumAmount.get() && (isCreative || player.experienceLevel >= levelCost)) {
+        final ItemStack book = player.getItemInHand( hand );
+        
+        if( !world.isClientSide ) {
+            
+            final float currentCap = HeartManager.getNaturalAbsorption( player );
+            final int levelCost = getLevelCost( currentCap );
+            
+            if( currentCap < Config.ABSORPTION.NATURAL.maximumAmount.get() && (isCreative || player.experienceLevel >= levelCost) ) {
                 // Consume costs
-                if (!isCreative) {
-                    player.setItemInHand(hand, ItemStack.EMPTY);
-                    player.giveExperienceLevels(-levelCost);
+                if( !isCreative ) {
+                    player.setItemInHand( hand, ItemStack.EMPTY );
+                    player.giveExperienceLevels( -levelCost );
                 }
-                // Apply upgrade effects
-                HeartData data = HeartData.get(player);
-                float total = currentCap + (float) Config.ABSORPTION.NATURAL.upgradeGain.get();
-                data.setNaturalAbsorption(total);
-                NetworkHelper.setNaturalAbsorption((ServerPlayerEntity) player, total);
-
-                player.awardStat(Stats.ITEM_USED.get(this));
-
+                
+                // Apply upgrade effects and notify client
+                final HeartData data = HeartData.get( player );
+                data.setNaturalAbsorption( currentCap + (float) Config.ABSORPTION.NATURAL.upgradeGain.get() );
+                
+                player.awardStat( Stats.ITEM_USED.get( this ) );
+                
                 // Play sound to show success
-                player.playSound(SoundEvents.PLAYER_LEVELUP, 1.0F, 1.0F);
-
+                player.playSound( SoundEvents.PLAYER_LEVELUP, 1.0F, 1.0F );
+                
                 return ActionResult.consume( book );
             }
-
+            
             player.displayClientMessage( new TranslationTextComponent( References.NOT_ENOUGH_LEVELS, levelCost ), true );
-
+            
             return ActionResult.fail( book );
         }
         

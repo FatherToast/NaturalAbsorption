@@ -83,7 +83,7 @@ public class RenderEventHandler {
         final PlayerEntity player = Minecraft.getInstance().player;
         
         if( player == null || PLAYER_NATURAL_ABSORPTION <= 0.0F ) return;
-
+        
         final int tickCount = Minecraft.getInstance().gui.getGuiTicks();
         
         final int health = MathHelper.ceil( player.getHealth() );
@@ -110,20 +110,18 @@ public class RenderEventHandler {
         final float healthMax = (float) player.getAttributeValue( Attributes.MAX_HEALTH );
         final float absorb = MathHelper.ceil( player.getAbsorptionAmount() );
         final float globalMax = (float) Config.ABSORPTION.GENERAL.globalMax.get();
-
-        float absorbMax;
-
+        
         // Calculate the effective absorption capacity
-        if (globalMax < 0) {
-            absorbMax = PLAYER_NATURAL_ABSORPTION + HeartManager.getEquipmentAbsorption( player ) + HeartManager.getPotionAbsorption( player );
+        final float absorbMax;
+        if( globalMax < 0 ) {
+            absorbMax = PLAYER_NATURAL_ABSORPTION + HeartManager.getEquipmentAbsorption( player ) +
+                    HeartManager.getPotionAbsorption( player );
         }
         else {
-            absorbMax = Math.min(
-                    PLAYER_NATURAL_ABSORPTION + HeartManager.getEquipmentAbsorption( player ),
-                    (float) Config.ABSORPTION.GENERAL.globalMax.get())
-                    + HeartManager.getPotionAbsorption( player );
+            absorbMax = Math.min( PLAYER_NATURAL_ABSORPTION + HeartManager.getEquipmentAbsorption( player ), globalMax ) +
+                    HeartManager.getPotionAbsorption( player );
         }
-
+        
         // Calculate number of hearts we want vs. number that vanilla would render
         int extraHearts = MathHelper.ceil( (healthMax + absorbMax) / 2.0F ) -
                 MathHelper.ceil( (healthMax + absorb) / 2.0F );

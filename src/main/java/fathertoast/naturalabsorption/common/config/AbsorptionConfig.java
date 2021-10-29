@@ -15,7 +15,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
     AbsorptionConfig( File dir, String fileName ) {
         super( dir, fileName,
                 "This config contains most options for features that apply to absorption (yellow hearts).",
-                "Does NOT contain any armor or enchantment options - see the 'armor_and_enchant' config for those.",
+                "Does NOT contain any armor or enchantment options - see the 'enchant_and_armor' config for those.",
                 "Also contains hunger options related specifically to absorption recovery."
         );
         
@@ -57,7 +57,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "The amount of time (in ticks) a player must go without taking damage before their absorption begins",
                     "to recover (20 ticks = 1 second). If this is set less than 0, players will not naturally recover lost absorption." ) );
             recoveryRate = SPEC.define( new ScaledDoubleField.Rate( "recovery.rate", 2.0, DoubleField.Range.NON_NEGATIVE,
-                    "The amount of absorption regenerated each second while recovering." ) );
+                    "The amount of absorption regenerated each second while recovering (in half-hearts/second)." ) );
             
             SPEC.newLine();
             
@@ -66,7 +66,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
             recoveryHungerCost = SPEC.define( new ScaledDoubleField( "recovery.hunger_cost", 0.0, 4.0, DoubleField.Range.NON_NEGATIVE,
                     // Converted to exhaustion/half-heart
                     "The amount of hunger drained for each absorption regenerated (in drumsticks/heart).",
-                    "Players can't lose more 1/2 drumstick per game tick or more than 5 drumsticks of hunger per recovery tick." ) );
+                    "Players can't lose over 1/2 drumstick per game tick or more than 5 drumsticks of hunger per recovery tick." ) );
             
             SPEC.newLine();
             
@@ -86,7 +86,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         
         public final DoubleField upgradeGain;
         
-        public final DoubleField upgradeLevelCost;
+        public final DoubleField upgradeLevelCostBase;
         public final IntField upgradeLevelCostMax;
         public final DoubleField upgradeLevelCostPerPoint;
         
@@ -107,7 +107,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "The amount of natural absorption a new player starts with." ) );
             maximumAmount = SPEC.define( new DoubleField( "max_absorption", 20.0, DoubleField.Range.NON_NEGATIVE,
                     "The maximum natural absorption a player may obtain from upgrades.",
-                    "Does not include other source of max absorption (such as from potions or equipment)." ) );
+                    "Does not include any other sources of max absorption (such as from potions or equipment)." ) );
             
             SPEC.newLine();
             
@@ -124,8 +124,9 @@ public class AbsorptionConfig extends Config.AbstractConfig {
             
             SPEC.newLine();
             
-            upgradeLevelCost = SPEC.define( new DoubleField( "level_cost.base", 5.0, DoubleField.Range.NON_NEGATIVE,
+            upgradeLevelCostBase = SPEC.define( new DoubleField( "level_cost.base", 5.0, DoubleField.Range.ANY,
                     "The base number of levels required to use a Book of Absorption.",
+                    "A negative value reduces the cost of the first upgrade(s).",
                     "The final level cost is rounded down to the nearest whole number and clamped between 0 and the cost limit." ) );
             upgradeLevelCostPerPoint = SPEC.define( new DoubleField( "level_cost.per_point", 2.5, DoubleField.Range.NON_NEGATIVE,
                     "The number of levels required to use a Book of Absorption for each point of natural absorption",

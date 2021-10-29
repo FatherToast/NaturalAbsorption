@@ -34,19 +34,13 @@ public class HeartManager {
     private static final Set<DamageSource> MODDED_SOURCES = new HashSet<>();
     
     /** @return True if health features in this mod are enabled. */
-    public static boolean isHealthEnabled() {
-        return !Config.MAIN.GENERAL.disableHealthFeatures.get();
-    }
+    public static boolean isHealthEnabled() { return !Config.MAIN.GENERAL.disableHealthFeatures.get(); }
     
     /** @return True if absorption features in this mod are enabled. */
-    public static boolean isAbsorptionEnabled() {
-        return !Config.MAIN.GENERAL.disableAbsorptionFeatures.get();
-    }
+    public static boolean isAbsorptionEnabled() { return !Config.MAIN.GENERAL.disableAbsorptionFeatures.get(); }
     
     /** @return True if armor replacement features in this mod are enabled. */
-    public static boolean isArmorReplacementEnabled() {
-        return Config.EQUIPMENT.ARMOR.enabled.get();
-    }
+    public static boolean isArmorReplacementEnabled() { return Config.EQUIPMENT.ARMOR.enabled.get(); }
     
     public static float getNaturalAbsorption( PlayerEntity player ) {
         return HeartData.get( player ).getNaturalAbsorption();
@@ -82,10 +76,16 @@ public class HeartManager {
         // From armor
         if( isArmorReplacementEnabled() ) {
             if( Config.EQUIPMENT.ARMOR.armorMultiplier.get() > 0.0 ) {
-                bonus += Config.EQUIPMENT.ARMOR.armorMultiplier.get() * player.getAttributeValue( Attributes.ARMOR );
+                final double armor = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
+                if( armor > 0.0F ) {
+                    bonus += Config.EQUIPMENT.ARMOR.armorMultiplier.get() * armor;
+                }
             }
             if( Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() > 0.0 ) {
-                bonus += Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() * player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
+                final double toughness = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
+                if( toughness > 0.0F ) {
+                    bonus += Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() * toughness;
+                }
             }
         }
         

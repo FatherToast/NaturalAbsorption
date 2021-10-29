@@ -155,11 +155,19 @@ public class HeartData {
         final float oldAbsorption = owner.getAbsorptionAmount();
         
         if( recovered > 0.0F && oldAbsorption < maxAbsorption ) {
-            // Apply armor toughness to recovery
-            if( HeartManager.isArmorReplacementEnabled() && Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get() > 0.0 ) {
-                final double toughness = owner.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
-                if( toughness > 0.0F ) {
-                    recovered *= 1.0 + toughness * Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get();
+            // Apply recovery rate increase from armor
+            if( HeartManager.isArmorReplacementEnabled() ) {
+                if( Config.EQUIPMENT.ARMOR.armorRecovery.get() > 0.0 ) {
+                    final double armor = owner.getAttributeValue( Attributes.ARMOR );
+                    if( armor > 0.0F ) {
+                        recovered *= 1.0 + armor * Config.EQUIPMENT.ARMOR.armorRecovery.get();
+                    }
+                }
+                if( Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get() > 0.0 ) {
+                    final double toughness = owner.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
+                    if( toughness > 0.0F ) {
+                        recovered *= 1.0 + toughness * Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get();
+                    }
                 }
             }
             
