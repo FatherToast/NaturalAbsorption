@@ -1,29 +1,41 @@
-modLoader="javafml"
-loaderVersion="[36,)"
-license="MIT License"
-issueTrackerURL="https://github.com/FatherToast/NaturalAbsorption/issues"
+modLoader = "javafml"
+loaderVersion = "[36,)"
+license = "GNU General Public License v3.0"
+issueTrackerURL = "https://github.com/FatherToast/NaturalAbsorption/issues/"
 
 [[mods]]
-modId="naturalabsorption"
-version="${file.jarVersion}"
-displayName="Natural Absorption"
-logoFile="logo.png"
-credits="Sarinsa (some code stuff)"
-authors="FatherToast"
-description='''
-Puts the vanilla mechanic 'absorption' to use as a regenerating health buffer. Additionally adds options to disable and/or limit health regeneration.
+logoFile = "banner.png"
+authors = "FatherToast"
+credits = "Sarinsa (big brain), Mother Toast & Baby Toast"
+version = "${file.jarVersion}"
+displayName = "Natural Absorption"
+modId = "naturalabsorption"
+description = '''
+Puts the vanilla mechanic 'absorption' to use as a regenerating health buffer, complete with an enchantment and upgrade system.
+Additionally adds options to disable and/or limit health regeneration and armor.
+
+This mod is highly configurable and each feature has at least one config option associated with it.
+Browsing the configs will provide information on all the mod's features. If more in-depth information is needed, ask in the Discord server.
+
+Download: https://www.curseforge.com/members/fathertoast/projects/
+
+Source: https://github.com/FatherToast/
+
+Discussion: https://discord.gg/GFTzTdX
+
+Sarinsa's Discord: https://discord.gg/8FhRDZGAvX
 '''
 
 [[dependencies.naturalabsorption]]
-modId="forge"
-mandatory=true
-versionRange="[36.1.4,)"
-ordering="NONE"
-side="BOTH"
+modId = "forge"
+mandatory = true
+versionRange = "[36.1.4,)"
+ordering = "NONE"
+side = "BOTH"
 
 [[dependencies.naturalabsorption]]
-modId="minecraft"
-mandatory=true
-versionRange="[1.16.5,1.17)"
-ordering="NONE"
-side="BOTH"
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16.5,1.17)"
+ordering = "NONE"
+side = "BOTH"
