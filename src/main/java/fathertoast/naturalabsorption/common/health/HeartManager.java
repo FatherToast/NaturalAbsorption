@@ -2,6 +2,7 @@ package fathertoast.naturalabsorption.common.health;
 
 import fathertoast.naturalabsorption.ObfuscationHelper;
 import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
 import fathertoast.naturalabsorption.common.network.NetworkHelper;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -26,12 +27,16 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 public class HeartManager {
     /** Set of all currently altered damage sources. */
     private static final Set<DamageSource> MODDED_SOURCES = new HashSet<>();
+    
+    /** Map of all currently tracked players to their last known hunger state. */
+    private static final HashMap<PlayerEntity, HungerState> PLAYER_HUNGER_STATE_TRACKER = new HashMap<>();
     
     /** @return True if health features in this mod are enabled. */
     public static boolean isHealthEnabled() { return !Config.MAIN.GENERAL.disableHealthFeatures.get(); }
@@ -68,6 +73,18 @@ public class HeartManager {
         }
         MODDED_SOURCES.clear();
     }
+    
+    private static void trackPlayerHungerState( PlayerEntity player ) {
+        final HungerState hungerState = PLAYER_HUNGER_STATE_TRACKER.get( player );
+        if( hungerState == null ) {
+            PLAYER_HUNGER_STATE_TRACKER.put( player, new HungerState( player ) );
+        }
+        else {
+            hungerState.update( player );
+        }
+    }
+    
+    private static void clearPlayerHungerState( PlayerEntity player ) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
     
     /** @return The max absorption granted by equipment. */
     public static float getEquipmentAbsorption( PlayerEntity player ) {
@@ -125,6 +142,7 @@ public class HeartManager {
             // Counter for cache cleanup.
             if( ++cleanupCounter >= 600 ) {
                 cleanupCounter = 0;
+                PLAYER_HUNGER_STATE_TRACKER.clear();
                 clearSources();
                 HeartData.clearCache();
             }
@@ -144,6 +162,45 @@ public class HeartManager {
     }
     
     /**
+     * Called when any item use is started.
+     *
+     * @param event The event data.
+     */
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onItemUseStart( LivingEntityUseItemEvent.Start event ) {
+        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+            // Start watching hunger
+            trackPlayerHungerState( (PlayerEntity) event.getEntityLiving() );
+        }
+    }
+    
+    /**
+     * Called each tick while an item is in use.
+     *
+     * @param event The event data.
+     */
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onItemUseTick( LivingEntityUseItemEvent.Tick event ) {
+        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+            // Update watched hunger, just in case anything changes mid-use
+            trackPlayerHungerState( (PlayerEntity) event.getEntityLiving() );
+        }
+    }
+    
+    /**
+     * Called when any item use is canceled (i.e., before reaching max use duration).
+     *
+     * @param event The event data.
+     */
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onItemUseStop( LivingEntityUseItemEvent.Stop event ) {
+        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+            // Stop watching hunger; item was not food or eating was canceled
+            clearPlayerHungerState( (PlayerEntity) event.getEntityLiving() );
+        }
+    }
+    
+    /**
      * Called when any item use is completed.
      * <p>
      * Applies healing from food, if enabled.
@@ -153,6 +210,7 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseFinish( LivingEntityUseItemEvent.Finish event ) {
         if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+            final PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingMax.get() != 0.0 ) {
                 // Apply healing from food
                 final ItemStack stack = event.getItem();
@@ -162,10 +220,26 @@ public class HeartManager {
                             (float) Config.HEALTH.GENERAL.foodHealingMax.get();
                     
                     // Calculate the food's hunger and saturation
-                    //TODO Calculate actual hunger/saturation changes, try tracking players that are using items
-                    final Food food = stack.getItem().getFoodProperties();
-                    final int hunger = food.getNutrition();
-                    final float saturation = hunger * food.getSaturationModifier() * 2.0F;
+                    final int hunger;
+                    final float saturation;
+                    final HungerState hungerState = PLAYER_HUNGER_STATE_TRACKER.get( player );
+                    if( hungerState == null ) {
+                        // Fall back to the old method of direct food potential :(
+                        NaturalAbsorption.LOG.warn( "Failed to calculate actual hunger/saturation gained from eating! Item:[{}]",
+                                stack.toString() );
+                        
+                        final Food food = stack.getItem().getFoodProperties();
+                        hunger = food.getNutrition();
+                        saturation = hunger * food.getSaturationModifier() * 2.0F;
+                    }
+                    else {
+                        // Calculate actual hunger and saturation gained
+                        hunger = player.getFoodData().getFoodLevel() - hungerState.food;
+                        saturation = player.getFoodData().getSaturationLevel() - hungerState.saturation;
+                        
+                        // Stop watching hunger
+                        clearPlayerHungerState( player );
+                    }
                     
                     // Apply any healing
                     float healing = 0.0F;
@@ -176,7 +250,7 @@ public class HeartManager {
                         healing += saturation * (float) Config.HEALTH.GENERAL.foodHealingPerSaturation.get();
                     }
                     if( healing > 0.0F ) {
-                        event.getEntityLiving().heal( Math.min( healing, maxHealing ) );
+                        player.heal( Math.min( healing, maxHealing ) );
                     }
                 }
             }
@@ -327,4 +401,17 @@ public class HeartManager {
     }
     
     public enum EnumDurabilityTrigger { ALL, HITS, NONE }
+    
+    /** Used to track the current hunger and saturation level for a player of interest. */
+    private static class HungerState {
+        int food;
+        float saturation;
+        
+        HungerState( PlayerEntity player ) { update( player ); }
+        
+        void update( PlayerEntity player ) {
+            food = player.getFoodData().getFoodLevel();
+            saturation = player.getFoodData().getSaturationLevel();
+        }
+    }
 }

@@ -81,9 +81,7 @@ public class HealthConfig extends Config.AbstractConfig {
             
             foodHealingPerHunger = SPEC.define( new DoubleField( "food_healing.per_hunger", 0.25, DoubleField.Range.NON_NEGATIVE,
                     "The amount of health recovered for each hunger and saturation (in hearts/drumstick) granted by",
-                    "eaten food." ) );
-            //TODO Not yet implemented
-            //"eaten food. Health is only granted for the hunger/saturation actually restored (no gain from over-eating)." ) );
+                    "eaten food. Health is only granted for the hunger/saturation actually restored (no gain from over-eating)." ) );
             foodHealingPerSaturation = SPEC.define( new DoubleField( "food_healing.per_saturation", 0.5, DoubleField.Range.NON_NEGATIVE ) );
         }
     }
