@@ -1,6 +1,5 @@
 package fathertoast.naturalabsorption.common.health;
 
-import fathertoast.naturalabsorption.ObfuscationHelper;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
@@ -57,19 +56,19 @@ public class HeartManager {
     /** Modifies a source to ignore armor. */
     private static void modifySource( DamageSource source ) {
         if( source.isBypassInvul() ) return;
-        ObfuscationHelper.DamageSource_isUnblockable.set( source, true );
+        source.bypassArmor = true;
     }
     
     /** Undoes any modification done to a damage source. */
     private static void restoreSource( DamageSource source ) {
-        ObfuscationHelper.DamageSource_isUnblockable.set( source, false );
+        source.bypassArmor = false;
         MODDED_SOURCES.remove( source );
     }
     
     /** Undoes all modification done to all damage sources. */
     public static void clearSources() {
         for( DamageSource source : MODDED_SOURCES ) {
-            ObfuscationHelper.DamageSource_isUnblockable.set( source, false );
+            source.bypassArmor = false;
         }
         MODDED_SOURCES.clear();
     }
