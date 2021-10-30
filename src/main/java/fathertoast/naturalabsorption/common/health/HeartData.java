@@ -20,6 +20,7 @@ public class HeartData {
     
     private static final String TAG_BASE = NaturalAbsorption.MOD_ID;
     private static final String TAG_NATURAL_ABSORPTION = "AbsorbNatural";
+    private static final String TAG_EQUIPMENT_ABSORPTION = "AbsorbEquip";
     private static final String TAG_DELAY_ABSORPTION = "AbsorbDelay";
     private static final String TAG_DELAY_HEALTH = "HealthDelay";
     
@@ -50,6 +51,7 @@ public class HeartData {
     private final CompoundNBT saveTag;
     
     private float naturalAbsorption = -1.0F;
+    private float lastEquipmentAbsorption = -1.0F;
     private int absorptionRecoveryDelay;
     private int healthRecoveryDelay;
     
@@ -61,12 +63,27 @@ public class HeartData {
         if( HeartManager.isAbsorptionEnabled() ) {
             value = MathHelper.clamp( value, 0.0F, (float) Config.ABSORPTION.NATURAL.maximumAmount.get() );
             if( naturalAbsorption != value ) {
+                final float netChange = value - naturalAbsorption;
+                
                 saveTag.putFloat( TAG_NATURAL_ABSORPTION, value );
                 naturalAbsorption = value;
+                
+                setAbsorption( owner.getAbsorptionAmount() + netChange );
                 
                 if( owner instanceof ServerPlayerEntity ) {
                     NetworkHelper.setNaturalAbsorption( (ServerPlayerEntity) owner, value );
                 }
+            }
+        }
+    }
+    
+    private float getLastEquipmentAbsorption() { return lastEquipmentAbsorption; }
+    
+    private void setLastEquipmentAbsorption( float value ) {
+        if( HeartManager.isAbsorptionEnabled() ) {
+            if( lastEquipmentAbsorption != value ) {
+                saveTag.putFloat( TAG_EQUIPMENT_ABSORPTION, value );
+                lastEquipmentAbsorption = value;
             }
         }
     }
@@ -110,12 +127,34 @@ public class HeartData {
                 Math.min( calculatedMax, (float) Config.ABSORPTION.GENERAL.globalMax.get() );
     }
     
+    /** @return The player's max absorption actually granted by equipment. That is, how much they would lose by unequipping everything. */
+    private float getTrueEquipmentAbsorption() {
+        // Use the max just in case the player meets or exceeds the global limit with natural absorption on its own
+        return Math.max( 0.0F, getSteadyStateMaxAbsorption() - getNaturalAbsorption() );
+    }
+    
     /** @return The player's max absorption, from all sources combined. */
     public float getMaxAbsorption() { return getSteadyStateMaxAbsorption() + HeartManager.getPotionAbsorption( owner ); }
     
     /** Helper method to set the player's current absorption; clamps the value between 0 and the player's personal maximum. */
     public void setAbsorption( float value ) {
         owner.setAbsorptionAmount( MathHelper.clamp( value, 0.0F, getMaxAbsorption() ) );
+    }
+    
+    /** Changes the player's absorption based on currently equipped items. */
+    void onEquipmentChanged() {
+        final float newEquipmentAbsorption = getTrueEquipmentAbsorption();
+        if( getLastEquipmentAbsorption() < 0.0F ) {
+            // This case probably shouldn't happen, but it just means there is no last value or we don't know it
+            setLastEquipmentAbsorption( newEquipmentAbsorption );
+        }
+        else if( newEquipmentAbsorption != getLastEquipmentAbsorption() ) {
+            // Changes in max absorption should provide equivalent changes to current absorption, if possible
+            final float netChange = newEquipmentAbsorption - getLastEquipmentAbsorption();
+            setAbsorption( owner.getAbsorptionAmount() + netChange );
+            
+            setLastEquipmentAbsorption( newEquipmentAbsorption );
+        }
     }
     
     /** Updates the player's absorption and health values by the number of ticks since this was last updated. */
@@ -235,6 +274,13 @@ public class HeartData {
             // New player, give starting absorption
             setNaturalAbsorption( (float) Config.ABSORPTION.NATURAL.startingAmount.get() );
             setAbsorption( getNaturalAbsorption() );
+        }
+        if( saveTag.contains( TAG_EQUIPMENT_ABSORPTION, NBT_TYPE_NUMERICAL ) ) {
+            setLastEquipmentAbsorption( saveTag.getFloat( TAG_EQUIPMENT_ABSORPTION ) );
+        }
+        else if( HeartManager.isAbsorptionEnabled() ) {
+            // New player, assume nothing equipped grants max absorption
+            setLastEquipmentAbsorption( 0.0F );
         }
         
         if( saveTag.contains( TAG_DELAY_ABSORPTION, NBT_TYPE_NUMERICAL ) ) {

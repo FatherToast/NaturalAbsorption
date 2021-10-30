@@ -16,6 +16,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -23,9 +24,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class HeartManager {
     /** Set of all currently altered damage sources. */
@@ -33,6 +32,9 @@ public class HeartManager {
     
     /** Map of all currently tracked players to their last known hunger state. */
     private static final HashMap<PlayerEntity, HungerState> PLAYER_HUNGER_STATE_TRACKER = new HashMap<>();
+    
+    /** Set of players that have had equipment changed this tick. */
+    private static final Set<PlayerEntity> PLAYER_EQUIPMENT_CHANGES = new HashSet<>();
     
     /** @return True if health features in this mod are enabled. */
     public static boolean isHealthEnabled() { return !Config.MAIN.GENERAL.disableHealthFeatures.get(); }
@@ -42,10 +44,6 @@ public class HeartManager {
     
     /** @return True if armor replacement features in this mod are enabled. */
     public static boolean isArmorReplacementEnabled() { return Config.EQUIPMENT.ARMOR.enabled.get(); }
-    
-    public static float getNaturalAbsorption( PlayerEntity player ) {
-        return HeartData.get( player ).getNaturalAbsorption();
-    }
     
     /** Returns true if the given damage source is modified to ignore armor. */
     private static boolean isSourceModified( DamageSource source ) { return MODDED_SOURCES.contains( source ); }
@@ -135,7 +133,7 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
-            // Counter for cache cleanup.
+            // Counter for cache cleanup
             if( ++cleanupCounter >= 600 ) {
                 cleanupCounter = 0;
                 PLAYER_HUNGER_STATE_TRACKER.clear();
@@ -143,7 +141,15 @@ public class HeartManager {
                 HeartData.clearCache();
             }
             
-            // Counter for player shield update.
+            // Handle equipment changes
+            if( !PLAYER_EQUIPMENT_CHANGES.isEmpty() ) {
+                for( PlayerEntity player : PLAYER_EQUIPMENT_CHANGES ) {
+                    if( player != null && player.isAlive() ) HeartData.get( player ).onEquipmentChanged();
+                }
+                PLAYER_EQUIPMENT_CHANGES.clear();
+            }
+            
+            // Counter for player shield update
             if( ++updateCounter >= Config.MAIN.GENERAL.updateTime.get() ) {
                 updateCounter = 0;
                 
@@ -306,6 +312,23 @@ public class HeartManager {
             
             // Initialize the client's absorption capacity
             NetworkHelper.setNaturalAbsorption( (ServerPlayerEntity) player, absorptionHealth );
+        }
+    }
+    
+    /**
+     * Called after a living entity's equipment has been changed (including when the equipment is loaded from spawn).
+     * <p>
+     * Used to track changes in max absorption granted by equipment.
+     *
+     * @param event The event data.
+     */
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onLivingEquipmentChange( LivingEquipmentChangeEvent event ) {
+        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+            if( isAbsorptionEnabled() ) {
+                // Mark the player to be checked for changes; this event is called for each changed slot, avoid adding duplicates
+                PLAYER_EQUIPMENT_CHANGES.add( (PlayerEntity) event.getEntityLiving() );
+            }
         }
     }
     

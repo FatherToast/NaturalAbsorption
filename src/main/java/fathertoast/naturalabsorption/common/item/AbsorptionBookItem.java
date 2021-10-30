@@ -53,7 +53,9 @@ public class AbsorptionBookItem extends Item {
         final ItemStack book = player.getItemInHand( hand );
         
         if( !world.isClientSide ) {
-            final float currentCap = HeartManager.getNaturalAbsorption( player );
+            final HeartData data = HeartData.get( player );
+            
+            final float currentCap = data.getNaturalAbsorption();
             final int levelCost = getLevelCost( currentCap );
             
             // Give the player feedback on failure
@@ -73,7 +75,6 @@ public class AbsorptionBookItem extends Item {
             }
             
             // Apply upgrade effects and notify client
-            final HeartData data = HeartData.get( player );
             data.setNaturalAbsorption( currentCap + (float) Config.ABSORPTION.NATURAL.upgradeGain.get() );
             
             player.awardStat( Stats.ITEM_USED.get( this ) );
