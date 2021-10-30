@@ -12,7 +12,7 @@ displayName = "Natural Absorption"
 modId = "naturalabsorption"
 description = '''
 Puts the vanilla mechanic 'absorption' to use as a regenerating health buffer, complete with an enchantment and upgrade system.
-Additionally adds options to disable and/or limit health regeneration and armor.
+Additionally adds options to disable and/or limit health regeneration and armor. Disables health regen by default.
 
 This mod is highly configurable and each feature has at least one config option associated with it.
 Browsing the configs will provide information on all the mod's features. If more in-depth information is needed, ask in the Discord server.
