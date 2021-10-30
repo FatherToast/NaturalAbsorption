@@ -2,6 +2,7 @@ package fathertoast.naturalabsorption.common.config;
 
 import fathertoast.naturalabsorption.common.config.field.*;
 import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
+import net.minecraft.world.GameRules;
 
 import java.io.File;
 
@@ -23,7 +24,7 @@ public class MainConfig extends Config.AbstractConfig {
         
         public final IntField updateTime;
         
-        public final BooleanField disableRegenGameRule;
+        public final InjectionWrapperField<BooleanField> defaultGameRuleNoRegen;
         
         public final BooleanField disableAbsorptionFeatures;
         public final BooleanField disableHealthFeatures;
@@ -38,9 +39,17 @@ public class MainConfig extends Config.AbstractConfig {
             
             SPEC.newLine();
             
-            disableRegenGameRule = SPEC.define( new BooleanField( "disable_regen_game_rule", true,
-                    "When set to true, this mod will constantly set the vanilla regeneration game rule",
-                    "\"naturalRegeneration\" to \"false\" to disable other sources of health (red hearts) regeneration." ) );
+            defaultGameRuleNoRegen = SPEC.define( new InjectionWrapperField<>(
+                    new BooleanField( "default_regen_game_rule_disabled", true,
+                            "When set to true, this mod will alter the vanilla regeneration game rule \"naturalRegeneration\" to",
+                            "be \"false\" by default when creating new worlds.",
+                            "Regardless of this config setting, you can still create a world with vanilla health regen ON or OFF",
+                            "by using the Game Rules button on the new world options screen or by using commands in-game." ),
+                    ( wrapped ) -> {
+                        // Note, we are assuming the default is always true without this mod (ie, no other mod changes the default)
+                        GameRules.GAME_RULE_TYPES.put( GameRules.RULE_NATURAL_REGENERATION,
+                                GameRules.BooleanValue.create( !wrapped.get() ) );
+                    } ) );
             
             SPEC.newLine();
             

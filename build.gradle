@@ -6,17 +6,18 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
-        classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
+        //classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
-apply plugin: "org.spongepowered.mixin"
+//apply plugin: "org.spongepowered.mixin"
 
-version = "${mc_version}-${mod_version}"
-group = 'com.toast.naturalabsorption'
-archivesBaseName = 'Natural-Absorption'
+// The mod's version and id
+version = "${mc_version}-1.0.0a"
+archivesBaseName = 'naturalabsorption'
+group = "fathertoast.${archivesBaseName}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 

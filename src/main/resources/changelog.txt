@@ -1,3 +1,12 @@
+1.16.5-1.0.0
+    - Rewritten for 1.16.5, primarily done by Sarinsa
+    - The health regen disabling option now sets the game rule's default value rather than constantly setting it
+    - Food healing rebalanced
+        - Only counts actual hunger and saturation restored, rather than counting total value of food eaten
+        - Now counts saturation (on its own drumstick:health ratio)
+    - Armor replacement rebalanced
+        - Most settings can now be enabled/disabled independently (still need to be enabled by master toggle)
+        - Now armor and armor toughness can each provide absorption hearts and/or absorption recovery rate
 1.0.0
     - Rewritten for 1.12.2.
     - Merged unreleased mod "Regen Cap" - similar controls for normal health.

@@ -13,8 +13,6 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -24,7 +22,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -284,18 +281,6 @@ public class HeartManager {
             }
             if( isAbsorptionEnabled() ) {
                 data.setAbsorption( (float) Config.ABSORPTION.GENERAL.respawnAmount.get() );
-            }
-        }
-    }
-    
-    @SubscribeEvent( priority = EventPriority.NORMAL )
-    public void onServerStarting( FMLServerStartingEvent event ) {
-        // Disable the health regen game rule if needed
-        if( Config.MAIN.GENERAL.disableRegenGameRule.get() ) {
-            // Pretty sure the game rules are only stored in the overworld instance, but do this just in case for now
-            for( ServerWorld world : event.getServer().getAllLevels() ) {
-                final GameRules.BooleanValue naturalRegenRule = world.getGameRules().getRule( GameRules.RULE_NATURAL_REGENERATION );
-                if( naturalRegenRule.get() ) naturalRegenRule.set( false, event.getServer() );
             }
         }
     }
