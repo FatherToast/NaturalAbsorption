@@ -124,7 +124,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
             
             SPEC.newLine();
             
-            upgradeLevelCostBase = SPEC.define( new DoubleField( "level_cost.base", 5.0, DoubleField.Range.ANY,
+            upgradeLevelCostBase = SPEC.define( new DoubleField( "level_cost.base", 0.0, DoubleField.Range.ANY,
                     "The base number of levels required to use a Book of Absorption.",
                     "A negative value reduces the cost of the first upgrade(s).",
                     "The final level cost is rounded down to the nearest whole number and clamped between 0 and the cost limit." ) );

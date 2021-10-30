@@ -2,6 +2,7 @@ package fathertoast.naturalabsorption.common.util;
 
 public class References {
     
+    public static final String ALREADY_MAX = "item.naturalabsorption.absorption_book.already_max";
     public static final String NOT_ENOUGH_LEVELS = "item.naturalabsorption.absorption_book.not_enough_levels";
     
     public static final String BOOK_CURRENT = "item.naturalabsorption.absorption_book.tooltip.current";

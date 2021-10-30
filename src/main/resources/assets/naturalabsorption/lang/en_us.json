@@ -8,6 +8,7 @@
   "item.naturalabsorption.absorption_book.tooltip.canuse": "Right click to use",
   "item.naturalabsorption.absorption_book.tooltip.nouse": "You can't use this",
 
+  "item.naturalabsorption.absorption_book.already_max": "Cannot upgrade your natural absorption any higher",
   "item.naturalabsorption.absorption_book.not_enough_levels": "Requires at least %s levels to use",
 
   "enchantment.naturalabsorption.absorption": "Absorption"
