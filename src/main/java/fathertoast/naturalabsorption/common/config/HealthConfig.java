@@ -37,6 +37,8 @@ public class HealthConfig extends Config.AbstractConfig {
         public final DoubleField foodHealingPerHunger;
         public final DoubleField foodHealingPerSaturation;
         
+        //public final BooleanField foodHealingExtraTooltipInfo;
+        
         General( ToastConfigSpec parent ) {
             super( parent, "health",
                     "Options that apply to health (red hearts).",
@@ -83,6 +85,13 @@ public class HealthConfig extends Config.AbstractConfig {
                     "The amount of health recovered for each hunger and saturation (in hearts/drumstick) granted by",
                     "eaten food. Health is only granted for the hunger/saturation actually restored (no gain from over-eating)." ) );
             foodHealingPerSaturation = SPEC.define( new DoubleField( "food_healing.per_saturation", 0.5, DoubleField.Range.NON_NEGATIVE ) );
+            
+            // TODO Would be nice, even if not "pretty" and default disabled
+            //SPEC.newLine();
+            
+            //foodHealingExtraTooltipInfo = SPEC.define( new BooleanField( "food_healing.extra_tooltip_info", false,
+            //        "Set to true to display nutritional value on the tooltips of food items.",
+            //        "Lists hunger, saturation, and health that can be restored from eating." ) );
         }
     }
 }
