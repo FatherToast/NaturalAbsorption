@@ -1,5 +1,6 @@
 package fathertoast.naturalabsorption.common.health;
 
+import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.network.NetworkHelper;
@@ -9,12 +10,13 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings( "WeakerAccess" )
-public class HeartData {
+public class HeartData implements IHeartData {
     
     private static final int NBT_TYPE_NUMERICAL = 99;
     
@@ -33,7 +35,12 @@ public class HeartData {
      * @param player Player to get or load heart data for.
      * @return The player's heart data.
      */
+    @Nullable
     public static HeartData get( PlayerEntity player ) {
+        if (player == null) {
+            return null;
+        }
+
         if( player.level.isClientSide ) {
             throw new IllegalArgumentException( "Heart data is only stored on the server side!" );
         }
