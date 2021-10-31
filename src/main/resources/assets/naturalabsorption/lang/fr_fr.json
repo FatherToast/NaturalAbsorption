@@ -1,0 +1,15 @@
+{
+  "item.naturalabsorption.absorption_book": "Livre d'absorption",
+
+  "item.naturalabsorption.absorption_book.tooltip.current": "Ton absorption",
+  "item.naturalabsorption.absorption_book.tooltip.gain": "Quand utilisé :",
+  "item.naturalabsorption.absorption_book.tooltip.max": "+%s Max Absorption",
+  "item.naturalabsorption.absorption_book.tooltip.cost": "Coût: %d niveaux",
+  "item.naturalabsorption.absorption_book.tooltip.canuse": "Clic droit pour utiliser",
+  "item.naturalabsorption.absorption_book.tooltip.nouse": "Tu ne peux pas utiliser ça",
+
+  "item.naturalabsorption.absorption_book.already_max": "Tu ne peux pas améliorer votre absorption naturelle plus haut",
+  "item.naturalabsorption.absorption_book.not_enough_levels": "Nécessite au moins %s niveaux à utiliser",
+
+  "enchantment.naturalabsorption.absorption": "Absorption"
+}

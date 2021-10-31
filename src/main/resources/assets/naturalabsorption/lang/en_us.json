@@ -3,7 +3,7 @@
 
   "item.naturalabsorption.absorption_book.tooltip.current": "Your absorption",
   "item.naturalabsorption.absorption_book.tooltip.gain": "When used:",
-  "item.naturalabsorption.absorption_book.tooltip.max": "Max Absorption",
+  "item.naturalabsorption.absorption_book.tooltip.max": "+%s Max Absorption",
   "item.naturalabsorption.absorption_book.tooltip.cost": "Cost: %d levels",
   "item.naturalabsorption.absorption_book.tooltip.canuse": "Right click to use",
   "item.naturalabsorption.absorption_book.tooltip.nouse": "You can't use this",

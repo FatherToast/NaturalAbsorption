@@ -114,7 +114,7 @@ public class AbsorptionBookItem extends Item {
                 tooltip.add( new TranslationTextComponent( TextFormatting.GRAY +
                         translate( References.BOOK_GAIN ).getString() ) );
                 tooltip.add( new TranslationTextComponent( TextFormatting.BLUE +
-                        "+" + prettyToString( gainOnUse ) + " " + translate( References.BOOK_MAX ).getString() ) );
+                        translate( References.BOOK_MAX, prettyToString( gainOnUse ) ).getString() ) );
                 
                 // Provide feedback on cost and usability
                 if( player != null ) {

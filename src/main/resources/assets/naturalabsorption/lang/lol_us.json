@@ -1,0 +1,15 @@
+{
+  "item.naturalabsorption.absorption_book": "BIG book ov absorbystuff",
+
+  "item.naturalabsorption.absorption_book.tooltip.current": "ur aps0rbings",
+  "item.naturalabsorption.absorption_book.tooltip.gain": "Wehn u Use:",
+  "item.naturalabsorption.absorption_book.tooltip.max": "+%s abzorbshin MAX",
+  "item.naturalabsorption.absorption_book.tooltip.cost": "c0st: %d lvlz",
+  "item.naturalabsorption.absorption_book.tooltip.canuse": "Rite clix 2 uze!!1!",
+  "item.naturalabsorption.absorption_book.tooltip.nouse": "N0T KEWL ENUF 4 ME",
+
+  "item.naturalabsorption.absorption_book.already_max": "U gots 2 muhc absoorbshingksdafgklm",
+  "item.naturalabsorption.absorption_book.not_enough_levels": "git gud",
+
+  "enchantment.naturalabsorption.absorption": "absurbshun"
+}
