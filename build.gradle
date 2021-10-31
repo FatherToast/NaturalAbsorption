@@ -99,6 +99,19 @@ jar {
     }
 }
 
+task apiJar(type: Jar) {
+    classifier = 'api'
+    include 'fathertoast/naturalabsorption/api/**/*'
+    exclude 'fathertoast/naturalabsorption/api/impl/**/*'
+
+    from sourceSets.main.output
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives apiJar
+}
+
 jar.finalizedBy('reobfJar')
 
 publishing {
