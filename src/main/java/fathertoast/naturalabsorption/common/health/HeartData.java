@@ -10,7 +10,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -35,12 +35,8 @@ public class HeartData implements IHeartData {
      * @param player Player to get or load heart data for.
      * @return The player's heart data.
      */
-    @Nullable
-    public static HeartData get( PlayerEntity player ) {
-        if (player == null) {
-            return null;
-        }
-
+    @Nonnull
+    public static HeartData get( @Nonnull PlayerEntity player ) {
         if( player.level.isClientSide ) {
             throw new IllegalArgumentException( "Heart data is only stored on the server side!" );
         }
@@ -64,8 +60,12 @@ public class HeartData implements IHeartData {
     
     // Absorption health capacity methods
     
+    /** @return The player's natural absorption. */
+    @Override
     public float getNaturalAbsorption() { return naturalAbsorption; }
     
+    /** Sets the player's natural absorption. The player will gain or lose current absorption to match. */
+    @Override
     public void setNaturalAbsorption( float value ) {
         if( HeartManager.isAbsorptionEnabled() ) {
             value = MathHelper.clamp( value, 0.0F, (float) Config.ABSORPTION.NATURAL.maximumAmount.get() );
@@ -118,6 +118,7 @@ public class HeartData implements IHeartData {
     public void reduceHealthDelay( int val ) { setHealthDelay( healthRecoveryDelay - val ); }
     
     /** Starts the player's recovery delay timers. */
+    @Override
     public void startRecoveryDelay() {
         if( HeartManager.isHealthEnabled() && Config.HEALTH.GENERAL.recoveryDelay.get() > 0 ) {
             setHealthDelay( Config.HEALTH.GENERAL.recoveryDelay.get() );
@@ -128,22 +129,26 @@ public class HeartData implements IHeartData {
     }
     
     /** @return The player's max absorption not counting buffs, limited by the global max absorption config. */
-    private float getSteadyStateMaxAbsorption() {
+    @Override
+    public float getSteadyStateMaxAbsorption() {
         final float calculatedMax = getNaturalAbsorption() + HeartManager.getEquipmentAbsorption( owner );
         return Config.ABSORPTION.GENERAL.globalMax.get() < 0.0F ? calculatedMax :
                 Math.min( calculatedMax, (float) Config.ABSORPTION.GENERAL.globalMax.get() );
     }
     
     /** @return The player's max absorption actually granted by equipment. That is, how much they would lose by unequipping everything. */
-    private float getTrueEquipmentAbsorption() {
+    @Override
+    public float getTrueEquipmentAbsorption() {
         // Use the max just in case the player meets or exceeds the global limit with natural absorption on its own
         return Math.max( 0.0F, getSteadyStateMaxAbsorption() - getNaturalAbsorption() );
     }
     
     /** @return The player's max absorption, from all sources combined. */
+    @Override
     public float getMaxAbsorption() { return getSteadyStateMaxAbsorption() + HeartManager.getPotionAbsorption( owner ); }
     
     /** Helper method to set the player's current absorption; clamps the value between 0 and the player's personal maximum. */
+    @Override
     public void setAbsorption( float value ) {
         owner.setAbsorptionAmount( MathHelper.clamp( value, 0.0F, getMaxAbsorption() ) );
     }
