@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 //apply plugin: "org.spongepowered.mixin"
 
 // The mod's version and id
-version = "${mc_version}-1.0.0a"
+version = "${mc_version}-1.0.0"
 archivesBaseName = 'naturalabsorption'
 group = "fathertoast.${archivesBaseName}"
 
@@ -88,13 +88,13 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "Natural Absorption",
-            "Specification-Vendor": "FatherToast",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"FatherToast",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Specification-Title"     : "Natural Absorption",
+                "Specification-Vendor"    : "FatherToast",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : "FatherToast",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
