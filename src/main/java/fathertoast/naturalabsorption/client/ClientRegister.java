@@ -12,6 +12,6 @@ public class ClientRegister {
 
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
-        MinecraftForge.EVENT_BUS.register( new RenderEventHandler() );
+        //MinecraftForge.EVENT_BUS.register( new RenderEventHandler() );
     }
 }

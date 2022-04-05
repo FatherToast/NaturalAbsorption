@@ -3,7 +3,6 @@ package fathertoast.naturalabsorption.client;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fathertoast.naturalabsorption.common.config.Config;
-import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.health.HeartManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -23,6 +22,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Random;
 
+// TODO - Remove in 1.18.X as Minecraft handles this
+//        on its own now, seemingly.
+@Deprecated
 public class RenderEventHandler {
     
     public static float PLAYER_NATURAL_ABSORPTION = -1.0F;
@@ -36,16 +38,10 @@ public class RenderEventHandler {
     private int displayHealth;
     /** The last recorded system time */
     private long lastHealthTime;
-    
-    /**
-     * Called before rendering each game overlay element.
-     * <p>
-     * Cancels armor bar rendering when appropriate.
-     *
-     * @param event The event data.
-     */
-    @SubscribeEvent( priority = EventPriority.NORMAL )
+
+    //@SubscribeEvent( priority = EventPriority.NORMAL )
     public void beforeRenderGameOverlay( RenderGameOverlayEvent.Pre event ) {
+        /*
         if( HeartManager.isArmorReplacementEnabled() && Config.EQUIPMENT.ARMOR.hideArmorBar.get() &&
                 RenderGameOverlayEvent.ElementType.ARMOR.equals( event.getType() ) ) {
             event.setCanceled( true );
@@ -60,6 +56,7 @@ public class RenderEventHandler {
                 event.setCanceled( false ); // In case we already canceled the vanilla event
             }
         }
+         */
     }
     
     /**
