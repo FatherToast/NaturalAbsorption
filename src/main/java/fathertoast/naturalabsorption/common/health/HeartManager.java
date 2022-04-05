@@ -133,11 +133,14 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
+            final MinecraftServer server = LogicalSidedProvider.INSTANCE.get( LogicalSide.SERVER );
+
             // Counter for cache cleanup
             if( ++cleanupCounter >= 600 ) {
                 cleanupCounter = 0;
                 PLAYER_HUNGER_STATE_TRACKER.clear();
                 clearSources();
+                HeartData.saveToPersistent(server.getPlayerList().getPlayers());
                 HeartData.clearCache();
             }
             
@@ -152,9 +155,7 @@ public class HeartManager {
             // Counter for player shield update
             if( ++updateCounter >= Config.MAIN.GENERAL.updateTime.get() ) {
                 updateCounter = 0;
-                
-                // Maybe this is the right way to get the server instance
-                final MinecraftServer server = LogicalSidedProvider.INSTANCE.get( LogicalSide.SERVER );
+
                 for( ServerPlayerEntity player : server.getPlayerList().getPlayers() ) {
                     // Update each player's data
                     if( player != null && player.isAlive() ) HeartData.get( player ).update();
@@ -298,20 +299,14 @@ public class HeartManager {
      *
      * @param event The event data.
      */
-    @SubscribeEvent( priority = EventPriority.NORMAL )
+    // TODO - Remove in 1.18.X.
+    //@SubscribeEvent( priority = EventPriority.NORMAL )
+    @Deprecated
     public void onJoinWorld( EntityJoinWorldEvent event ) {
         if( !event.getWorld().isClientSide && event.getEntity() instanceof PlayerEntity ) {
             final PlayerEntity player = (PlayerEntity) event.getEntity();
             final float absorptionHealth = player.getAbsorptionAmount();
-            
-            // An effort to fix the vanilla bug with absorption not updating properly
-            /* This bug appears to have been fixed; remove this for now.
-            player.setAbsorptionAmount( absorptionHealth + 0.01F );
-            player.setAbsorptionAmount( absorptionHealth );
-            */
-            
-            // Initialize the client's absorption capacity
-            NetworkHelper.setNaturalAbsorption( (ServerPlayerEntity) player, absorptionHealth );
+
         }
     }
     

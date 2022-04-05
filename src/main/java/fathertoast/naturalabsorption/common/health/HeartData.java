@@ -1,8 +1,8 @@
 package fathertoast.naturalabsorption.common.health;
 
 import fathertoast.naturalabsorption.api.IHeartData;
+import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
 import fathertoast.naturalabsorption.common.config.Config;
-import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.network.NetworkHelper;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,6 +12,7 @@ import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,16 +21,40 @@ public class HeartData implements IHeartData {
     
     private static final int NBT_TYPE_NUMERICAL = 99;
     
-    private static final String TAG_BASE = NaturalAbsorption.MOD_ID;
-    private static final String TAG_NATURAL_ABSORPTION = "AbsorbNatural";
-    private static final String TAG_EQUIPMENT_ABSORPTION = "AbsorbEquip";
-    private static final String TAG_DELAY_ABSORPTION = "AbsorbDelay";
-    private static final String TAG_DELAY_HEALTH = "HealthDelay";
+    private static final String TAG_BASE = NaturalAbsorptionAPI.TAG_BASE;
+    private static final String TAG_NATURAL_ABSORPTION = NaturalAbsorptionAPI.TAG_NATURAL_ABSORPTION;
+    private static final String TAG_EQUIPMENT_ABSORPTION = NaturalAbsorptionAPI.TAG_EQUIPMENT_ABSORPTION;
+    private static final String TAG_DELAY_ABSORPTION = NaturalAbsorptionAPI.TAG_DELAY_ABSORPTION;
+    private static final String TAG_DELAY_HEALTH = NaturalAbsorptionAPI.TAG_DELAY_HEALTH;
     
     private static final Map<UUID, HeartData> PLAYER_CACHE = new HashMap<>();
     
-    /** Clears the cache of all stored player heath data. Done periodically just in case anything weird goes on. */
-    public static void clearCache() { PLAYER_CACHE.clear(); }
+    /**
+     * Clears the cache of all stored player health data.
+     * Done periodically just in case anything weird goes on.
+     */
+    public static void clearCache() {
+        PLAYER_CACHE.clear();
+    }
+
+    /**
+     * Saves all currently cached heart data save tags to
+     * players' persistent data. The List parsed is usually
+     * one containing all online players.
+     */
+    public static void saveToPersistent(@Nonnull List<ServerPlayerEntity> players) {
+        if (!players.isEmpty()) {
+            for (ServerPlayerEntity player : players) {
+                if (PLAYER_CACHE.containsKey(player.getUUID())) {
+                    HeartData data = PLAYER_CACHE.get(player.getUUID());
+
+                    if (data.saveTag != null) {
+                        player.getPersistentData().put(TAG_BASE, data.saveTag);
+                    }
+                }
+            }
+        }
+    }
     
     /**
      * @param player Player to get or load heart data for.
@@ -76,10 +101,6 @@ public class HeartData implements IHeartData {
                 naturalAbsorption = value;
                 
                 setAbsorption( owner.getAbsorptionAmount() + netChange );
-                
-                if( owner instanceof ServerPlayerEntity ) {
-                    NetworkHelper.setNaturalAbsorption( (ServerPlayerEntity) owner, value );
-                }
             }
         }
     }
@@ -275,55 +296,55 @@ public class HeartData implements IHeartData {
         }
     }
     
-    private HeartData( PlayerEntity player ) {
-        owner = player;
-        saveTag = getModNBTTag();
+    private HeartData(PlayerEntity player) {
+        this.owner = player;
+        this.saveTag = getModNBTTag();
         
-        if( saveTag.contains( TAG_NATURAL_ABSORPTION, NBT_TYPE_NUMERICAL ) ) {
-            setNaturalAbsorption( saveTag.getFloat( TAG_NATURAL_ABSORPTION ) );
+        if (saveTag.contains(TAG_NATURAL_ABSORPTION, NBT_TYPE_NUMERICAL)) {
+            this.setNaturalAbsorption(saveTag.getFloat(TAG_NATURAL_ABSORPTION));
         }
-        else if( HeartManager.isAbsorptionEnabled() ) {
+        else if (HeartManager.isAbsorptionEnabled()) {
             // New player, give starting absorption
-            setNaturalAbsorption( (float) Config.ABSORPTION.NATURAL.startingAmount.get() );
-            setAbsorption( getNaturalAbsorption() );
+            this.setNaturalAbsorption((float) Config.ABSORPTION.NATURAL.startingAmount.get());
+            this.setAbsorption(getNaturalAbsorption());
         }
-        if( saveTag.contains( TAG_EQUIPMENT_ABSORPTION, NBT_TYPE_NUMERICAL ) ) {
-            setLastEquipmentAbsorption( saveTag.getFloat( TAG_EQUIPMENT_ABSORPTION ) );
+        if (saveTag.contains(TAG_EQUIPMENT_ABSORPTION, NBT_TYPE_NUMERICAL)) {
+            this.setLastEquipmentAbsorption(saveTag.getFloat(TAG_EQUIPMENT_ABSORPTION));
         }
-        else if( HeartManager.isAbsorptionEnabled() ) {
+        else if (HeartManager.isAbsorptionEnabled()) {
             // New player, assume nothing equipped grants max absorption
-            setLastEquipmentAbsorption( 0.0F );
+            this.setLastEquipmentAbsorption(0.0F);
         }
         
-        if( saveTag.contains( TAG_DELAY_ABSORPTION, NBT_TYPE_NUMERICAL ) ) {
-            absorptionRecoveryDelay = saveTag.getInt( TAG_DELAY_ABSORPTION );
+        if (saveTag.contains(TAG_DELAY_ABSORPTION, NBT_TYPE_NUMERICAL)) {
+            absorptionRecoveryDelay = saveTag.getInt(TAG_DELAY_ABSORPTION);
         }
         else {
-            setAbsorptionDelay( 0 );
+            this.setAbsorptionDelay(0);
         }
-        if( saveTag.contains( TAG_DELAY_HEALTH, NBT_TYPE_NUMERICAL ) ) {
-            healthRecoveryDelay = saveTag.getInt( TAG_DELAY_HEALTH );
+        if (saveTag.contains(TAG_DELAY_HEALTH, NBT_TYPE_NUMERICAL)) {
+            healthRecoveryDelay = saveTag.getInt(TAG_DELAY_HEALTH);
         }
         else {
-            setHealthDelay( 0 );
+            this.setHealthDelay(0);
         }
     }
     
     /** @return The nbt tag compound that holds all of this mod's data. */
     private CompoundNBT getModNBTTag() {
         // Start with the base entity forge data
-        CompoundNBT tag = owner.getPersistentData();
+        CompoundNBT tag = this.owner.getPersistentData();
         
         // Get/make the persistent nbt tag so we don't lose data on respawn
-        if( !tag.contains( PlayerEntity.PERSISTED_NBT_TAG, tag.getId() ) ) {
-            tag.put( PlayerEntity.PERSISTED_NBT_TAG, new CompoundNBT() );
+        if(!tag.contains(PlayerEntity.PERSISTED_NBT_TAG, tag.getId())) {
+            tag.put(PlayerEntity.PERSISTED_NBT_TAG, new CompoundNBT());
         }
-        tag = tag.getCompound( PlayerEntity.PERSISTED_NBT_TAG );
+        tag = tag.getCompound(PlayerEntity.PERSISTED_NBT_TAG);
         
         // Get/make a tag unique to this mod
-        if( !tag.contains( TAG_BASE, tag.getId() ) ) {
-            tag.put( TAG_BASE, new CompoundNBT() );
+        if(!tag.contains(TAG_BASE, tag.getId())) {
+            tag.put(TAG_BASE, new CompoundNBT());
         }
-        return tag.getCompound( TAG_BASE );
+        return tag.getCompound(TAG_BASE);
     }
 }

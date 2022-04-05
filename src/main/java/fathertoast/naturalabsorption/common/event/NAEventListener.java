@@ -3,14 +3,10 @@ package fathertoast.naturalabsorption.common.event;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
-import fathertoast.naturalabsorption.common.health.HeartData;
 import fathertoast.naturalabsorption.common.health.HeartManager;
-import fathertoast.naturalabsorption.common.network.NetworkHelper;
 import fathertoast.naturalabsorption.common.recipe.condition.BookRecipeCondition;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -36,18 +32,6 @@ public class NAEventListener {
                     e.printStackTrace();
                 }
             }
-        }
-    }
-
-    /**
-     * Update player absorption client side when
-     * the player changes dimension.
-     */
-    @SubscribeEvent
-    public void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-        if ( !event.getPlayer( ).level.isClientSide ) {
-            ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer( );
-            NetworkHelper.setNaturalAbsorption( player, HeartData.get(player).getNaturalAbsorption() );
         }
     }
 }
