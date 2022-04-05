@@ -30,5 +30,5 @@ public interface INaturalAbsorption {
      * @return the given player's heart data.
      */
     @Nonnull
-    IHeartData get( @Nonnull PlayerEntity player );
+    IHeartData getHeartData( @Nonnull PlayerEntity player );
 }
