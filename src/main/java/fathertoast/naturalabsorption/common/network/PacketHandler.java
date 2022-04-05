@@ -1,7 +1,6 @@
 package fathertoast.naturalabsorption.common.network;
 
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
-import fathertoast.naturalabsorption.common.network.message.S2CSetNaturalAbsorption;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -34,7 +33,6 @@ public class PacketHandler {
     }
 
     public final void registerMessages() {
-        registerMessage( S2CSetNaturalAbsorption.class, S2CSetNaturalAbsorption::encode, S2CSetNaturalAbsorption::decode, S2CSetNaturalAbsorption::handle);
     }
 
     public <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer) {
