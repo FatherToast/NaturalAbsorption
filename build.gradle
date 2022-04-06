@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 //apply plugin: "org.spongepowered.mixin"
 
 // The mod's version and id
-version = "${mc_version}-1.0.0"
+version = "${mc_version}-${mod_version}"
 archivesBaseName = 'naturalabsorption'
 group = "fathertoast.${archivesBaseName}"
 

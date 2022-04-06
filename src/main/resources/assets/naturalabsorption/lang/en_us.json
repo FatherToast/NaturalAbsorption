@@ -1,5 +1,6 @@
 {
   "item.naturalabsorption.absorption_book": "Book of Absorption",
+  "item.naturalabsorption.absorption_absorbing_book": "Absorption Absorbing Book",
 
   "item.naturalabsorption.absorption_book.tooltip.current": "Your absorption",
   "item.naturalabsorption.absorption_book.tooltip.gain": "When used:",

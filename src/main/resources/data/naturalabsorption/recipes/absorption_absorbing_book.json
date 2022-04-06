@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {
+      "type": "naturalabsorption:config_option",
+      "operation": "sponge_book"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "item": "minecraft:sponge"
+    }
+  ],
+  "result": {
+    "item": "naturalabsorption:absorption_absorbing_book"
+  }
+}

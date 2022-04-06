@@ -1,7 +1,6 @@
 package fathertoast.naturalabsorption.common.item;
 
 import fathertoast.naturalabsorption.client.ClientRegister;
-import fathertoast.naturalabsorption.client.RenderEventHandler;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.health.HeartData;
 import fathertoast.naturalabsorption.common.health.HeartManager;
@@ -10,6 +9,7 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -17,6 +17,7 @@ import net.minecraft.item.Rarity;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -24,6 +25,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -51,46 +53,42 @@ public class AbsorptionBookItem extends Item {
     @Override
     public ActionResult<ItemStack> use( World world, PlayerEntity player, Hand hand ) {
         // Check if natural absorption can be upgraded
-        if( !HeartManager.isAbsorptionEnabled() || Config.ABSORPTION.NATURAL.upgradeGain.get() <= 0.0 ) {
-            return super.use( world, player, hand );
+        if(!HeartManager.isAbsorptionEnabled() || Config.ABSORPTION.NATURAL.upgradeGain.get() <= 0.0) {
+            return super.use(world, player, hand);
         }
         final boolean isCreative = player.isCreative();
-        final ItemStack book = player.getItemInHand( hand );
+        final ItemStack book = player.getItemInHand(hand);
         
-        if( !world.isClientSide ) {
-            final HeartData data = HeartData.get( player );
+        if(!world.isClientSide) {
+            final HeartData data = HeartData.get(player);
             
             final float currentCap = data.getNaturalAbsorption();
-            final int levelCost = getLevelCost( currentCap );
+            final int levelCost = getLevelCost(currentCap);
             
             // Give the player feedback on failure
-            if( currentCap >= Config.ABSORPTION.NATURAL.maximumAmount.get() ) {
-                player.displayClientMessage( new TranslationTextComponent( References.ALREADY_MAX ), true );
-                return ActionResult.fail( book );
+            if(currentCap >= Config.ABSORPTION.NATURAL.maximumAmount.get()) {
+                player.displayClientMessage(new TranslationTextComponent(References.ALREADY_MAX), true);
+                return ActionResult.fail(book);
             }
-            if( !isCreative && player.experienceLevel < levelCost ) {
-                player.displayClientMessage( new TranslationTextComponent( References.NOT_ENOUGH_LEVELS, levelCost ), true );
-                return ActionResult.fail( book );
+            if(!isCreative && player.experienceLevel < levelCost) {
+                player.displayClientMessage(new TranslationTextComponent(References.NOT_ENOUGH_LEVELS, levelCost), true);
+                return ActionResult.fail(book);
             }
-            
             // Consume costs
-            if( !isCreative ) {
-                player.setItemInHand( hand, ItemStack.EMPTY );
-                player.giveExperienceLevels( -levelCost );
+            if(!isCreative) {
+                player.setItemInHand(hand, ItemStack.EMPTY);
+                player.giveExperienceLevels(-levelCost);
             }
-            
+
             // Apply upgrade effects and notify client
-            data.setNaturalAbsorption( currentCap + (float) Config.ABSORPTION.NATURAL.upgradeGain.get() );
-            
-            player.awardStat( Stats.ITEM_USED.get( this ) );
-            
+            data.setNaturalAbsorption(currentCap + (float) Config.ABSORPTION.NATURAL.upgradeGain.get());
+            player.awardStat(Stats.ITEM_USED.get(this));
+
             // Play sound to show success
-            player.playSound( SoundEvents.PLAYER_LEVELUP, 1.0F, 1.0F );
-            
-            return ActionResult.consume( book );
+            world.playSound(null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.9F, 1.0F);
+            return ActionResult.consume(book);
         }
-        
-        return ActionResult.success( book );
+        return ActionResult.success(book);
     }
     
     @Override
@@ -156,5 +154,5 @@ public class AbsorptionBookItem extends Item {
     }
     
     @Override
-    public Rarity getRarity( ItemStack stack ) { return Rarity.UNCOMMON; }
+    public Rarity getRarity( ItemStack stack ) { return Rarity.RARE; }
 }

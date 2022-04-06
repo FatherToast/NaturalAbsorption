@@ -26,6 +26,8 @@ public class AbsorptionConfig extends Config.AbstractConfig {
     public static class General extends Config.AbstractCategory {
         
         public final DoubleField globalMax;
+
+        public final BooleanField spongeBookEnabled;
         
         public final DoubleField respawnAmount;
         
@@ -47,7 +49,12 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "This limit is ignored by potion effects. If this is set less than 0, the limit is disabled." ) );
             
             SPEC.newLine();
-            
+
+            spongeBookEnabled = SPEC.define( new BooleanField( "enable_sponge_book", true,
+                    "If enabled, players can use the Absorption Absorbing Book to convert some of their natural absorption back into an absorption book.") );
+
+            SPEC.newLine();
+
             respawnAmount = SPEC.define( new DoubleField( "respawn_amount", 0.0, DoubleField.Range.NON_NEGATIVE,
                     "Players will respawn with up to this much absorption, limited by their personal max absorption." ) );
             
