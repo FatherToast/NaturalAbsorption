@@ -91,10 +91,14 @@ public class AbsorptionBookItem extends Item {
     @Override
     @OnlyIn( value = Dist.CLIENT )
     public void appendHoverText( ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag ) {
-        final float capacity = RenderEventHandler.PLAYER_NATURAL_ABSORPTION;
+        final PlayerEntity player = Minecraft.getInstance().player;
+
+        if (player == null)
+            return;
+
+        final float capacity = player.getAbsorptionAmount();
         
-        if( capacity >= 0.0F ) {
-            final PlayerEntity player = Minecraft.getInstance().player;
+        if (capacity >= 0.0F) {
             
             final float maxCapacity = (float) Config.ABSORPTION.NATURAL.maximumAmount.get();
             final float gainOnUse = capacity >= maxCapacity ? 0.0F :
@@ -117,22 +121,20 @@ public class AbsorptionBookItem extends Item {
                         translate( References.BOOK_MAX, prettyToString( gainOnUse ) ).getString() ) );
                 
                 // Provide feedback on cost and usability
-                if( player != null ) {
-                    tooltip.add( new StringTextComponent( "" ) );
+                tooltip.add( new StringTextComponent( "" ) );
                     
-                    final int levelCost = getLevelCost( capacity );
-                    if( levelCost > 0 ) {
-                        tooltip.add( new TranslationTextComponent( TextFormatting.GREEN +
-                                translate( References.BOOK_COST, levelCost ).getString() ) );
-                    }
-                    if( levelCost <= player.experienceLevel || player.isCreative() ) {
-                        tooltip.add( new TranslationTextComponent( TextFormatting.GRAY +
-                                translate( References.BOOK_CAN_USE ).getString() ) );
-                    }
-                    else {
-                        tooltip.add( new TranslationTextComponent( TextFormatting.RED +
-                                translate( References.BOOK_NO_USE ).getString() ) );
-                    }
+                final int levelCost = getLevelCost( capacity );
+                if( levelCost > 0 ) {
+                    tooltip.add( new TranslationTextComponent( TextFormatting.GREEN +
+                            translate( References.BOOK_COST, levelCost ).getString() ) );
+                }
+                if( levelCost <= player.experienceLevel || player.isCreative() ) {
+                    tooltip.add( new TranslationTextComponent( TextFormatting.GRAY +
+                            translate( References.BOOK_CAN_USE ).getString() ) );
+                }
+                else {
+                    tooltip.add( new TranslationTextComponent( TextFormatting.RED +
+                            translate( References.BOOK_NO_USE ).getString() ) );
                 }
             }
             else {
