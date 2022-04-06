@@ -1,5 +1,6 @@
 package fathertoast.naturalabsorption.common.item;
 
+import fathertoast.naturalabsorption.client.ClientRegister;
 import fathertoast.naturalabsorption.client.RenderEventHandler;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.health.HeartData;
@@ -34,7 +35,11 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class AbsorptionBookItem extends Item {
     
-    public AbsorptionBookItem() { super( new Item.Properties().tab( ItemGroup.TAB_COMBAT ).stacksTo( 1 ) ); }
+    public AbsorptionBookItem() {
+        super(new Item.Properties()
+                .tab(ItemGroup.TAB_COMBAT)
+                .stacksTo(1));
+    }
     
     @SuppressWarnings( "WeakerAccess" )
     public static int getLevelCost( float capacity ) {
@@ -96,7 +101,7 @@ public class AbsorptionBookItem extends Item {
         if (player == null)
             return;
 
-        final float capacity = player.getAbsorptionAmount();
+        final float capacity = ClientRegister.NATURAL_ABSORPTION;
         
         if (capacity >= 0.0F) {
             

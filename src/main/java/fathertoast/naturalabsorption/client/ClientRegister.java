@@ -10,6 +10,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber( value = Dist.CLIENT, modid = NaturalAbsorption.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD )
 public class ClientRegister {
 
+    /**
+     * Used for the Absorption Book tooltip.
+     * Updated via packets when needded.
+     */
+    public static float NATURAL_ABSORPTION = -1.0F;
+
+
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
         //MinecraftForge.EVENT_BUS.register( new RenderEventHandler() );

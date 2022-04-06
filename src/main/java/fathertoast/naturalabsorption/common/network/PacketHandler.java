@@ -1,6 +1,7 @@
 package fathertoast.naturalabsorption.common.network;
 
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.network.message.S2CSetNaturalAbsorption;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -19,20 +20,21 @@ public class PacketHandler {
     private static final String PROTOCOL_NAME = "NATURALABSORPTION";
     /** The network channel our mod will be
      *  using when sending messages. */
-    public static final SimpleChannel CHANNEL = createChannel( );
+    public static final SimpleChannel CHANNEL = createChannel();
 
     private int messageIndex;
 
-    private static SimpleChannel createChannel( ) {
+    private static SimpleChannel createChannel() {
         return NetworkRegistry.ChannelBuilder
-                .named( new ResourceLocation(NaturalAbsorption.MOD_ID, "channel" ) )
-                .serverAcceptedVersions( PROTOCOL_NAME::equals )
-                .clientAcceptedVersions( PROTOCOL_NAME::equals )
-                .networkProtocolVersion( ( ) -> PROTOCOL_NAME )
-                .simpleChannel( );
+                .named( new ResourceLocation(NaturalAbsorption.MOD_ID, "channel"))
+                .serverAcceptedVersions(PROTOCOL_NAME::equals)
+                .clientAcceptedVersions(PROTOCOL_NAME::equals)
+                .networkProtocolVersion(() -> PROTOCOL_NAME)
+                .simpleChannel();
     }
 
     public final void registerMessages() {
+        registerMessage(S2CSetNaturalAbsorption.class, S2CSetNaturalAbsorption::encode, S2CSetNaturalAbsorption::decode, S2CSetNaturalAbsorption::handle);
     }
 
     public <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer) {

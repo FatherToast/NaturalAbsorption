@@ -101,6 +101,10 @@ public class HeartData implements IHeartData {
                 naturalAbsorption = value;
                 
                 setAbsorption( owner.getAbsorptionAmount() + netChange );
+
+                if (owner instanceof ServerPlayerEntity) {
+                    NetworkHelper.setNaturalAbsorption((ServerPlayerEntity) owner, value);
+                }
             }
         }
     }
