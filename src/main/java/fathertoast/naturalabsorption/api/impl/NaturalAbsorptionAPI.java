@@ -20,7 +20,7 @@ public class NaturalAbsorptionAPI implements INaturalAbsorption {
      */
     @Nonnull
     @Override
-    public IHeartData getHeartData( @Nonnull PlayerEntity player ) {
-        return HeartData.get( player );
+    public IHeartData getHeartData(@Nonnull PlayerEntity player) {
+        return HeartData.get(player);
     }
 }

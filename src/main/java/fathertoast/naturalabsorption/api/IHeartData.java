@@ -9,7 +9,7 @@ public interface IHeartData {
     float getNaturalAbsorption();
     
     /** Sets the player's natural absorption. The player will gain or lose current absorption to match. */
-    void setNaturalAbsorption( float value );
+    void setNaturalAbsorption(float value);
     
     /** Starts the player's recovery delay timers. */
     void startRecoveryDelay();
@@ -24,5 +24,5 @@ public interface IHeartData {
     float getMaxAbsorption();
     
     /** Helper method to set the player's current absorption; clamps the value between 0 and the player's personal maximum. */
-    void setAbsorption( float value );
+    void setAbsorption(float value);
 }
