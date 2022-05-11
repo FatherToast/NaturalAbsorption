@@ -79,7 +79,7 @@ public class AbsorptionBookItem extends Item {
             }
 
             // Apply upgrade effects and notify client
-            data.setNaturalAbsorption(naturalAbsorption + (float) Config.ABSORPTION.NATURAL.upgradeGain.get());
+            data.setNaturalAbsorption(naturalAbsorption + (float) Config.ABSORPTION.NATURAL.upgradeGain.get(), true);
             player.awardStat(Stats.ITEM_USED.get(this));
 
             // Play sound to show success

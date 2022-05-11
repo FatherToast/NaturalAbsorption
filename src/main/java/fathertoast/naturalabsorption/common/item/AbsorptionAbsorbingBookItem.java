@@ -47,7 +47,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
             // Give the player feedback on failure
             if(naturalAbsorption >= upgradeGain) {
                 final float newAbsorption = naturalAbsorption - upgradeGain;
-                data.setNaturalAbsorption(newAbsorption);
+                data.setNaturalAbsorption(newAbsorption, true);
 
                 if (!isCreative) {
                     spongeBook.shrink(1);

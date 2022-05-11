@@ -140,7 +140,7 @@ public class HeartManager {
                 cleanupCounter = 0;
                 PLAYER_HUNGER_STATE_TRACKER.clear();
                 clearSources();
-                HeartData.saveToPersistent(server.getPlayerList().getPlayers());
+                HeartData.allSaveToPersistent(server.getPlayerList().getPlayers());
                 HeartData.clearCache();
             }
             
@@ -276,8 +276,8 @@ public class HeartManager {
             if( isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0 ) {
                 final float naturalAbsorption = data.getNaturalAbsorption();
                 if( naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get() ) {
-                    data.setNaturalAbsorption( (float) Math.max( Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
-                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get() ) );
+                    data.setNaturalAbsorption((float) Math.max(Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
+                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get()), true);
                 }
             }
             
@@ -299,14 +299,13 @@ public class HeartManager {
      *
      * @param event The event data.
      */
-    // TODO - Remove in 1.18.X.
-    //@SubscribeEvent( priority = EventPriority.NORMAL )
-    @Deprecated
+    @SubscribeEvent
     public void onJoinWorld( EntityJoinWorldEvent event ) {
         if( !event.getWorld().isClientSide && event.getEntity() instanceof PlayerEntity ) {
-            final PlayerEntity player = (PlayerEntity) event.getEntity();
+            final ServerPlayerEntity player = (ServerPlayerEntity) event.getEntity();
             final float absorptionHealth = player.getAbsorptionAmount();
 
+            NetworkHelper.setNaturalAbsorption(player, absorptionHealth);
         }
     }
     
