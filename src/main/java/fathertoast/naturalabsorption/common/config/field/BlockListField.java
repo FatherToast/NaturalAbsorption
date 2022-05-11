@@ -14,8 +14,9 @@ import java.util.List;
 @SuppressWarnings( "unused" )
 public class BlockListField extends GenericField<BlockList> {
     
-    /** Provides a detailed description of how to use entity lists. Recommended to put at the top of any file using entity lists. */
-    public static List<String> verboseDescription() {
+    /** Provides a detailed description of how to use entity lists. Recommended putting at the top of any file using entity lists. */
+    @Override
+    public List<String> verboseDescription() {
         List<String> comment = new ArrayList<>();
         comment.add( "Block List fields: General format = [ \"namespace:block_name[property1=value1,...]\", ... ]" );
         comment.add( "  Block lists are arrays of blocks and partial block states." );

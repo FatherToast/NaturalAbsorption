@@ -4,8 +4,7 @@ import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.core.file.FileConfigBuilder;
 import com.electronwill.nightconfig.core.io.CharacterOutput;
 import fathertoast.naturalabsorption.common.config.field.AbstractConfigField;
-import fathertoast.naturalabsorption.common.config.field.BlockListField;
-import fathertoast.naturalabsorption.common.config.field.EntityListField;
+import fathertoast.naturalabsorption.common.config.field.GenericField;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 
 import java.io.File;
@@ -295,13 +294,15 @@ public class ToastConfigSpec {
     
     /** @param comment The file comment to insert. */
     public void header( List<String> comment ) { ACTIONS.add( new Header( this, comment ) ); }
-    
-    /** Inserts a detailed description of how to use the entity list field. */
-    public void describeEntityList() { ACTIONS.add( new Comment( EntityListField.verboseDescription() ) ); }
-    
-    /** Inserts a detailed description of how to use the block list field. */
-    public void describeBlockList() { ACTIONS.add( new Comment( BlockListField.verboseDescription() ) ); }
-    
+
+    /** Inserts a detailed description of how to use the given field. */
+    public void verboseFieldDesc(GenericField<?> field) {
+        final List<String> description = field.verboseDescription();
+
+        if (description != null && !description.isEmpty())
+            ACTIONS.add(new Comment(field.verboseDescription()));
+    }
+
     /**
      * @param name    The category name.
      * @param comment The category comment to insert.
