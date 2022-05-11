@@ -5,6 +5,7 @@ import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
+import fathertoast.naturalabsorption.common.core.register.NALootModifiers;
 import fathertoast.naturalabsorption.common.event.NAEventListener;
 import fathertoast.naturalabsorption.common.health.HeartManager;
 import fathertoast.naturalabsorption.common.network.PacketHandler;
@@ -25,12 +26,13 @@ import java.util.function.Supplier;
 
 @Mod( NaturalAbsorption.MOD_ID )
 public class NaturalAbsorption {
+
     /** Our mod ID. */
     @SuppressWarnings( "SpellCheckingInspection" )
     public static final String MOD_ID = "naturalabsorption";
-    
+
     /** Logger instance for the mod. */
-    public static final Logger LOG = LogManager.getLogger( MOD_ID );
+    public static final Logger LOG = LogManager.getLogger(MOD_ID);
     
     /** Our mod's packet handler; takes care of networking and sending messages. */
     @SuppressWarnings( "FieldCanBeLocal" )
@@ -46,35 +48,36 @@ public class NaturalAbsorption {
         packetHandler.registerMessages();
         CraftingUtil.registerConditions();
         
-        MinecraftForge.EVENT_BUS.register( new NAEventListener() );
-        MinecraftForge.EVENT_BUS.register( new HeartManager() );
+        MinecraftForge.EVENT_BUS.register(new NAEventListener());
+        MinecraftForge.EVENT_BUS.register(new HeartManager());
         
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
-        eventBus.addListener( this::onInterModProcess );
+        eventBus.addListener(this::onInterModProcess);
         
-        NAItems.ITEMS.register( eventBus );
-        NAEnchantments.ENCHANTMENTS.register( eventBus );
+        NAItems.ITEMS.register(eventBus);
+        NAEnchantments.ENCHANTMENTS.register(eventBus);
+        NALootModifiers.LOOT_MODIFIER_SERIALIZERS.register(eventBus);
     }
     
     /**
      * Hands the mod API to mods that ask for it.
      */
-    private void onInterModProcess( InterModProcessEvent event ) {
-        event.getIMCStream().forEach( ( message ) -> {
-            if( message.getMethod().equals( "getNaturalAbsorptionAPI" ) ) {
+    private void onInterModProcess(InterModProcessEvent event) {
+        event.getIMCStream().forEach((message) -> {
+            if(message.getMethod().equals( "getNaturalAbsorptionAPI")) {
                 Supplier<Function<INaturalAbsorption, Void>> supplier = message.getMessageSupplier();
-                supplier.get().apply( modApi );
+                supplier.get().apply(modApi);
             }
-        } );
+        });
     }
     
     /** @return A ResourceLocation with the mod's namespace. */
-    public static ResourceLocation resourceLoc( String path ) { return new ResourceLocation( MOD_ID, path ); }
+    public static ResourceLocation resourceLoc(String path) { return new ResourceLocation(MOD_ID, path); }
     
     /** @return Returns a Forge registry entry as a string, or "null" if it is null. */
-    public static String toString( @Nullable ForgeRegistryEntry<?> regEntry ) { return regEntry == null ? "null" : toString( regEntry.getRegistryName() ); }
+    public static String toString(@Nullable ForgeRegistryEntry<?> regEntry) { return regEntry == null ? "null" : toString(regEntry.getRegistryName()); }
     
     /** @return Returns the resource location as a string, or "null" if it is null. */
-    public static String toString( @Nullable ResourceLocation res ) { return res == null ? "null" : res.toString(); }
+    public static String toString(@Nullable ResourceLocation res) { return res == null ? "null" : res.toString(); }
 }
