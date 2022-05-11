@@ -3,6 +3,7 @@ package fathertoast.naturalabsorption.client;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.health.HeartManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -22,9 +23,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Random;
 
-// TODO - Remove in 1.18.X as Minecraft handles this
-//        on its own now, seemingly.
-@Deprecated
+
 public class RenderEventHandler {
     
     public static float PLAYER_NATURAL_ABSORPTION = -1.0F;
@@ -39,24 +38,22 @@ public class RenderEventHandler {
     /** The last recorded system time */
     private long lastHealthTime;
 
-    //@SubscribeEvent( priority = EventPriority.NORMAL )
-    public void beforeRenderGameOverlay( RenderGameOverlayEvent.Pre event ) {
-        /*
-        if( HeartManager.isArmorReplacementEnabled() && Config.EQUIPMENT.ARMOR.hideArmorBar.get() &&
-                RenderGameOverlayEvent.ElementType.ARMOR.equals( event.getType() ) ) {
-            event.setCanceled( true );
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void beforeRenderGameOverlay(RenderGameOverlayEvent.Pre event) {
+        if(HeartManager.isArmorReplacementEnabled() && Config.EQUIPMENT.ARMOR.hideArmorBar.get() &&
+                RenderGameOverlayEvent.ElementType.ARMOR.equals(event.getType())) {
+            event.setCanceled(true);
         }
-        else if( Config.ABSORPTION.GENERAL.renderCapacityBackground.get() &&
-                RenderGameOverlayEvent.ElementType.HEALTH.equals( event.getType() ) ) {
+        else if(Config.ABSORPTION.GENERAL.renderCapacityBackground.get() &&
+                RenderGameOverlayEvent.ElementType.HEALTH.equals(event.getType())) {
             try {
-                renderAbsorptionCapacity( event );
+                renderAbsorptionCapacity(event);
             }
-            catch( Exception ex ) {
-                NaturalAbsorption.LOG.error( "Encountered exception during heart render tick", ex );
-                event.setCanceled( false ); // In case we already canceled the vanilla event
+            catch(Exception ex) {
+                NaturalAbsorption.LOG.error("Encountered exception during heart render tick", ex);
+                event.setCanceled(false); // In case we already canceled the vanilla event
             }
         }
-         */
     }
     
     /**
@@ -195,7 +192,6 @@ public class RenderEventHandler {
                     blit( mStack, x, y, MARGIN + 45, TOP, 9, 9 ); //5
             }
         }
-        
         RenderSystem.disableBlend();
     }
     
