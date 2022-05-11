@@ -53,8 +53,12 @@ public class AbsorptionAbsorbingBookItem extends Item {
                     spongeBook.shrink(1);
                     Block.popResource(world, player.blockPosition(), new ItemStack(NAItems.ABSORPTION_BOOK.get()));
 
-                    final int levelsReturned = getLevelCost(newAbsorption);
-                    player.giveExperienceLevels(levelsReturned);
+                    double xpReturnMult = Config.ABSORPTION.GENERAL.spongeBookXpReturn.get();
+
+                    if (xpReturnMult > 0) {
+                        final int levelsReturned = (int) (xpReturnMult * getLevelCost(newAbsorption));
+                        player.giveExperienceLevels(levelsReturned);
+                    }
                 }
                 world.playSound(null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.WOOL_PLACE, SoundCategory.PLAYERS, 0.9F, 1.0F);
                 player.awardStat(Stats.ITEM_USED.get(this));

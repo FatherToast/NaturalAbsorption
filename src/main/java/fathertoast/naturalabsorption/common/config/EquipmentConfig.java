@@ -33,6 +33,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
         public final EnumField<EnchantArmorType> slot;
         public final BooleanField allowOnBooks;
         public final BooleanField treasureOnly;
+        // TODO - Loot table config field for Absorption Book treasure
         public final EnumField<EnchantmentRarity> rarity;
         
         public final DoubleField potencyBase;

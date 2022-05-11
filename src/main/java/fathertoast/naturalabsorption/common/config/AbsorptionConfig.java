@@ -28,6 +28,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         public final DoubleField globalMax;
 
         public final BooleanField spongeBookEnabled;
+        public final DoubleField spongeBookXpReturn;
         
         public final DoubleField respawnAmount;
         
@@ -55,6 +56,13 @@ public class AbsorptionConfig extends Config.AbstractConfig {
 
             SPEC.newLine();
 
+            spongeBookXpReturn = SPEC.define(new DoubleField("sponge_book_xp_return", 0.75, DoubleField.Range.PERCENT,
+                    "The percentage of the experience levels used when using an Absorption Book that should be returned to the player upon" +
+                            "using an Absorption Absorbing Book (aka Sponge Book). For example, a value of 1.0 (100%) will return all the levels that was used, while 0.5 (50%) " +
+                            "will only return half of the levels used. Default value is 0.75 (75%)."));
+
+            SPEC.newLine();
+
             respawnAmount = SPEC.define( new DoubleField( "respawn_amount", 0.0, DoubleField.Range.NON_NEGATIVE,
                     "Players will respawn with up to this much absorption, limited by their personal max absorption." ) );
             
@@ -76,10 +84,12 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "Players can't lose over 1/2 drumstick per game tick or more than 5 drumsticks of hunger per recovery tick." ) );
             
             SPEC.newLine();
-            
+
+            SPEC.comment("NOTE: This option is not compatible with a lot of mods that do their own heart rendering stuff. For instance, " +
+                    "Mantle's heart stacker option that stacks hearts instead of vanilla drawing multiple rows, will break this feature.");
             renderCapacityBackground = SPEC.define( new BooleanField( "render_capacity_background", true,
                     "If true, the mod will render the empty heart background behind absorption hearts you are missing,",
-                    "but can regenerate back. This may not work right if another mod changes heart bar rendering." ) );
+                    "but can regenerate back. This may not work right if another mod changes heart bar rendering." ));
         }
     }
     
