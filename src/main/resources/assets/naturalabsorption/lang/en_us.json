@@ -8,9 +8,12 @@
   "item.naturalabsorption.absorption_book.tooltip.cost": "Cost: %d levels",
   "item.naturalabsorption.absorption_book.tooltip.canuse": "Right click to use",
   "item.naturalabsorption.absorption_book.tooltip.nouse": "You can't use this",
+  "item.naturalabsorption.sponge_book.tooltip.xp_gain": "+%s experience levels",
+  "item.naturalabsorption.sponge_book.tooltip.absorption_lost": "-%s absorption capacity",
 
   "item.naturalabsorption.absorption_book.already_max": "Cannot upgrade your natural absorption any higher",
   "item.naturalabsorption.absorption_book.not_enough_levels": "Requires at least %s levels to use",
+  "item.naturalabsorption.sponge_book.not_enough_absorption": "You don't have enough natural absorption to convert this",
 
   "enchantment.naturalabsorption.absorption": "Absorption"
 }

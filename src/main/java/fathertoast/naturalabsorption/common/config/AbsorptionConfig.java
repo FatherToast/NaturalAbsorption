@@ -29,7 +29,8 @@ public class AbsorptionConfig extends Config.AbstractConfig {
 
         public final BooleanField spongeBookEnabled;
         public final DoubleField spongeBookXpReturn;
-        
+        public final BooleanField spongeBookExtraTooltipInfo;
+
         public final DoubleField respawnAmount;
         
         public final IntField recoveryDelay;
@@ -60,6 +61,11 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "The percentage of the experience levels used when using an Absorption Book that should be returned to the player upon" +
                             "using an Absorption Absorbing Book (aka Sponge Book). For example, a value of 1.0 (100%) will return all the levels that was used, while 0.5 (50%) " +
                             "will only return half of the levels used. Default value is 0.75 (75%)."));
+
+            SPEC.newLine();
+
+            spongeBookExtraTooltipInfo = SPEC.define(new BooleanField("sponge_book.extra_tooltip_info", true,
+                    "Set to true to display how many experience levels will be given back when using an Absorption Absorbing Book on the item's tooltip."));
 
             SPEC.newLine();
 

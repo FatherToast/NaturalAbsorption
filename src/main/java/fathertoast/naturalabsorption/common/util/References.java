@@ -8,14 +8,16 @@ public class References {
     
     public static final String ALREADY_MAX = "item.naturalabsorption.absorption_book.already_max";
     public static final String NOT_ENOUGH_LEVELS = "item.naturalabsorption.absorption_book.not_enough_levels";
-    
+    public static final String NOT_ENOUGH_ABSORPTION = "item.naturalabsorption.sponge_book.not_enough_absorption";
+
     public static final String BOOK_CURRENT = "item.naturalabsorption.absorption_book.tooltip.current";
     public static final String BOOK_GAIN = "item.naturalabsorption.absorption_book.tooltip.gain";
     public static final String BOOK_MAX = "item.naturalabsorption.absorption_book.tooltip.max";
     public static final String BOOK_COST = "item.naturalabsorption.absorption_book.tooltip.cost";
     public static final String BOOK_CAN_USE = "item.naturalabsorption.absorption_book.tooltip.canuse";
     public static final String BOOK_NO_USE = "item.naturalabsorption.absorption_book.tooltip.nouse";
-
+    public static final String SPONGE_BOOK_XP_GAIN = "item.naturalabsorption.sponge_book.tooltip.xp_gain";
+    public static final String SPONGE_BOOK_ABSORPTION_LOST = "item.naturalabsorption.sponge_book.tooltip.absorption_lost";
 
     //---------------- COOL SYMBOLS -------------------
 

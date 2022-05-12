@@ -83,7 +83,7 @@ public class AbsorptionBookItem extends Item {
             player.awardStat(Stats.ITEM_USED.get(this));
 
             // Play sound to show success
-            world.playSound(null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.9F, 1.0F);
+            world.playSound(null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.75F, 1.0F);
             return ActionResult.consume(book);
         }
         return ActionResult.success(book);
