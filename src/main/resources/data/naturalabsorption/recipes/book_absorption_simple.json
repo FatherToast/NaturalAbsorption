@@ -1,1 +1,0 @@
-{  "conditions": [    {      "type": "naturalabsorption:recipe_style",      "name": "simple"    }  ],  "type": "minecraft:crafting_shapeless",  "ingredients": [    {      "item": "minecraft:golden_apple",      "data": 0    },    {      "item": "minecraft:writable_book"    }  ],  "result": {    "item": "naturalabsorption:absorption_book"  }}

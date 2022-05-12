@@ -1,0 +1,1 @@
+{  "conditions": [    {      "type": "naturalabsorption:recipe_style",      "name": "sandwich"    }  ],  "type": "minecraft:crafting_shaped",  "pattern": [    "aBa"  ],  "key": {    "a": {      "item": "minecraft:golden_apple"    },    "B": {      "item": "minecraft:writable_book"    }  },  "result": {    "item": "naturalabsorption:absorption_book"  }}
