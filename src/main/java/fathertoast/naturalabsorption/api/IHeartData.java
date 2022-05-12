@@ -5,10 +5,16 @@ package fathertoast.naturalabsorption.api;
  * along with methods to interact with it.
  */
 public interface IHeartData {
+
     /** @return The player's natural absorption. */
     float getNaturalAbsorption();
     
-    /** Sets the player's natural absorption. The player will gain or lose current absorption to match. */
+    /**
+     *  Sets the player's natural absorption. The player will gain or lose current absorption to match.
+     *
+     * @param value the natural absorption amount to set for the player.
+     * @param updateActualAbsorption if false, the player's current absorption will not be changed.
+     */
     void setNaturalAbsorption(float value, boolean updateActualAbsorption);
     
     /** Starts the player's recovery delay timers. */

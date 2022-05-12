@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Mod( NaturalAbsorption.MOD_ID )
+@Mod(NaturalAbsorption.MOD_ID)
 public class NaturalAbsorption {
 
     /** Our mod ID. */
