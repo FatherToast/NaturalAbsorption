@@ -19,6 +19,8 @@ public class References {
     public static final String SPONGE_BOOK_XP_GAIN = "item.naturalabsorption.sponge_book.tooltip.xp_gain";
     public static final String SPONGE_BOOK_ABSORPTION_LOST = "item.naturalabsorption.sponge_book.tooltip.absorption_lost";
 
+    public static final String TC_ARMOR_ABSORPTION = "modifier.naturalabsorption.armor_absorption.tooltip.info";
+
     //---------------- COOL SYMBOLS -------------------
 
     /** The plus or minus symbol (+/-). */

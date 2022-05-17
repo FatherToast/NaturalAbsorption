@@ -39,3 +39,10 @@ mandatory = true
 versionRange = "[1.16.5,1.17)"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.naturalabsorption]]
+modId = "tconstruct"
+mandatory = false
+versionRange = "[3.3.4.335,)"
+ordering = "BEFORE"
+side = "BOTH"

@@ -2,6 +2,8 @@ package fathertoast.naturalabsorption.common.core;
 
 import fathertoast.naturalabsorption.api.INaturalAbsorption;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
+import fathertoast.naturalabsorption.common.compat.tc.NAModifiers;
+import fathertoast.naturalabsorption.common.compat.tc.NaturalAbsorptionTC;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
@@ -13,6 +15,9 @@ import fathertoast.naturalabsorption.common.recipe.CraftingUtil;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoader;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -51,13 +56,17 @@ public class NaturalAbsorption {
         MinecraftForge.EVENT_BUS.register(new NAEventListener());
         MinecraftForge.EVENT_BUS.register(new HeartManager());
         
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        modBus.addListener(this::onInterModProcess);
         
-        eventBus.addListener(this::onInterModProcess);
-        
-        NAItems.ITEMS.register(eventBus);
-        NAEnchantments.ENCHANTMENTS.register(eventBus);
-        NALootModifiers.LOOT_MODIFIER_SERIALIZERS.register(eventBus);
+        NAItems.ITEMS.register(modBus);
+        NAEnchantments.ENCHANTMENTS.register(modBus);
+        NALootModifiers.LOOT_MODIFIER_SERIALIZERS.register(modBus);
+
+        if (ModList.get().isLoaded("tconstruct")) {
+            NaturalAbsorptionTC.initRegistries(modBus);
+        }
     }
     
     /**

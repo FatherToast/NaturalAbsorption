@@ -15,5 +15,8 @@
   "item.naturalabsorption.absorption_book.not_enough_levels": "Requires at least %s levels to use",
   "item.naturalabsorption.sponge_book.not_enough_absorption": "You don't have enough natural absorption to convert this",
 
-  "enchantment.naturalabsorption.absorption": "Absorption"
+  "enchantment.naturalabsorption.absorption": "Absorption",
+
+  "modifier.naturalabsorption.armor_absorption": "Absorption",
+  "modifier.naturalabsorption.armor_absorption.tooltip.info": "+%s Absorption Capacity"
 }

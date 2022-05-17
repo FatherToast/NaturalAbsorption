@@ -24,7 +24,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HeartManager {
     /** Set of all currently altered damage sources. */
@@ -85,26 +87,30 @@ public class HeartManager {
         float bonus = 0.0F;
         
         // From armor
-        if( isArmorReplacementEnabled() ) {
-            if( Config.EQUIPMENT.ARMOR.armorMultiplier.get() > 0.0 ) {
+        if(isArmorReplacementEnabled()) {
+            if(Config.EQUIPMENT.ARMOR.armorMultiplier.get() > 0.0) {
                 final double armor = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
                 if( armor > 0.0F ) {
                     bonus += Config.EQUIPMENT.ARMOR.armorMultiplier.get() * armor;
                 }
             }
-            if( Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() > 0.0 ) {
+            if(Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() > 0.0) {
                 final double toughness = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
-                if( toughness > 0.0F ) {
+                if(toughness > 0.0F) {
                     bonus += Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() * toughness;
                 }
             }
         }
-        
+
         // From enchantments
-        if( Config.EQUIPMENT.ENCHANTMENT.enabled.get() ) {
+        if(Config.EQUIPMENT.ENCHANTMENT.enabled.get()) {
             bonus += AbsorptionEnchantment.getMaxAbsorptionBonus( player );
         }
-        
+
+        // From equipment with the TC absorption modifier
+        if (Config.COMPAT.TC.modifierEnabled.get()) {
+            bonus += HeartData.get(player).getTCModifierAbsorption();
+        }
         return bonus;
     }
     

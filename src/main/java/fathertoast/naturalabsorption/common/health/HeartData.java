@@ -26,6 +26,7 @@ public class HeartData implements IHeartData {
     private static final String TAG_BASE = NaturalAbsorptionAPI.TAG_BASE;
     private static final String TAG_NATURAL_ABSORPTION = NaturalAbsorptionAPI.TAG_NATURAL_ABSORPTION;
     private static final String TAG_EQUIPMENT_ABSORPTION = NaturalAbsorptionAPI.TAG_EQUIPMENT_ABSORPTION;
+    private static final String TAG_TC_MODIFIER_ABSORPTION = "AbsorbTCModifier";
     private static final String TAG_DELAY_ABSORPTION = NaturalAbsorptionAPI.TAG_DELAY_ABSORPTION;
     private static final String TAG_DELAY_HEALTH = NaturalAbsorptionAPI.TAG_DELAY_HEALTH;
     
@@ -86,6 +87,7 @@ public class HeartData implements IHeartData {
     
     private float naturalAbsorption = -1.0F;
     private float lastEquipmentAbsorption = -1.0F;
+    private float lastTcModifierAbsorption = -1.0F;
     private int absorptionRecoveryDelay;
     private int healthRecoveryDelay;
     
@@ -120,7 +122,20 @@ public class HeartData implements IHeartData {
             }
         }
     }
-    
+
+    public float getTCModifierAbsorption() {
+        return this.lastTcModifierAbsorption;
+    }
+
+    public void setTcModifierAbsorption(float value) {
+        if( HeartManager.isAbsorptionEnabled() ) {
+            if( lastTcModifierAbsorption != value ) {
+                saveTag.putFloat( TAG_TC_MODIFIER_ABSORPTION, value );
+                lastTcModifierAbsorption = value;
+            }
+        }
+    }
+
     private float getLastEquipmentAbsorption() { return lastEquipmentAbsorption; }
     
     private void setLastEquipmentAbsorption( float value ) {
@@ -131,7 +146,7 @@ public class HeartData implements IHeartData {
             }
         }
     }
-    
+
     // Absorption recovery delay methods
     
     public int getAbsorptionDelay() { return absorptionRecoveryDelay; }
@@ -333,6 +348,13 @@ public class HeartData implements IHeartData {
         else if (HeartManager.isAbsorptionEnabled()) {
             // New player, assume nothing equipped grants max absorption
             this.setLastEquipmentAbsorption(0.0F);
+        }
+
+        if (saveTag.contains(TAG_TC_MODIFIER_ABSORPTION, NBT_TYPE_NUMERICAL)) {
+            this.setTcModifierAbsorption(saveTag.getFloat(TAG_TC_MODIFIER_ABSORPTION));
+        }
+        else if (HeartManager.isAbsorptionEnabled()) {
+            this.setTcModifierAbsorption(0.0F);
         }
 
         // Absorption delay

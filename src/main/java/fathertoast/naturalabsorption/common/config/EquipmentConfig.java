@@ -74,7 +74,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
             SPEC.newLine();
             
             potencyBase = SPEC.define( new DoubleField( "potency.base", 2.0, DoubleField.Range.ANY,
-                    "Maximum absorption gained for for having at least one level of the Absorption enchantment.",
+                    "Maximum absorption gained for having at least one level of the Absorption enchantment.",
                     "A negative value reduces the effect of the first level(s)." ) );
             potencyPerLevel = SPEC.define( new DoubleField( "potency.per_level", 2.0, DoubleField.Range.NON_NEGATIVE,
                     "Maximum absorption gained for each level of the Absorption enchantment." ) );
