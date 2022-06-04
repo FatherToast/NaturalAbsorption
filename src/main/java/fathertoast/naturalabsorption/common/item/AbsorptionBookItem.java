@@ -36,9 +36,9 @@ import java.util.List;
 public class AbsorptionBookItem extends Item {
     
     public AbsorptionBookItem() {
-        super(new Item.Properties()
-                .tab(ItemGroup.TAB_COMBAT)
-                .stacksTo(1));
+        super( new Item.Properties()
+                .tab( ItemGroup.TAB_COMBAT )
+                .stacksTo( 1 ) );
     }
     
     @SuppressWarnings( "WeakerAccess" )
@@ -51,100 +51,92 @@ public class AbsorptionBookItem extends Item {
     @Override
     public ActionResult<ItemStack> use( World world, PlayerEntity player, Hand hand ) {
         // Check if natural absorption can be upgraded
-        if(!HeartManager.isAbsorptionEnabled() || Config.ABSORPTION.NATURAL.upgradeGain.get() <= 0.0) {
-            return super.use(world, player, hand);
+        if( !HeartManager.isAbsorptionEnabled() || Config.ABSORPTION.NATURAL.upgradeGain.get() <= 0.0 ) {
+            return super.use( world, player, hand );
         }
         final boolean isCreative = player.isCreative();
-        final ItemStack book = player.getItemInHand(hand);
+        final ItemStack book = player.getItemInHand( hand );
         
-        if(!world.isClientSide) {
-            final HeartData data = HeartData.get(player);
+        if( !world.isClientSide ) {
+            final HeartData data = HeartData.get( player );
             
             final float naturalAbsorption = data.getNaturalAbsorption();
-            final int levelCost = getLevelCost(naturalAbsorption);
+            final int levelCost = getLevelCost( naturalAbsorption );
             
             // Give the player feedback on failure
-            if(naturalAbsorption >= Config.ABSORPTION.NATURAL.maximumAmount.get()) {
-                player.displayClientMessage(new TranslationTextComponent(References.ALREADY_MAX), true);
-                return ActionResult.fail(book);
+            if( naturalAbsorption >= Config.ABSORPTION.NATURAL.maximumAmount.get() ) {
+                player.displayClientMessage( new TranslationTextComponent( References.ALREADY_MAX ), true );
+                return ActionResult.fail( book );
             }
-            if(!isCreative && player.experienceLevel < levelCost) {
-                player.displayClientMessage(new TranslationTextComponent(References.NOT_ENOUGH_LEVELS, levelCost), true);
-                return ActionResult.fail(book);
+            if( !isCreative && player.experienceLevel < levelCost ) {
+                player.displayClientMessage( new TranslationTextComponent( References.NOT_ENOUGH_LEVELS, levelCost ), true );
+                return ActionResult.fail( book );
             }
             // Consume costs
-            if(!isCreative) {
-                player.setItemInHand(hand, ItemStack.EMPTY);
-                player.giveExperienceLevels(-levelCost);
+            if( !isCreative ) {
+                book.shrink( 1 );
+                player.giveExperienceLevels( -levelCost );
             }
-
+            
             // Apply upgrade effects and notify client
-            data.setNaturalAbsorption(naturalAbsorption + (float) Config.ABSORPTION.NATURAL.upgradeGain.get(), true);
-            player.awardStat(Stats.ITEM_USED.get(this));
-
-            // Play sound to show success
-            world.playSound(null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.75F, 1.0F);
-            return ActionResult.consume(book);
+            data.setNaturalAbsorption( naturalAbsorption + (float) Config.ABSORPTION.NATURAL.upgradeGain.get(), true );
+            player.awardStat( Stats.ITEM_USED.get( this ) );
+            world.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.75F, 1.0F );
+            
+            return ActionResult.consume( book );
         }
-        return ActionResult.success(book);
+        return ActionResult.success( book );
     }
     
     @Override
     @OnlyIn( value = Dist.CLIENT )
     public void appendHoverText( ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag ) {
         final PlayerEntity player = Minecraft.getInstance().player;
-
-        if (player == null)
-            return;
-
-        final float capacity = RenderEventHandler.PLAYER_NATURAL_ABSORPTION;
         
-        if (capacity >= 0.0F) {
+        if( player == null )
+            return;
+        
+        final float naturalAbsorption = RenderEventHandler.PLAYER_NATURAL_ABSORPTION;
+        
+        if( naturalAbsorption >= 0.0F ) {
             
-            final float maxCapacity = (float) Config.ABSORPTION.NATURAL.maximumAmount.get();
-            final float gainOnUse = capacity >= maxCapacity ? 0.0F :
-                    Math.min((float) Config.ABSORPTION.NATURAL.upgradeGain.get(), maxCapacity - capacity);
+            final float maxNaturalAbsorption = (float) Config.ABSORPTION.NATURAL.maximumAmount.get();
+            final float gainOnUse = naturalAbsorption >= maxNaturalAbsorption ? 0.0F :
+                    Math.min( (float) Config.ABSORPTION.NATURAL.upgradeGain.get(), maxNaturalAbsorption - naturalAbsorption );
             
             // Extra tooltip info, if enabled
-            if (Config.ABSORPTION.NATURAL.upgradeBookExtraTooltipInfo.get()) {
-                tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + translate(References.BOOK_CURRENT).getString()));
-                tooltip.add(new TranslationTextComponent(TextFormatting.YELLOW + " " + prettyToString(capacity) + " / " + prettyToString(maxCapacity)));
+            if( Config.ABSORPTION.NATURAL.upgradeBookExtraTooltipInfo.get() ) {
+                tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.ABSORPTION_BOOK_CURRENT ).getString() ) );
+                tooltip.add( new TranslationTextComponent( TextFormatting.YELLOW + " " +
+                        References.prettyToString( naturalAbsorption ) + " / " + References.prettyToString( maxNaturalAbsorption ) ) );
             }
-            tooltip.add(new StringTextComponent(""));
+            tooltip.add( new StringTextComponent( "" ) );
             
-            if (gainOnUse > 0.0F) {
+            if( gainOnUse > 0.0F ) {
                 // Tell player how much absorption they gain on use
-                tooltip.add(new TranslationTextComponent(TextFormatting.GRAY + translate(References.BOOK_GAIN).getString()));
-                tooltip.add(new TranslationTextComponent(TextFormatting.BLUE + translate(References.BOOK_MAX, prettyToString(gainOnUse)).getString()));
+                tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
+                tooltip.add( new TranslationTextComponent( TextFormatting.BLUE + References.translate( References.ABSORPTION_BOOK_MAX, References.prettyToString( gainOnUse ) ).getString() ) );
+                
+                tooltip.add( new StringTextComponent( "" ) );
                 
                 // Provide feedback on cost and usability
-                tooltip.add(new StringTextComponent(""));
-                    
-                final int levelCost = getLevelCost( capacity );
-                if(levelCost > 0) {
-                    tooltip.add(new TranslationTextComponent(TextFormatting.GREEN + translate(References.BOOK_COST, levelCost).getString()));
+                final int levelCost = getLevelCost( naturalAbsorption );
+                if( levelCost > 0 ) {
+                    tooltip.add( new TranslationTextComponent( TextFormatting.GREEN + References.translate( References.ABSORPTION_BOOK_COST, levelCost ).getString() ) );
                 }
-                if(levelCost <= player.experienceLevel || player.isCreative()) {
-                    tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + translate(References.BOOK_CAN_USE).getString()));
+                if( levelCost <= player.experienceLevel || player.isCreative() ) {
+                    tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.BOOK_CAN_USE ).getString() ) );
                 }
                 else {
-                    tooltip.add(new TranslationTextComponent(TextFormatting.RED + translate(References.BOOK_NO_USE).getString()));
+                    tooltip.add( new TranslationTextComponent( TextFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
                 }
             }
             else {
-                tooltip.add(new TranslationTextComponent(TextFormatting.RED + translate(References.BOOK_NO_USE).getString()));
+                tooltip.add( new TranslationTextComponent( TextFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
             }
         }
     }
     
-    private ITextComponent translate(String key, Object... args) { return new TranslationTextComponent(key, args); }
-    
-    private String prettyToString(float value) {
-        return Math.round(value) == value ? Integer.toString(Math.round(value)) : Float.toString(value);
-    }
-    
     @Override
-    public Rarity getRarity(ItemStack stack) {
-        return Rarity.RARE;
-    }
+    public Rarity getRarity( ItemStack stack ) { return Rarity.RARE; }
 }

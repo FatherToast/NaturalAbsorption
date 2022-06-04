@@ -26,11 +26,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
     public static class General extends Config.AbstractCategory {
         
         public final DoubleField globalMax;
-
-        public final BooleanField spongeBookEnabled;
-        public final DoubleField spongeBookXpReturn;
-        public final BooleanField spongeBookExtraTooltipInfo;
-
+        
         public final DoubleField respawnAmount;
         
         public final IntField recoveryDelay;
@@ -51,24 +47,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "This limit is ignored by potion effects. If this is set less than 0, the limit is disabled." ) );
             
             SPEC.newLine();
-
-            spongeBookEnabled = SPEC.define( new BooleanField( "enable_sponge_book", true,
-                    "If enabled, players can use the Absorption Absorbing Book to convert some of their natural absorption back into an absorption book.") );
-
-            SPEC.newLine();
-
-            spongeBookXpReturn = SPEC.define(new DoubleField("sponge_book_xp_return", 0.75, DoubleField.Range.PERCENT,
-                    "The percentage of the experience levels used when using an Absorption Book that should be returned to the player upon" +
-                            "using an Absorption Absorbing Book (aka Sponge Book). For example, a value of 1.0 (100%) will return all the levels that was used, while 0.5 (50%) " +
-                            "will only return half of the levels used. Default value is 0.75 (75%)."));
-
-            SPEC.newLine();
-
-            spongeBookExtraTooltipInfo = SPEC.define(new BooleanField("sponge_book.extra_tooltip_info", true,
-                    "Set to true to display how many experience levels will be given back when using an Absorption Absorbing Book on the item's tooltip."));
-
-            SPEC.newLine();
-
+            
             respawnAmount = SPEC.define( new DoubleField( "respawn_amount", 0.0, DoubleField.Range.NON_NEGATIVE,
                     "Players will respawn with up to this much absorption, limited by their personal max absorption." ) );
             
@@ -90,12 +69,12 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "Players can't lose over 1/2 drumstick per game tick or more than 5 drumsticks of hunger per recovery tick." ) );
             
             SPEC.newLine();
-
-            SPEC.comment("NOTE: This option is not compatible with a lot of mods that do their own heart rendering stuff. For instance, " +
-                    "Mantle's heart stacker option that stacks hearts instead of vanilla drawing multiple rows, will break this feature.");
+            
+            SPEC.comment( "NOTE: This option is not compatible with a lot of mods that do their own heart rendering stuff. For instance, " +
+                    "Mantle's heart stacker option that stacks hearts instead of vanilla drawing multiple rows, will break this feature." );
             renderCapacityBackground = SPEC.define( new BooleanField( "render_capacity_background", true,
                     "If true, the mod will render the empty heart background behind absorption hearts you are missing,",
-                    "but can regenerate back. This may not work right if another mod changes heart bar rendering." ));
+                    "but can regenerate back. This may not work right if another mod changes heart bar rendering." ) );
         }
     }
     
@@ -113,9 +92,12 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         public final IntField upgradeLevelCostMax;
         public final DoubleField upgradeLevelCostPerPoint;
         
-        public final EnumField<BookRecipeCondition.Type> upgradeBookRecipe;
         
+        public final EnumField<BookRecipeCondition.Type> upgradeBookRecipe;
         public final BooleanField upgradeBookExtraTooltipInfo;
+        
+        public final BooleanField spongeBookEnabled;
+        public final DoubleField spongeBookLevelRefundMulti;
         
         Natural( ToastConfigSpec parent ) {
             super( parent, "natural_absorption",
@@ -172,12 +154,19 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "             aBa ",
                     "             aaa ",
                     "B = book & quill, a = golden apple" ) );
-            
-            SPEC.newLine();
-            
             upgradeBookExtraTooltipInfo = SPEC.define( new BooleanField( "upgrade_book.extra_tooltip_info", false,
                     "Set to true to display current and max natural absorption on the Book of Absorption tooltip.",
                     "Particularly helpful if you must disable the heart background rendering." ) );
+            
+            SPEC.newLine();
+            
+            spongeBookEnabled = SPEC.define( new BooleanField( "downgrade_book.enabled", true,
+                    "If enabled, players can use the glorious Absorption Absorbing Book to convert some of their natural",
+                    "absorption back into an absorption book. The natural absorption lost per use is exactly one upgrade." ) );
+            spongeBookLevelRefundMulti = SPEC.define( new DoubleField( "downgrade_book.level_refund", 0.75, DoubleField.Range.PERCENT,
+                    "The percentage of the experience levels refunded when using an Absorption Absorbing Book.",
+                    "For example, a value of 0.5 (50%) will restore half of the levels consumed by a Book of Absorption,",
+                    "rounded down to the nearest whole number." ) );
         }
     }
 }
