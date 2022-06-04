@@ -29,6 +29,28 @@ public class NaturalAbsorption {
     
     /* TODO LIST:
      *  - Fix lang files
+     *
+     * Feature List:
+     *  - Absorption
+     *      - Natural
+     *      - Regeneration to max
+     *  - Health
+     *      - Disable vanilla regen
+     *      - Regeneration to limit
+     *      - Eating heals
+     *  - Items
+     *      - Book of Absorption
+     *      - Absorption Absorbing Book
+     *  - Enchantments
+     *      - Absorption
+     *  - Loot
+     *      - Book of Absorption added to dungeon loot
+     *  - GUI
+     *      - Render empty hearts to show max absorption
+     *  - Secret features
+     *      - The Almighty Cactus God
+     *  - Default-disabled features
+     *      - Armor replacement
      */
     
     /** Our mod ID. */
