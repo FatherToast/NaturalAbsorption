@@ -92,12 +92,13 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         public final IntField upgradeLevelCostMax;
         public final DoubleField upgradeLevelCostPerPoint;
         
-        
         public final EnumField<BookRecipeCondition.Type> upgradeBookRecipe;
         public final BooleanField upgradeBookExtraTooltipInfo;
         
         public final BooleanField spongeBookEnabled;
         public final DoubleField spongeBookLevelRefundMulti;
+        
+        // Insert here if a config for loot table injection for upgrade/sponge books is desired; see net.minecraftforge.event.LootTableLoadEvent
         
         Natural( ToastConfigSpec parent ) {
             super( parent, "natural_absorption",
