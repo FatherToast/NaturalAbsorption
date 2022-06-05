@@ -134,13 +134,13 @@ public class HeartManager {
     public void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
             final MinecraftServer server = LogicalSidedProvider.INSTANCE.get( LogicalSide.SERVER );
-
+            
             // Counter for cache cleanup
             if( ++cleanupCounter >= 600 ) {
                 cleanupCounter = 0;
                 PLAYER_HUNGER_STATE_TRACKER.clear();
                 clearSources();
-                HeartData.allSaveToPersistent(server.getPlayerList().getPlayers());
+                HeartData.allSaveToPersistent( server.getPlayerList().getPlayers() );
                 HeartData.clearCache();
             }
             
@@ -155,7 +155,7 @@ public class HeartManager {
             // Counter for player shield update
             if( ++updateCounter >= Config.MAIN.GENERAL.updateTime.get() ) {
                 updateCounter = 0;
-
+                
                 for( ServerPlayerEntity player : server.getPlayerList().getPlayers() ) {
                     // Update each player's data
                     if( player != null && player.isAlive() ) HeartData.get( player ).update();
@@ -233,7 +233,7 @@ public class HeartManager {
                         
                         final Food food = stack.getItem().getFoodProperties();
                         hunger = food.getNutrition();
-                        saturation = hunger * food.getSaturationModifier() * 2.0F;
+                        saturation = calculateSaturation( hunger, food.getSaturationModifier() );
                     }
                     else {
                         // Calculate actual hunger and saturation gained
@@ -245,19 +245,28 @@ public class HeartManager {
                     }
                     
                     // Apply any healing
-                    float healing = 0.0F;
-                    if( hunger > 0 ) {
-                        healing += hunger * (float) Config.HEALTH.GENERAL.foodHealingPerHunger.get();
-                    }
-                    if( saturation > 0.0F ) {
-                        healing += saturation * (float) Config.HEALTH.GENERAL.foodHealingPerSaturation.get();
-                    }
+                    final float healing = getFoodHealing( hunger, saturation );
                     if( healing > 0.0F ) {
                         player.heal( Math.min( healing, maxHealing ) );
                     }
                 }
             }
         }
+    }
+    
+    /** Calculates saturation value based on hunger and saturation modifier. */
+    public static float calculateSaturation( int hunger, float saturationModifier ) { return hunger * saturationModifier * 2.0F; }
+    
+    /** Calculates amount of healing to provide based on hunger and saturation granted. */
+    public static float getFoodHealing( int hunger, float saturation ) {
+        float healing = 0.0F;
+        if( hunger > 0 ) {
+            healing += hunger * (float) Config.HEALTH.GENERAL.foodHealingPerHunger.get();
+        }
+        if( saturation > 0.0F ) {
+            healing += saturation * (float) Config.HEALTH.GENERAL.foodHealingPerSaturation.get();
+        }
+        return healing;
     }
     
     /**
@@ -276,8 +285,8 @@ public class HeartManager {
             if( isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0 ) {
                 final float naturalAbsorption = data.getNaturalAbsorption();
                 if( naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get() ) {
-                    data.setNaturalAbsorption((float) Math.max(Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
-                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get()), true);
+                    data.setNaturalAbsorption( (float) Math.max( Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
+                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get() ), true );
                 }
             }
             
@@ -304,8 +313,8 @@ public class HeartManager {
         if( !event.getWorld().isClientSide && event.getEntity() instanceof PlayerEntity ) {
             final ServerPlayerEntity player = (ServerPlayerEntity) event.getEntity();
             final float absorptionHealth = player.getAbsorptionAmount();
-
-            NetworkHelper.setNaturalAbsorption(player, absorptionHealth);
+            
+            NetworkHelper.setNaturalAbsorption( player, absorptionHealth );
         }
     }
     

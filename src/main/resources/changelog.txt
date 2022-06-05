@@ -1,5 +1,6 @@
 1.16.5-2.2.0
     - Absorption Absorbing Book!
+    - Now provides info about hunger, saturation, and health restored to food tooltips
     - Rewrote localization into new data gen system
 1.16.5-2.1.1
     - Fixed absorption data not being saved to player persistent data before clearing HeartData cache

@@ -26,11 +26,13 @@ public class NALanguageProvider extends LanguageProvider {
         // Note that this must match up EXACTLY to the TranslationKey enum above
         String[] translation = { key, en, es, pt, fr, it, de, pir };
         for( int i = 1; i < translation.length; i++ ) {
-            //noinspection ConstantConditions This is a dumb thing to do, but for some reason it fixes the encoding
+            //noinspection ConstantConditions NOTE: This is a dumb thing to do, but for some reason it fixes the encoding
             translation[i] = translation[i]
-                    .replace( "à", "\u00E0" ).replace( "á", "\u00E1" ).replace( "ã", "\u00E3" )
-                    .replace( "ç", "\u00E7" ).replace( "é", "\u00E9" ).replace( "ê", "\u00EA" )
-                    .replace( "í", "\u00ED" ).replace( "ó", "\u00F3" ).replace( "ö", "\u00F6" )
+                    .replace( "à", "\u00E0" ).replace( "á", "\u00E1" ).replace( "ã", "\u00E3" ).replace( "ä", "\u00E4" )
+                    .replace( "ç", "\u00E7" )
+                    .replace( "é", "\u00E9" ).replace( "ê", "\u00EA" )
+                    .replace( "í", "\u00ED" )
+                    .replace( "ó", "\u00F3" ).replace( "ö", "\u00F6" )
                     .replace( "ù", "\u00F9" ).replace( "û", "\u00FB" ).replace( "ü", "\u00FC" );
         }
         return translation;
@@ -48,6 +50,16 @@ public class NALanguageProvider extends LanguageProvider {
                     "Assorbimento libro assorbente", "Absorption Absorptionsbuch", "Magic Heart Plundering Book" ),
             Translations( NAEnchantments.ABSORPTION_ENCHANTMENT.get().getDescriptionId(), "Absorption",
                     "Absorción", "Absorção", "Absorption", "Assorbimento", "Absorption", "Heart o' Magic" ),
+            
+            Translations( References.FOOD_HUNGER, "%s Hunger",
+                    "%s Hambre", "%s Fome", "%s Faim",
+                    "%s Fame", "%s Hunger", "%s Scurvy" ),
+            Translations( References.FOOD_SATURATION, "%s Saturation",
+                    "%s Saturación", "%s Saturação", "%s Saturation",
+                    "%s Sazietà", "%s Sättigung", "%s Full Belly" ),
+            Translations( References.FOOD_HEALTH, "%s Health",
+                    "%s Salud", "%s Vida", "%s Vie",
+                    "%s Salute", "%s Gesundheit", "%s Healin'" ),
             
             Translations( References.BOOK_GAIN, "When used:",
                     "Al usarse:", "Quando usado:", "Quand utilisé :",

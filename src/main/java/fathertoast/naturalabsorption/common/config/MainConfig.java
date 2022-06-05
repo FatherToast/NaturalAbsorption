@@ -26,9 +26,11 @@ public class MainConfig extends Config.AbstractConfig {
         
         public final InjectionWrapperField<BooleanField> defaultGameRuleNoRegen;
         
+        public final BooleanField foodExtraTooltipInfo;
+        
         public final BooleanField disableAbsorptionFeatures;
         public final BooleanField disableHealthFeatures;
-        //public final BooleanField disableHungerFeatures;
+        //public final BooleanField disableHungerFeatures; // NOTE: If/when hunger features are added, also move food configs from health
         
         General( ToastConfigSpec parent ) {
             super( parent, "general",
@@ -50,6 +52,12 @@ public class MainConfig extends Config.AbstractConfig {
                         GameRules.GAME_RULE_TYPES.put( GameRules.RULE_NATURAL_REGENERATION,
                                 GameRules.BooleanValue.create( !wrapped.get() ) );
                     } ) );
+            
+            SPEC.newLine();
+            
+            foodExtraTooltipInfo = SPEC.define( new BooleanField( "food.extra_tooltip_info", true,
+                    "Set to true to display nutritional value on the tooltips of food items.",
+                    "Lists hunger and saturation that can be restored from eating. (See health config for healing display.)" ) );
             
             SPEC.newLine();
             

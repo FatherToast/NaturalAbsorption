@@ -16,6 +16,10 @@ public class References {
     public static final String NOT_ENOUGH_LEVELS = ITEM_ROOT + "absorption_book.not_enough_levels";
     public static final String NOT_ENOUGH_ABSORPTION = ITEM_ROOT + "sponge_book.not_enough_absorption";
     
+    public static final String FOOD_HUNGER = ITEM_ROOT + "food.tooltip.hunger";
+    public static final String FOOD_SATURATION = ITEM_ROOT + "food.tooltip.saturation";
+    public static final String FOOD_HEALTH = ITEM_ROOT + "food.tooltip.health";
+    
     public static final String BOOK_GAIN = ITEM_ROOT + "book.tooltip.gain";
     public static final String BOOK_MAX = ITEM_ROOT + "book.tooltip.max";
     public static final String BOOK_CAN_USE = ITEM_ROOT + "book.tooltip.can_use";
@@ -29,7 +33,7 @@ public class References {
     public static ITextComponent translate( String key, Object... args ) { return new TranslationTextComponent( key, args ); }
     
     public static String prettyToString( float value ) {
-        return Math.round( value ) == value ? Integer.toString( Math.round( value ) ) : Float.toString( value );
+        return Math.round( value ) == value ? Integer.toString( Math.round( value ) ) : Float.toString( Math.round( value * 100.0F ) / 100.0F );
     }
     
     //---------------- COOL SYMBOLS -------------------

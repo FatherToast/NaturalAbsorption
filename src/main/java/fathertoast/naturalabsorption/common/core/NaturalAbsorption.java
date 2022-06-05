@@ -35,6 +35,7 @@ public class NaturalAbsorption {
      *      - Disable vanilla regen
      *      - Regeneration to limit
      *      - Eating heals
+     *      - Adds food info to tooltip
      *  - Items
      *      - Book of Absorption
      *      - Absorption Absorbing Book
