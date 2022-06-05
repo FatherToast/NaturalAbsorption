@@ -27,10 +27,7 @@ import java.util.function.Supplier;
 @Mod( NaturalAbsorption.MOD_ID )
 public class NaturalAbsorption {
     
-    /* TODO LIST:
-     *  - Fix lang files
-     *
-     * Feature List:
+    /* Feature List:
      *  - Absorption
      *      - Natural
      *      - Regeneration to max
