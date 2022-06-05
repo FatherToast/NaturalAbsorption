@@ -107,7 +107,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
         
         // Tell player how much absorption they lose on use
         tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
-        tooltip.add( new TranslationTextComponent( TextFormatting.BLUE + References.translate( References.SPONGE_BOOK_MAX, References.prettyToString( gainOnUse ) ).getString() ) );
+        tooltip.add( new TranslationTextComponent( TextFormatting.RED + References.translate( References.BOOK_MAX, "-" + References.prettyToString( gainOnUse ) ).getString() ) );
         
         tooltip.add( new StringTextComponent( "" ) );
         

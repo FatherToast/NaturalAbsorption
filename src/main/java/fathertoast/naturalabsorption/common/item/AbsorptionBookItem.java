@@ -115,7 +115,7 @@ public class AbsorptionBookItem extends Item {
             if( gainOnUse > 0.0F ) {
                 // Tell player how much absorption they gain on use
                 tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
-                tooltip.add( new TranslationTextComponent( TextFormatting.BLUE + References.translate( References.ABSORPTION_BOOK_MAX, References.prettyToString( gainOnUse ) ).getString() ) );
+                tooltip.add( new TranslationTextComponent( TextFormatting.BLUE + References.translate( References.BOOK_MAX, "+" + References.prettyToString( gainOnUse ) ).getString() ) );
                 
                 tooltip.add( new StringTextComponent( "" ) );
                 

@@ -1,5 +1,6 @@
 package fathertoast.naturalabsorption.common.util;
 
+import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -9,18 +10,19 @@ public class References {
     
     //--------------- TRANSLATION KEYS ----------------
     
-    public static final String ALREADY_MAX = "item.naturalabsorption.absorption_book.already_max";
-    public static final String NOT_ENOUGH_LEVELS = "item.naturalabsorption.absorption_book.not_enough_levels";
-    public static final String NOT_ENOUGH_ABSORPTION = "item.naturalabsorption.sponge_book.not_enough_absorption";
+    private static final String ITEM_ROOT = "item." + NaturalAbsorption.MOD_ID + ".";
     
-    public static final String BOOK_GAIN = "item.naturalabsorption.book.tooltip.gain";
-    public static final String BOOK_CAN_USE = "item.naturalabsorption.book.tooltip.can_use";
-    public static final String BOOK_NO_USE = "item.naturalabsorption.book.tooltip.no_use";
-    public static final String ABSORPTION_BOOK_CURRENT = "item.naturalabsorption.absorption_book.tooltip.current";
-    public static final String ABSORPTION_BOOK_MAX = "item.naturalabsorption.absorption_book.tooltip.max";
-    public static final String ABSORPTION_BOOK_COST = "item.naturalabsorption.absorption_book.tooltip.cost";
-    public static final String SPONGE_BOOK_MAX = "item.naturalabsorption.sponge_book.tooltip.max";
-    public static final String SPONGE_BOOK_REFUND = "item.naturalabsorption.sponge_book.tooltip.refund";
+    public static final String ALREADY_MAX = ITEM_ROOT + "absorption_book.already_max";
+    public static final String NOT_ENOUGH_LEVELS = ITEM_ROOT + "absorption_book.not_enough_levels";
+    public static final String NOT_ENOUGH_ABSORPTION = ITEM_ROOT + "sponge_book.not_enough_absorption";
+    
+    public static final String BOOK_GAIN = ITEM_ROOT + "book.tooltip.gain";
+    public static final String BOOK_MAX = ITEM_ROOT + "book.tooltip.max";
+    public static final String BOOK_CAN_USE = ITEM_ROOT + "book.tooltip.can_use";
+    public static final String BOOK_NO_USE = ITEM_ROOT + "book.tooltip.no_use";
+    public static final String ABSORPTION_BOOK_CURRENT = ITEM_ROOT + "absorption_book.tooltip.current";
+    public static final String ABSORPTION_BOOK_COST = ITEM_ROOT + "absorption_book.tooltip.cost";
+    public static final String SPONGE_BOOK_REFUND = ITEM_ROOT + "sponge_book.tooltip.refund";
     
     //---------------- FORMAT METHODS -------------------
     
