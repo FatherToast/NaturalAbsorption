@@ -1,6 +1,12 @@
+1.16.5-2.2.0
+    - Absorption Absorbing Book!
+    - Rewrote localization into new data gen system
+1.16.5-2.1.1
+    - Fixed absorption data not being saved to player persistent data before clearing HeartData cache
+    - Removed unneeded absorption update packet
 1.16.5-1.0.0
     - Rewritten for 1.16.5, primarily done by Sarinsa
-    - Terminology rebased, now absorption is no longer referred to as health and health/absorption together are called hearts.
+    - Terminology rebased, now absorption is no longer referred to as health and health/absorption together are called hearts
     - The health regen disabling option now sets the game rule's default value rather than constantly setting it
     - Food healing rebalanced
         - Only counts actual hunger and saturation restored, rather than counting total value of food eaten
