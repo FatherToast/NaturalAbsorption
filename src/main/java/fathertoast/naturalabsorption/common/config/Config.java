@@ -22,6 +22,7 @@ public class Config {
     public static final AbsorptionConfig ABSORPTION = new AbsorptionConfig( CONFIG_DIR, "absorption" );
     public static final EquipmentConfig EQUIPMENT = new EquipmentConfig( CONFIG_DIR, "enchant_and_armor" );
     public static final HealthConfig HEALTH = new HealthConfig( CONFIG_DIR, "health" );
+    public static final CompatConfig COMPAT = new CompatConfig(CONFIG_DIR, "compat");
     //public static final HungerConfig HUNGER = new MainConfig( CONFIG_DIR, "hunger" );
     
     /** Performs initial loading of all configs in this mod. */
@@ -32,6 +33,7 @@ public class Config {
         ABSORPTION.SPEC.initialize();
         EQUIPMENT.SPEC.initialize();
         HEALTH.SPEC.initialize();
+        COMPAT.SPEC.initialize();
         //HUNGER.SPEC.initialize();
     }
     

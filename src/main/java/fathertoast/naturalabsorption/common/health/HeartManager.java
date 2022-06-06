@@ -24,7 +24,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HeartManager {
     /** Set of all currently altered damage sources. */
@@ -79,35 +81,7 @@ public class HeartManager {
     }
     
     private static void clearPlayerHungerState( PlayerEntity player ) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
-    
-    /** @return The max absorption granted by equipment. */
-    public static float getEquipmentAbsorption( PlayerEntity player ) {
-        float bonus = 0.0F;
-        
-        // From armor
-        if( isArmorReplacementEnabled() ) {
-            if( Config.EQUIPMENT.ARMOR.armorMultiplier.get() > 0.0 ) {
-                final double armor = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
-                if( armor > 0.0F ) {
-                    bonus += Config.EQUIPMENT.ARMOR.armorMultiplier.get() * armor;
-                }
-            }
-            if( Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() > 0.0 ) {
-                final double toughness = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
-                if( toughness > 0.0F ) {
-                    bonus += Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() * toughness;
-                }
-            }
-        }
-        
-        // From enchantments
-        if( Config.EQUIPMENT.ENCHANTMENT.enabled.get() ) {
-            bonus += AbsorptionEnchantment.getMaxAbsorptionBonus( player );
-        }
-        
-        return bonus;
-    }
-    
+
     /** @return The max absorption granted by potion effects. */
     public static float getPotionAbsorption( PlayerEntity player ) {
         if( player.hasEffect( Effects.ABSORPTION ) ) {
@@ -134,7 +108,7 @@ public class HeartManager {
     public void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
             final MinecraftServer server = LogicalSidedProvider.INSTANCE.get( LogicalSide.SERVER );
-            
+
             // Counter for cache cleanup
             if( ++cleanupCounter >= 600 ) {
                 cleanupCounter = 0;
@@ -143,19 +117,11 @@ public class HeartManager {
                 HeartData.allSaveToPersistent( server.getPlayerList().getPlayers() );
                 HeartData.clearCache();
             }
-            
-            // Handle equipment changes
-            if( !PLAYER_EQUIPMENT_CHANGES.isEmpty() ) {
-                for( PlayerEntity player : PLAYER_EQUIPMENT_CHANGES ) {
-                    if( player != null && player.isAlive() ) HeartData.get( player ).onEquipmentChanged();
-                }
-                PLAYER_EQUIPMENT_CHANGES.clear();
-            }
-            
+
             // Counter for player shield update
             if( ++updateCounter >= Config.MAIN.GENERAL.updateTime.get() ) {
                 updateCounter = 0;
-                
+
                 for( ServerPlayerEntity player : server.getPlayerList().getPlayers() ) {
                     // Update each player's data
                     if( player != null && player.isAlive() ) HeartData.get( player ).update();
@@ -253,10 +219,10 @@ public class HeartManager {
             }
         }
     }
-    
+
     /** Calculates saturation value based on hunger and saturation modifier. */
     public static float calculateSaturation( int hunger, float saturationModifier ) { return hunger * saturationModifier * 2.0F; }
-    
+
     /** Calculates amount of healing to provide based on hunger and saturation granted. */
     public static float getFoodHealing( int hunger, float saturation ) {
         float healing = 0.0F;
@@ -266,7 +232,6 @@ public class HeartManager {
         if( saturation > 0.0F ) {
             healing += saturation * (float) Config.HEALTH.GENERAL.foodHealingPerSaturation.get();
         }
-        return healing;
     }
     
     /**
@@ -282,11 +247,12 @@ public class HeartManager {
             final HeartData data = HeartData.get( event.getPlayer() );
             
             // Apply death penalty
-            if( isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0 ) {
-                final float naturalAbsorption = data.getNaturalAbsorption();
-                if( naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get() ) {
-                    data.setNaturalAbsorption( (float) Math.max( Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
-                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get() ), true );
+            if(isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0) {
+                final double naturalAbsorption = AbsorptionHelper.getNaturalAbsorption(event.getPlayer());
+
+                if(naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get()) {
+                    data.setNaturalAbsorption((float) Math.max(Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
+                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get()), true);
                 }
             }
             
@@ -300,41 +266,7 @@ public class HeartManager {
             }
         }
     }
-    
-    /**
-     * Called when any entity is spawned in the world, including by chunk loading and dimension transition.
-     * <p>
-     * Initializes important information for client players.
-     *
-     * @param event The event data.
-     */
-    @SubscribeEvent
-    public void onJoinWorld( EntityJoinWorldEvent event ) {
-        if( !event.getWorld().isClientSide && event.getEntity() instanceof PlayerEntity ) {
-            final ServerPlayerEntity player = (ServerPlayerEntity) event.getEntity();
-            final float absorptionHealth = player.getAbsorptionAmount();
-            
-            NetworkHelper.setNaturalAbsorption( player, absorptionHealth );
-        }
-    }
-    
-    /**
-     * Called after a living entity's equipment has been changed (including when the equipment is loaded from spawn).
-     * <p>
-     * Used to track changes in max absorption granted by equipment.
-     *
-     * @param event The event data.
-     */
-    @SubscribeEvent( priority = EventPriority.NORMAL )
-    public void onLivingEquipmentChange( LivingEquipmentChangeEvent event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
-            if( isAbsorptionEnabled() ) {
-                // Mark the player to be checked for changes; this event is called for each changed slot, avoid adding duplicates
-                PLAYER_EQUIPMENT_CHANGES.add( (PlayerEntity) event.getEntityLiving() );
-            }
-        }
-    }
-    
+
     /**
      * Called when a living entity is damaged - before armor, potions, and enchantments reduce damage.
      * <p>

@@ -22,6 +22,7 @@ public class DataGatherListener {
         }
         if( event.includeServer() ) {
             generator.addProvider( new NALootModifierProvider( generator ) );
+            generator.addProvider( new NARecipeProvider( generator ) );
         }
     }
 }

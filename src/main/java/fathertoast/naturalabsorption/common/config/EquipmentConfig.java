@@ -22,8 +22,8 @@ public class EquipmentConfig extends Config.AbstractConfig {
                 "This config contains options for features that apply to the Absorption enchantment and armor."
         );
         
-        ENCHANTMENT = new Enchantment( SPEC );
-        ARMOR = new Armor( SPEC );
+        ENCHANTMENT = new Enchantment(SPEC);
+        ARMOR = new Armor(SPEC);
     }
     
     public static class Enchantment extends Config.AbstractCategory {
@@ -73,7 +73,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
             SPEC.newLine();
             
             potencyBase = SPEC.define( new DoubleField( "potency.base", 2.0, DoubleField.Range.ANY,
-                    "Maximum absorption gained for for having at least one level of the Absorption enchantment.",
+                    "Maximum absorption gained for having at least one level of the Absorption enchantment.",
                     "A negative value reduces the effect of the first level(s)." ) );
             potencyPerLevel = SPEC.define( new DoubleField( "potency.per_level", 2.0, DoubleField.Range.NON_NEGATIVE,
                     "Maximum absorption gained for each level of the Absorption enchantment." ) );

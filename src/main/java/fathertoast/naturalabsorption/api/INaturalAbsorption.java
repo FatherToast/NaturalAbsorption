@@ -18,8 +18,6 @@ public interface INaturalAbsorption {
      * persistent data tag and using these keys.
      */
     String TAG_BASE = "naturalabsorption";
-    String TAG_NATURAL_ABSORPTION = "AbsorbNatural";
-    String TAG_EQUIPMENT_ABSORPTION = "AbsorbEquip";
     String TAG_DELAY_ABSORPTION = "AbsorbDelay";
     String TAG_DELAY_HEALTH = "HealthDelay";
 
@@ -34,9 +32,5 @@ public interface INaturalAbsorption {
     @Nonnull
     IHeartData getHeartData(@Nonnull PlayerEntity player);
 
-    /**
-     * @return the player's natural absorption.
-     *         Can be called on both server and client.
-     */
-    float getNaturalAbsorption(@Nonnull PlayerEntity player);
+    IAbsorptionAccessor getAbsorptionAccessor();
 }
