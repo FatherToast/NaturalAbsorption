@@ -80,39 +80,7 @@ public class HeartManager {
         }
     }
     
-    private static void clearPlayerHungerState( PlayerEntity player ) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
-    
-    /** @return The max absorption granted by equipment. */
-    public static float getEquipmentAbsorption( PlayerEntity player ) {
-        float bonus = 0.0F;
-        
-        // From armor
-        if(isArmorReplacementEnabled()) {
-            if(Config.EQUIPMENT.ARMOR.armorMultiplier.get() > 0.0) {
-                final double armor = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
-                if( armor > 0.0F ) {
-                    bonus += Config.EQUIPMENT.ARMOR.armorMultiplier.get() * armor;
-                }
-            }
-            if(Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() > 0.0) {
-                final double toughness = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
-                if(toughness > 0.0F) {
-                    bonus += Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() * toughness;
-                }
-            }
-        }
-
-        // From enchantments
-        if(Config.EQUIPMENT.ENCHANTMENT.enabled.get()) {
-            bonus += AbsorptionEnchantment.getMaxAbsorptionBonus( player );
-        }
-
-        // From equipment with the TC absorption modifier
-        if (Config.COMPAT.TC.modifierEnabled.get()) {
-            bonus += HeartData.get(player).getTCModifierAbsorption();
-        }
-        return bonus;
-    }
+    private static void clearPlayerHungerState(PlayerEntity player) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
     
     /** @return The max absorption granted by potion effects. */
     public static float getPotionAbsorption( PlayerEntity player ) {
@@ -148,14 +116,6 @@ public class HeartManager {
                 clearSources();
                 HeartData.allSaveToPersistent(server.getPlayerList().getPlayers());
                 HeartData.clearCache();
-            }
-            
-            // Handle equipment changes
-            if( !PLAYER_EQUIPMENT_CHANGES.isEmpty() ) {
-                for( PlayerEntity player : PLAYER_EQUIPMENT_CHANGES ) {
-                    if( player != null && player.isAlive() ) HeartData.get( player ).onEquipmentChanged();
-                }
-                PLAYER_EQUIPMENT_CHANGES.clear();
             }
             
             // Counter for player shield update
@@ -216,14 +176,16 @@ public class HeartManager {
      *
      * @param event The event data.
      */
-    @SubscribeEvent( priority = EventPriority.NORMAL )
-    public void onItemUseFinish( LivingEntityUseItemEvent.Finish event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onItemUseFinish(LivingEntityUseItemEvent.Finish event) {
+        if (event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide) {
             final PlayerEntity player = (PlayerEntity) event.getEntityLiving();
-            if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingMax.get() != 0.0 ) {
+
+            if (isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingMax.get() != 0.0) {
                 // Apply healing from food
                 final ItemStack stack = event.getItem();
-                if( !stack.isEmpty() && stack.getItem().getFoodProperties() != null ) {
+
+                if (!stack.isEmpty() && stack.getItem().getFoodProperties() != null) {
                     // Ignore the max if setting is negative
                     final float maxHealing = Config.HEALTH.GENERAL.foodHealingMax.get() < 0.0 ? Float.POSITIVE_INFINITY :
                             (float) Config.HEALTH.GENERAL.foodHealingMax.get();
@@ -232,10 +194,11 @@ public class HeartManager {
                     final int hunger;
                     final float saturation;
                     final HungerState hungerState = PLAYER_HUNGER_STATE_TRACKER.get( player );
-                    if( hungerState == null ) {
+
+                    if (hungerState == null) {
                         // Fall back to the old method of direct food potential :(
-                        NaturalAbsorption.LOG.warn( "Failed to calculate actual hunger/saturation gained from eating! Item:[{}]",
-                                stack.toString() );
+                        NaturalAbsorption.LOG.warn("Failed to calculate actual hunger/saturation gained from eating! Item:[{}]",
+                                stack.toString());
                         
                         final Food food = stack.getItem().getFoodProperties();
                         hunger = food.getNutrition();
@@ -273,15 +236,16 @@ public class HeartManager {
      *
      * @param event The event data.
      */
-    @SubscribeEvent( priority = EventPriority.NORMAL )
-    public void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event ) {
-        if( !event.getPlayer().level.isClientSide && !event.isEndConquered() ) {
-            final HeartData data = HeartData.get( event.getPlayer() );
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if(!event.getPlayer().level.isClientSide && !event.isEndConquered()) {
+            final HeartData data = HeartData.get(event.getPlayer());
             
             // Apply death penalty
-            if( isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0 ) {
-                final float naturalAbsorption = data.getNaturalAbsorption();
-                if( naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get() ) {
+            if(isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0) {
+                final double naturalAbsorption = data.getNaturalAbsorption();
+
+                if(naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get()) {
                     data.setNaturalAbsorption((float) Math.max(Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
                             naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get()), true);
                 }
@@ -289,45 +253,11 @@ public class HeartManager {
             
             // Prepare the player for respawn
             data.startRecoveryDelay();
-            if( isHealthEnabled() && Config.HEALTH.GENERAL.respawnAmount.get() > 0.0F ) {
-                data.owner.setHealth( (float) Config.HEALTH.GENERAL.respawnAmount.get() );
+            if(isHealthEnabled() && Config.HEALTH.GENERAL.respawnAmount.get() > 0.0F) {
+                data.owner.setHealth((float) Config.HEALTH.GENERAL.respawnAmount.get());
             }
-            if( isAbsorptionEnabled() ) {
-                data.setAbsorption( (float) Config.ABSORPTION.GENERAL.respawnAmount.get() );
-            }
-        }
-    }
-    
-    /**
-     * Called when any entity is spawned in the world, including by chunk loading and dimension transition.
-     * <p>
-     * Initializes important information for client players.
-     *
-     * @param event The event data.
-     */
-    @SubscribeEvent
-    public void onJoinWorld( EntityJoinWorldEvent event ) {
-        if( !event.getWorld().isClientSide && event.getEntity() instanceof PlayerEntity ) {
-            final ServerPlayerEntity player = (ServerPlayerEntity) event.getEntity();
-            final float absorptionHealth = player.getAbsorptionAmount();
-
-            NetworkHelper.setNaturalAbsorption(player, absorptionHealth);
-        }
-    }
-    
-    /**
-     * Called after a living entity's equipment has been changed (including when the equipment is loaded from spawn).
-     * <p>
-     * Used to track changes in max absorption granted by equipment.
-     *
-     * @param event The event data.
-     */
-    @SubscribeEvent( priority = EventPriority.NORMAL )
-    public void onLivingEquipmentChange( LivingEquipmentChangeEvent event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
-            if( isAbsorptionEnabled() ) {
-                // Mark the player to be checked for changes; this event is called for each changed slot, avoid adding duplicates
-                PLAYER_EQUIPMENT_CHANGES.add( (PlayerEntity) event.getEntityLiving() );
+            if(isAbsorptionEnabled()) {
+                data.setAbsorption((float) Config.ABSORPTION.GENERAL.respawnAmount.get());
             }
         }
     }
@@ -339,43 +269,43 @@ public class HeartManager {
      *
      * @param event The event data.
      */
-    @SubscribeEvent( priority = EventPriority.LOWEST )
-    public void onLivingHurt( LivingHurtEvent event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
-            HeartData data = HeartData.get( (PlayerEntity) event.getEntityLiving() );
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onLivingHurt(LivingHurtEvent event) {
+        if(event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide) {
+            HeartData data = HeartData.get((PlayerEntity) event.getEntityLiving());
             
             // Interrupt recovery
             data.startRecoveryDelay();
             
             // Handle armor replacement, if enabled
-            if( isArmorReplacementEnabled() ) {
+            if(isArmorReplacementEnabled()) {
                 // Force damage to ignore armor
-                if( Config.EQUIPMENT.ARMOR.disableArmor.get() && !event.getSource().isBypassArmor() ) {
-                    modifySource( event.getSource() );
+                if(Config.EQUIPMENT.ARMOR.disableArmor.get() && !event.getSource().isBypassArmor()) {
+                    modifySource(event.getSource());
                 }
                 // Degrade armor manually (armor ignoring damage otherwise won't)
-                if( event.getAmount() > Config.EQUIPMENT.ARMOR.durabilityThreshold.get() &&
-                        !event.getSource().isBypassInvul() && !"thorns".equalsIgnoreCase( event.getSource().getMsgId() ) ) {
+                if(event.getAmount() > Config.EQUIPMENT.ARMOR.durabilityThreshold.get() &&
+                        !event.getSource().isBypassInvul() && !"thorns".equalsIgnoreCase( event.getSource().getMsgId())) {
                     
-                    switch( Config.EQUIPMENT.ARMOR.durabilityTrigger.get() ) {
+                    switch(Config.EQUIPMENT.ARMOR.durabilityTrigger.get()) {
                         case NONE:
                             break;
                         case HITS:
-                            if( isSourceDamageOverTime( event.getSource(), event.getAmount() ) ) break;
+                            if (isSourceDamageOverTime(event.getSource(), event.getAmount())) break;
                         default:
-                            damageArmor( event );
+                            damageArmor(event);
                     }
                 }
             }
         }
-        else if( isArmorReplacementEnabled() && isSourceModified( event.getSource() ) ) {
+        else if(isArmorReplacementEnabled() && isSourceModified(event.getSource())) {
             // Restore the source's normal settings against non-players
-            restoreSource( event.getSource() );
+            restoreSource(event.getSource());
         }
     }
     
     // Determines whether a damage source is damage-over-time.
-    private boolean isSourceDamageOverTime( DamageSource source, float amount ) {
+    private boolean isSourceDamageOverTime(DamageSource source, float amount) {
         // Potion degeneration
         return source == DamageSource.MAGIC && amount <= 1.0F /* Hopefully poison damage */ || source == DamageSource.WITHER ||
                 // Burning damage
@@ -389,21 +319,21 @@ public class HeartManager {
     }
     
     // Used to degrade armor durability when armor damage reduction is disabled.
-    private void damageArmor( LivingHurtEvent event ) {
+    private void damageArmor(LivingHurtEvent event) {
         final PlayerEntity player = (PlayerEntity) event.getEntityLiving();
         
         float durabilityDamage = event.getAmount();
         
         // Only degrade armor based on damage dealt to absorption health
-        if( Config.EQUIPMENT.ARMOR.durabilityFriendly.get() && durabilityDamage > player.getAbsorptionAmount() ) {
+        if(Config.EQUIPMENT.ARMOR.durabilityFriendly.get() && durabilityDamage > player.getAbsorptionAmount()) {
             durabilityDamage = player.getAbsorptionAmount();
         }
         // Multiply degradation based on settings
         durabilityDamage *= Config.EQUIPMENT.ARMOR.durabilityMultiplier.get();
         
         // Degrade armor durability
-        if( !event.getSource().isBypassInvul() && durabilityDamage > 0.0F ) {
-            player.inventory.hurtArmor( event.getSource(), durabilityDamage );
+        if(!event.getSource().isBypassInvul() && durabilityDamage > 0.0F) {
+            player.inventory.hurtArmor(event.getSource(), durabilityDamage);
         }
     }
     
@@ -414,9 +344,11 @@ public class HeartManager {
         int food;
         float saturation;
         
-        HungerState( PlayerEntity player ) { update( player ); }
+        HungerState(PlayerEntity player) {
+            update(player);
+        }
         
-        void update( PlayerEntity player ) {
+        void update(PlayerEntity player) {
             food = player.getFoodData().getFoodLevel();
             saturation = player.getFoodData().getSaturationLevel();
         }

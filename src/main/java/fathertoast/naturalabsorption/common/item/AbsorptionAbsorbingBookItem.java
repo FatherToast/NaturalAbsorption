@@ -3,12 +3,14 @@ package fathertoast.naturalabsorption.common.item;
 import fathertoast.naturalabsorption.client.RenderEventHandler;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
+import fathertoast.naturalabsorption.common.health.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.health.HeartData;
 import fathertoast.naturalabsorption.common.health.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -44,26 +46,25 @@ public class AbsorptionAbsorbingBookItem extends Item {
     @Override
     public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand ) {
         // Check if this item is enabled in the config
-        if(!HeartManager.isAbsorptionEnabled() || !Config.ABSORPTION.GENERAL.spongeBookEnabled.get()) {
+        if(!HeartManager.isAbsorptionEnabled() || !Config.ABSORPTION.NATURAL.spongeBookEnabled.get()) {
             return super.use(world, player, hand);
         }
         final boolean isCreative = player.isCreative();
         final ItemStack spongeBook = player.getItemInHand(hand);
 
         if(!world.isClientSide) {
-            final HeartData data = HeartData.get(player);
-            final float naturalAbsorption = data.getNaturalAbsorption();
+            final double naturalAbsorption = AbsorptionHelper.getNaturalAbsorption(player);
             final float upgradeGain = (float) Config.ABSORPTION.NATURAL.upgradeGain.get();
 
             if(naturalAbsorption >= upgradeGain) {
-                final float newAbsorption = naturalAbsorption - upgradeGain;
-                data.setNaturalAbsorption(newAbsorption, true);
+                final double newAbsorption = naturalAbsorption - upgradeGain;
+                AbsorptionHelper.setNaturalAbsorption(player, true, newAbsorption);
 
                 if (!isCreative) {
                     spongeBook.shrink(1);
                     Block.popResource(world, player.blockPosition(), new ItemStack(NAItems.ABSORPTION_BOOK.get()));
 
-                    double xpReturnMult = Config.ABSORPTION.GENERAL.spongeBookXpReturn.get();
+                    double xpReturnMult = Config.ABSORPTION.NATURAL.spongeBookXpReturn.get();
 
                     if (xpReturnMult > 0) {
                         final int levelsReturned = (int) (xpReturnMult * getLevelCost(newAbsorption));
@@ -86,7 +87,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
     @Override
     @OnlyIn( value = Dist.CLIENT )
     public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag ) {
-        if (!Config.ABSORPTION.GENERAL.spongeBookExtraTooltipInfo.get())
+        if (!Config.ABSORPTION.NATURAL.spongeBookExtraTooltipInfo.get())
             return;
 
         final PlayerEntity player = Minecraft.getInstance().player;
@@ -94,12 +95,12 @@ public class AbsorptionAbsorbingBookItem extends Item {
         if (player == null)
             return;
 
-        final float capacity = RenderEventHandler.PLAYER_NATURAL_ABSORPTION;
-        final float upgradeGain = (float) Config.ABSORPTION.NATURAL.upgradeGain.get();
+        final double capacity = AbsorptionHelper.getNaturalAbsorption(player);
+        final double upgradeGain = Config.ABSORPTION.NATURAL.upgradeGain.get();
 
         if (capacity >= upgradeGain) {
-            final float subtractedAbsorption = capacity - upgradeGain;
-            double xpReturnMult = Config.ABSORPTION.GENERAL.spongeBookXpReturn.get();
+            final double subtractedAbsorption = capacity - upgradeGain;
+            double xpReturnMult = Config.ABSORPTION.NATURAL.spongeBookXpReturn.get();
 
             final int levelsReturned = (int) (xpReturnMult * getLevelCost(subtractedAbsorption));
             tooltip.add(new StringTextComponent(""));

@@ -22,8 +22,8 @@ public class EquipmentConfig extends Config.AbstractConfig {
                 "This config contains options for features that apply to the Absorption enchantment and armor."
         );
         
-        ENCHANTMENT = new Enchantment( SPEC );
-        ARMOR = new Armor( SPEC );
+        ENCHANTMENT = new Enchantment(SPEC);
+        ARMOR = new Armor(SPEC);
     }
     
     public static class Enchantment extends Config.AbstractCategory {
@@ -33,7 +33,6 @@ public class EquipmentConfig extends Config.AbstractConfig {
         public final EnumField<EnchantArmorType> slot;
         public final BooleanField allowOnBooks;
         public final BooleanField treasureOnly;
-        // TODO - Loot table config field for Absorption Book treasure
         public final EnumField<EnchantmentRarity> rarity;
         
         public final DoubleField potencyBase;

@@ -1,13 +1,15 @@
 package fathertoast.naturalabsorption.common.item;
 
-import fathertoast.naturalabsorption.client.RenderEventHandler;
 import fathertoast.naturalabsorption.common.config.Config;
-import fathertoast.naturalabsorption.common.health.HeartData;
+import fathertoast.naturalabsorption.common.core.register.NAAttributes;
+import fathertoast.naturalabsorption.common.health.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.health.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -30,10 +32,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.UUID;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class AbsorptionBookItem extends Item {
+
+    public static final UUID absorptionBookUUID = UUID.fromString("16c3f14f-e0cb-4360-9fb2-3bf20aaf9dc2");
+
     
     public AbsorptionBookItem() {
         super(new Item.Properties()
@@ -42,7 +48,7 @@ public class AbsorptionBookItem extends Item {
     }
     
     @SuppressWarnings( "WeakerAccess" )
-    public static int getLevelCost( float capacity ) {
+    public static int getLevelCost( double capacity ) {
         return MathHelper.clamp(
                 (int) (Config.ABSORPTION.NATURAL.upgradeLevelCostBase.get() + Config.ABSORPTION.NATURAL.upgradeLevelCostPerPoint.get() * capacity),
                 0, Config.ABSORPTION.NATURAL.upgradeLevelCostMax.get() );
@@ -58,13 +64,11 @@ public class AbsorptionBookItem extends Item {
         final ItemStack book = player.getItemInHand(hand);
         
         if(!world.isClientSide) {
-            final HeartData data = HeartData.get(player);
-            
-            final float naturalAbsorption = data.getNaturalAbsorption();
-            final int levelCost = getLevelCost(naturalAbsorption);
+            final double naturalAbsorptionAmount = AbsorptionHelper.getNaturalAbsorption(player);
+            final int levelCost = getLevelCost(naturalAbsorptionAmount);
             
             // Give the player feedback on failure
-            if(naturalAbsorption >= Config.ABSORPTION.NATURAL.maximumAmount.get()) {
+            if(naturalAbsorptionAmount >= Config.ABSORPTION.NATURAL.maximumAmount.get()) {
                 player.displayClientMessage(new TranslationTextComponent(References.ALREADY_MAX), true);
                 return ActionResult.fail(book);
             }
@@ -78,9 +82,15 @@ public class AbsorptionBookItem extends Item {
                 player.giveExperienceLevels(-levelCost);
             }
 
-            // Apply upgrade effects and notify client
-            data.setNaturalAbsorption(naturalAbsorption + (float) Config.ABSORPTION.NATURAL.upgradeGain.get(), true);
-            player.awardStat(Stats.ITEM_USED.get(this));
+            // Apply upgrade effects
+            Attribute naturalAbsorption = NAAttributes.NATURAL_ABSORPTION.get();
+            double currentFromBook = 0.0D;
+
+            if (player.getAttribute(naturalAbsorption).getModifier(absorptionBookUUID) != null) {
+                currentFromBook = player.getAttribute(naturalAbsorption).getModifier(absorptionBookUUID).getAmount();
+            }
+            player.getAttribute(naturalAbsorption).removeModifier(absorptionBookUUID);
+            player.getAttribute(naturalAbsorption).addPermanentModifier(new AttributeModifier(absorptionBookUUID, "Absorption Book modifier", currentFromBook + Config.ABSORPTION.NATURAL.upgradeGain.get(), AttributeModifier.Operation.ADDITION));
 
             // Play sound to show success
             world.playSound(null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.75F, 1.0F);
@@ -90,19 +100,19 @@ public class AbsorptionBookItem extends Item {
     }
     
     @Override
-    @OnlyIn( value = Dist.CLIENT )
-    public void appendHoverText( ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag ) {
+    @OnlyIn(value = Dist.CLIENT)
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         final PlayerEntity player = Minecraft.getInstance().player;
 
         if (player == null)
             return;
 
-        final float capacity = RenderEventHandler.PLAYER_NATURAL_ABSORPTION;
+        final double capacity = AbsorptionHelper.getNaturalAbsorption(player);
         
         if (capacity >= 0.0F) {
             
-            final float maxCapacity = (float) Config.ABSORPTION.NATURAL.maximumAmount.get();
-            final float gainOnUse = capacity >= maxCapacity ? 0.0F :
+            final double maxCapacity = (float) Config.ABSORPTION.NATURAL.maximumAmount.get();
+            final double gainOnUse = capacity >= maxCapacity ? 0.0F :
                     Math.min((float) Config.ABSORPTION.NATURAL.upgradeGain.get(), maxCapacity - capacity);
             
             // Extra tooltip info, if enabled
@@ -139,8 +149,8 @@ public class AbsorptionBookItem extends Item {
     
     private ITextComponent translate(String key, Object... args) { return new TranslationTextComponent(key, args); }
     
-    private String prettyToString(float value) {
-        return Math.round(value) == value ? Integer.toString(Math.round(value)) : Float.toString(value);
+    private String prettyToString(double value) {
+        return Math.round(value) == value ? Integer.toString((int) Math.round(value)) : Double.toString(value);
     }
     
     @Override

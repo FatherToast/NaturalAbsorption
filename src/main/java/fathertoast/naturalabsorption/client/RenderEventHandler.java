@@ -4,6 +4,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.core.register.NAAttributes;
+import fathertoast.naturalabsorption.common.health.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.health.HeartManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -75,9 +77,13 @@ public class RenderEventHandler {
         // to smooth out rendering when we do render
         
         final PlayerEntity player = Minecraft.getInstance().player;
-        
-        if( player == null || PLAYER_NATURAL_ABSORPTION <= 0.0F ) return;
-        
+
+        if(player == null) return;
+
+        final double naturalAbsorption = player.getAttributeValue(NAAttributes.NATURAL_ABSORPTION.get());
+
+        if (naturalAbsorption <= 0) return;
+
         final int tickCount = Minecraft.getInstance().gui.getGuiTicks();
         
         final int health = MathHelper.ceil( player.getHealth() );
@@ -106,13 +112,14 @@ public class RenderEventHandler {
         final float globalMax = (float) Config.ABSORPTION.GENERAL.globalMax.get();
         
         // Calculate the effective absorption capacity
-        final float absorbMax;
+        final double absorbMax;
+
         if( globalMax < 0 ) {
-            absorbMax = PLAYER_NATURAL_ABSORPTION + HeartManager.getEquipmentAbsorption( player ) +
+            absorbMax = naturalAbsorption + AbsorptionHelper.getEquipmentAbsorption(player) +
                     HeartManager.getPotionAbsorption( player );
         }
         else {
-            absorbMax = Math.min( PLAYER_NATURAL_ABSORPTION + HeartManager.getEquipmentAbsorption( player ), globalMax ) +
+            absorbMax = Math.min( naturalAbsorption + AbsorptionHelper.getEquipmentAbsorption(player), globalMax ) +
                     HeartManager.getPotionAbsorption( player );
         }
         
@@ -211,8 +218,6 @@ public class RenderEventHandler {
     
     /**
      * Renders a 2D texture in the GUI using the default depth (aka blitOffset) and texture resolution.
-     *
-     * @see net.minecraft.client.gui.AbstractGui#innerBlit(Matrix4f, int, int, int, int, int, float, float, float, float)
      */
     private static void innerBlit( Matrix4f matrix, float x0, float x1, float y0, float y1, float u0, float u1, float v0, float v1 ) {
         final float z = -90;

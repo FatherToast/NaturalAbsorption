@@ -1,8 +1,9 @@
 package fathertoast.naturalabsorption.common.compat.tc;
 
 import fathertoast.naturalabsorption.common.config.Config;
-import fathertoast.naturalabsorption.common.health.HeartData;
+import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -21,8 +22,16 @@ import slimeknights.tconstruct.library.utils.TooltipKey;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
 public class ArmorAbsorptionModifier extends Modifier {
+
+    private static final UUID[] modifierSlotUuids = new UUID[] {
+            UUID.fromString("96676b21-1425-498a-b509-0d8f2709ce8c"),
+            UUID.fromString("6c425498-9c9a-4bed-9c61-e96e653b99cd"),
+            UUID.fromString("eb43f9cb-54f1-4e8c-a6ad-0a07e7a23dc2"),
+            UUID.fromString("a2c9e2e9-3a2c-4357-af24-fa13900970d3")
+    };
 
     public ArmorAbsorptionModifier() {
         super(0xFFF923);
@@ -42,10 +51,9 @@ public class ArmorAbsorptionModifier extends Modifier {
     public void onUnequip(IModifierToolStack tool, int level, EquipmentChangeContext context) {
         if (context.getEntity() instanceof ServerPlayerEntity && context.getChangedSlot().getType() == EquipmentSlotType.Group.ARMOR) {
             ServerPlayerEntity player = (ServerPlayerEntity) context.getEntity();
-            HeartData heartData = HeartData.get(player);
+            UUID uuid = modifierSlotUuids[context.getChangedSlot().getIndex()];
 
-            float absorption = heartData.getTCModifierAbsorption() - (float) (level * Config.EQUIPMENT.ENCHANTMENT.potencyPerLevel.get());
-            heartData.setTcModifierAbsorption(Math.max(0.0F, absorption));
+            player.getAttribute(NAAttributes.EQUIPMENT_ABSORPTION.get()).removeModifier(uuid);
         }
     }
 
@@ -53,9 +61,10 @@ public class ArmorAbsorptionModifier extends Modifier {
     public void onEquip(IModifierToolStack tool, int level, EquipmentChangeContext context) {
         if (context.getEntity() instanceof ServerPlayerEntity && context.getChangedSlot().getType() == EquipmentSlotType.Group.ARMOR) {
             ServerPlayerEntity player = (ServerPlayerEntity) context.getEntity();
-            HeartData heartData = HeartData.get(player);
 
-            heartData.setTcModifierAbsorption(heartData.getTCModifierAbsorption() + (float) (level * Config.EQUIPMENT.ENCHANTMENT.potencyPerLevel.get()));
+            double absorptionBonus = level * Config.EQUIPMENT.ENCHANTMENT.potencyPerLevel.get();
+            AttributeModifier modifier = new AttributeModifier(modifierSlotUuids[context.getChangedSlot().getIndex()], "TC Modifier absorption boost", absorptionBonus, AttributeModifier.Operation.ADDITION);
+            player.getAttribute(NAAttributes.EQUIPMENT_ABSORPTION.get()).addTransientModifier(modifier);
         }
     }
 }

@@ -27,10 +27,6 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         
         public final DoubleField globalMax;
 
-        public final BooleanField spongeBookEnabled;
-        public final DoubleField spongeBookXpReturn;
-        public final BooleanField spongeBookExtraTooltipInfo;
-
         public final DoubleField respawnAmount;
         
         public final IntField recoveryDelay;
@@ -49,23 +45,6 @@ public class AbsorptionConfig extends Config.AbstractConfig {
             globalMax = SPEC.define( new DoubleField( "global_maximum", -1.0, DoubleField.Range.ANY,
                     "The total maximum absorption a player may obtain from (almost) all sources combined.",
                     "This limit is ignored by potion effects. If this is set less than 0, the limit is disabled." ) );
-            
-            SPEC.newLine();
-
-            spongeBookEnabled = SPEC.define( new BooleanField( "enable_sponge_book", true,
-                    "If enabled, players can use the Absorption Absorbing Book to convert some of their natural absorption back into an absorption book.") );
-
-            SPEC.newLine();
-
-            spongeBookXpReturn = SPEC.define(new DoubleField("sponge_book_xp_return", 0.75, DoubleField.Range.PERCENT,
-                    "The percentage of the experience levels used when using an Absorption Book that should be returned to the player upon" +
-                            "using an Absorption Absorbing Book (aka Sponge Book). For example, a value of 1.0 (100%) will return all the levels that was used, while 0.5 (50%) " +
-                            "will only return half of the levels used. Default value is 0.75 (75%)."));
-
-            SPEC.newLine();
-
-            spongeBookExtraTooltipInfo = SPEC.define(new BooleanField("sponge_book.extra_tooltip_info", true,
-                    "Set to true to display how many experience levels will be given back when using an Absorption Absorbing Book on the item's tooltip."));
 
             SPEC.newLine();
 
@@ -116,6 +95,10 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         public final EnumField<BookRecipeCondition.Type> upgradeBookRecipe;
         
         public final BooleanField upgradeBookExtraTooltipInfo;
+
+        public final BooleanField spongeBookEnabled;
+        public final DoubleField spongeBookXpReturn;
+        public final BooleanField spongeBookExtraTooltipInfo;
         
         Natural( ToastConfigSpec parent ) {
             super( parent, "natural_absorption",
@@ -178,6 +161,23 @@ public class AbsorptionConfig extends Config.AbstractConfig {
             upgradeBookExtraTooltipInfo = SPEC.define( new BooleanField( "upgrade_book.extra_tooltip_info", false,
                     "Set to true to display current and max natural absorption on the Book of Absorption tooltip.",
                     "Particularly helpful if you must disable the heart background rendering." ) );
+
+            SPEC.newLine();
+
+            spongeBookEnabled = SPEC.define( new BooleanField( "enable_sponge_book", true,
+                    "If enabled, players can use the Absorption Absorbing Book to convert some of their natural absorption back into an absorption book.") );
+
+            SPEC.newLine();
+
+            spongeBookXpReturn = SPEC.define(new DoubleField("sponge_book_xp_return", 0.75, DoubleField.Range.PERCENT,
+                    "The percentage of the experience levels used when using an Absorption Book that should be returned to the player upon" +
+                            "using an Absorption Absorbing Book (aka Sponge Book). For example, a value of 1.0 (100%) will return all the levels that was used, while 0.5 (50%) " +
+                            "will only return half of the levels used. Default value is 0.75 (75%)."));
+
+            SPEC.newLine();
+
+            spongeBookExtraTooltipInfo = SPEC.define(new BooleanField("sponge_book.extra_tooltip_info", true,
+                    "Set to true to display how many experience levels will be given back when using an Absorption Absorbing Book on the item's tooltip."));
         }
     }
 }

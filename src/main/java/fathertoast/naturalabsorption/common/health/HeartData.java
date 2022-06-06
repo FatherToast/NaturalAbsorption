@@ -4,6 +4,7 @@ import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.network.NetworkHelper;
 import javafx.util.Pair;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -24,9 +25,6 @@ public class HeartData implements IHeartData {
     private static final int NBT_TYPE_NUMERICAL = 99;
     
     private static final String TAG_BASE = NaturalAbsorptionAPI.TAG_BASE;
-    private static final String TAG_NATURAL_ABSORPTION = NaturalAbsorptionAPI.TAG_NATURAL_ABSORPTION;
-    private static final String TAG_EQUIPMENT_ABSORPTION = NaturalAbsorptionAPI.TAG_EQUIPMENT_ABSORPTION;
-    private static final String TAG_TC_MODIFIER_ABSORPTION = "AbsorbTCModifier";
     private static final String TAG_DELAY_ABSORPTION = NaturalAbsorptionAPI.TAG_DELAY_ABSORPTION;
     private static final String TAG_DELAY_HEALTH = NaturalAbsorptionAPI.TAG_DELAY_HEALTH;
     
@@ -68,34 +66,32 @@ public class HeartData implements IHeartData {
      * @return The player's heart data.
      */
     @Nonnull
-    public static HeartData get( @Nonnull PlayerEntity player ) {
-        if( player.level.isClientSide ) {
-            throw new IllegalArgumentException( "Heart data is only stored on the server side!" );
+    public static HeartData get(@Nonnull PlayerEntity player) {
+        if(player.level.isClientSide) {
+            throw new IllegalArgumentException("Heart data is only stored on the server side!");
         }
         UUID uuid = player.getUUID();
-        HeartData data = PLAYER_CACHE.get( uuid );
+        HeartData data = PLAYER_CACHE.get(uuid);
         
-        if( data == null || player != data.owner ) {
-            data = new HeartData( player );
-            PLAYER_CACHE.put( uuid, data );
+        if(data == null || player != data.owner) {
+            data = new HeartData(player);
+            data.lastSteadyStateAbsorption = data.getSteadyStateMaxAbsorption();
+            PLAYER_CACHE.put(uuid, data);
         }
         return data;
     }
     
     public final PlayerEntity owner;
     private final CompoundNBT saveTag;
-    
-    private float naturalAbsorption = -1.0F;
-    private float lastEquipmentAbsorption = -1.0F;
-    private float lastTcModifierAbsorption = -1.0F;
+
     private int absorptionRecoveryDelay;
     private int healthRecoveryDelay;
+    private double lastSteadyStateAbsorption;
     
     // Absorption health capacity methods
     
     /** @return The player's natural absorption. */
-    @Override
-    public float getNaturalAbsorption() { return naturalAbsorption; }
+    public double getNaturalAbsorption() { return AbsorptionHelper.getNaturalAbsorption(this.owner); }
 
     /**
      * Sets the player's natural absorption. The player will gain or lose current absorption to match.
@@ -103,146 +99,101 @@ public class HeartData implements IHeartData {
      * @param updateActualAbsorption If true, the player's current absorption will be
      *                               updated to match the total natural absorption.
      */
-    @Override
-    public void setNaturalAbsorption(float value, boolean updateActualAbsorption) {
-        if( HeartManager.isAbsorptionEnabled() ) {
-            value = MathHelper.clamp( value, 0.0F, (float) Config.ABSORPTION.NATURAL.maximumAmount.get() );
-            if( naturalAbsorption != value ) {
-                final float netChange = value - naturalAbsorption;
-
-                saveTag.putFloat( TAG_NATURAL_ABSORPTION, value );
-                naturalAbsorption = value;
-
-                if (updateActualAbsorption) {
-                    setAbsorption(owner.getAbsorptionAmount() + netChange);
-                }
-                if (owner instanceof ServerPlayerEntity) {
-                    NetworkHelper.setNaturalAbsorption((ServerPlayerEntity) owner, value);
-                }
-            }
-        }
+    public void setNaturalAbsorption(double value, boolean updateActualAbsorption) {
+        AbsorptionHelper.setNaturalAbsorption(this.owner, updateActualAbsorption, value);
     }
 
-    public float getTCModifierAbsorption() {
-        return this.lastTcModifierAbsorption;
-    }
-
-    public void setTcModifierAbsorption(float value) {
-        if( HeartManager.isAbsorptionEnabled() ) {
-            if( lastTcModifierAbsorption != value ) {
-                saveTag.putFloat( TAG_TC_MODIFIER_ABSORPTION, value );
-                lastTcModifierAbsorption = value;
-            }
-        }
-    }
-
-    private float getLastEquipmentAbsorption() { return lastEquipmentAbsorption; }
-    
-    private void setLastEquipmentAbsorption( float value ) {
-        if( HeartManager.isAbsorptionEnabled() ) {
-            if( lastEquipmentAbsorption != value ) {
-                saveTag.putFloat( TAG_EQUIPMENT_ABSORPTION, value );
-                lastEquipmentAbsorption = value;
-            }
-        }
+    public void setEquipmentAbsorption(double value, boolean updateActualAbsorption) {
+        AbsorptionHelper.setEquipmentAbsorption(this.owner, updateActualAbsorption, value);
     }
 
     // Absorption recovery delay methods
-    
+    @Override
     public int getAbsorptionDelay() { return absorptionRecoveryDelay; }
-    
-    public void setAbsorptionDelay( int value ) {
-        saveTag.putFloat( TAG_DELAY_ABSORPTION, value );
+
+    @Override
+    public void setAbsorptionDelay(int value) {
+        saveTag.putFloat(TAG_DELAY_ABSORPTION, value);
         absorptionRecoveryDelay = value;
     }
     
-    public void reduceAbsorptionDelay( int value ) { setAbsorptionDelay( absorptionRecoveryDelay - value ); }
+    public void reduceAbsorptionDelay(int value) {
+        setAbsorptionDelay(absorptionRecoveryDelay - value);
+    }
     
     // Health recovery delay methods
-    
+    @Override
     public int getHealthDelay() { return healthRecoveryDelay; }
-    
-    public void setHealthDelay( int value ) {
-        saveTag.putFloat( TAG_DELAY_HEALTH, value );
+
+    @Override
+    public void setHealthDelay(int value) {
+        saveTag.putFloat(TAG_DELAY_HEALTH, value);
         healthRecoveryDelay = value;
     }
     
-    public void reduceHealthDelay( int val ) { setHealthDelay( healthRecoveryDelay - val ); }
+    public void reduceHealthDelay(int value) {
+        setHealthDelay(healthRecoveryDelay - value);
+    }
     
     /** Starts the player's recovery delay timers. */
     @Override
     public void startRecoveryDelay() {
-        if( HeartManager.isHealthEnabled() && Config.HEALTH.GENERAL.recoveryDelay.get() > 0 ) {
-            setHealthDelay( Config.HEALTH.GENERAL.recoveryDelay.get() );
+        if(HeartManager.isHealthEnabled() && Config.HEALTH.GENERAL.recoveryDelay.get() > 0) {
+            setHealthDelay(Config.HEALTH.GENERAL.recoveryDelay.get());
         }
-        if( HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.GENERAL.recoveryDelay.get() > 0 ) {
-            setAbsorptionDelay( Config.ABSORPTION.GENERAL.recoveryDelay.get() );
+        if(HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.GENERAL.recoveryDelay.get() > 0) {
+            setAbsorptionDelay(Config.ABSORPTION.GENERAL.recoveryDelay.get());
         }
     }
     
     /** @return The player's max absorption not counting buffs, limited by the global max absorption config. */
-    @Override
-    public float getSteadyStateMaxAbsorption() {
-        final float calculatedMax = getNaturalAbsorption() + HeartManager.getEquipmentAbsorption( owner );
-        return Config.ABSORPTION.GENERAL.globalMax.get() < 0.0F ? calculatedMax :
-                Math.min( calculatedMax, (float) Config.ABSORPTION.GENERAL.globalMax.get() );
+    public double getSteadyStateMaxAbsorption() {
+        return AbsorptionHelper.getSteadyStateMaxAbsorption(this.owner);
     }
     
     /** @return The player's max absorption actually granted by equipment. That is, how much they would lose by unequipping everything. */
-    @Override
-    public float getTrueEquipmentAbsorption() {
-        // Use the max just in case the player meets or exceeds the global limit with natural absorption on its own
-        return Math.max( 0.0F, getSteadyStateMaxAbsorption() - getNaturalAbsorption() );
+    public double getEquipmentAbsorption() {
+        return AbsorptionHelper.getEquipmentAbsorption(this.owner);
     }
     
     /** @return The player's max absorption, from all sources combined. */
-    @Override
-    public float getMaxAbsorption() { return getSteadyStateMaxAbsorption() + HeartManager.getPotionAbsorption( owner ); }
+    public double getMaxAbsorption() { return getSteadyStateMaxAbsorption() + HeartManager.getPotionAbsorption(owner); }
     
     /** Helper method to set the player's current absorption; clamps the value between 0 and the player's personal maximum. */
-    @Override
-    public void setAbsorption( float value ) {
-        owner.setAbsorptionAmount( MathHelper.clamp( value, 0.0F, getMaxAbsorption() ) );
-    }
-    
-    /** Changes the player's absorption based on currently equipped items. */
-    void onEquipmentChanged() {
-        final float newEquipmentAbsorption = getTrueEquipmentAbsorption();
-        if( getLastEquipmentAbsorption() < 0.0F ) {
-            // This case probably shouldn't happen, but it just means there is no last value or we don't know it
-            setLastEquipmentAbsorption( newEquipmentAbsorption );
-        }
-        else if( newEquipmentAbsorption != getLastEquipmentAbsorption() ) {
-            // Changes in max absorption should provide equivalent changes to current absorption, if possible
-            final float netChange = newEquipmentAbsorption - getLastEquipmentAbsorption();
-            setAbsorption( owner.getAbsorptionAmount() + netChange );
-            
-            setLastEquipmentAbsorption( newEquipmentAbsorption );
-        }
+    public void setAbsorption(float value) {
+        owner.setAbsorptionAmount(MathHelper.clamp(value, 0.0F, (float) getMaxAbsorption()));
     }
     
     /** Updates the player's absorption and health values by the number of ticks since this was last updated. */
     void update() {
-        if( HeartManager.isHealthEnabled() && Config.HEALTH.GENERAL.recoveryDelay.get() >= 0 ) {
+        if(HeartManager.isHealthEnabled() && Config.HEALTH.GENERAL.recoveryDelay.get() >= 0) {
             updateHealth();
         }
-        if( HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.GENERAL.recoveryDelay.get() >= 0 ) {
-            updateAbsorption();
+        if(HeartManager.isAbsorptionEnabled()) {
+            if (Config.ABSORPTION.GENERAL.recoveryDelay.get() >= 0) {
+                updateAbsorption();
+                lastSteadyStateAbsorption = getSteadyStateMaxAbsorption();
+            }
         }
     }
     
     private void updateAbsorption() {
+        if (owner.getAbsorptionAmount() > getMaxAbsorption()) {
+            owner.setAbsorptionAmount((float) getMaxAbsorption());
+        }
+
         // Update delay and determine amount to recover accordingly
         final int updateTime = Config.MAIN.GENERAL.updateTime.get();
         float recovered;
-        if( getAbsorptionDelay() > 0 ) {
-            if( getAbsorptionDelay() < updateTime ) {
+
+        if(getAbsorptionDelay() > 0) {
+            if(getAbsorptionDelay() < updateTime) {
                 final int ticksPastZero = updateTime - getAbsorptionDelay();
                 recovered = (float) (Config.ABSORPTION.GENERAL.recoveryRate.get() * ticksPastZero);
-                setAbsorptionDelay( 0 );
+                setAbsorptionDelay(0);
             }
             else {
-                reduceAbsorptionDelay( updateTime );
+                reduceAbsorptionDelay(updateTime);
                 return;
             }
         }
@@ -251,37 +202,39 @@ public class HeartData implements IHeartData {
         }
         
         // Handle hunger cost restrictions
-        if( owner.getFoodData().getFoodLevel() < Config.ABSORPTION.GENERAL.recoveryHungerRequired.get() ) return;
+        if(owner.getFoodData().getFoodLevel() < Config.ABSORPTION.GENERAL.recoveryHungerRequired.get()) return;
         
         // Recover absorption, if needed
-        final float maxAbsorption = getMaxAbsorption();
+        final double maxAbsorption = getMaxAbsorption();
         final float oldAbsorption = owner.getAbsorptionAmount();
         
-        if( recovered > 0.0F && oldAbsorption < maxAbsorption ) {
+        if(recovered > 0.0F && oldAbsorption < maxAbsorption) {
             // Apply recovery rate increase from armor
-            if( HeartManager.isArmorReplacementEnabled() ) {
-                if( Config.EQUIPMENT.ARMOR.armorRecovery.get() > 0.0 ) {
-                    final double armor = owner.getAttributeValue( Attributes.ARMOR );
-                    if( armor > 0.0F ) {
+            if(HeartManager.isArmorReplacementEnabled()) {
+                if(Config.EQUIPMENT.ARMOR.armorRecovery.get() > 0.0) {
+                    final double armor = owner.getAttributeValue(Attributes.ARMOR);
+
+                    if(armor > 0.0F) {
                         recovered *= 1.0 + armor * Config.EQUIPMENT.ARMOR.armorRecovery.get();
                     }
                 }
-                if( Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get() > 0.0 ) {
-                    final double toughness = owner.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
-                    if( toughness > 0.0F ) {
+                if(Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get() > 0.0) {
+                    final double toughness = owner.getAttributeValue(Attributes.ARMOR_TOUGHNESS);
+
+                    if(toughness > 0.0F) {
                         recovered *= 1.0 + toughness * Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get();
                     }
                 }
             }
             
             // Add absorption recovery
-            final float newAbsorption = Math.min( maxAbsorption, oldAbsorption + recovered );
-            owner.setAbsorptionAmount( newAbsorption );
+            final double newAbsorption = Math.min(maxAbsorption, oldAbsorption + recovered);
+            owner.setAbsorptionAmount((float) newAbsorption);
             
             // Apply hunger cost
-            if( newAbsorption - oldAbsorption > 0 && Config.ABSORPTION.GENERAL.recoveryHungerCost.get() > 0.0 ) {
-                owner.getFoodData().addExhaustion( (newAbsorption - oldAbsorption) *
-                        (float) Config.ABSORPTION.GENERAL.recoveryHungerCost.get() );
+            if(newAbsorption - oldAbsorption > 0 && Config.ABSORPTION.GENERAL.recoveryHungerCost.get() > 0.0) {
+                owner.getFoodData().addExhaustion((float) (newAbsorption - oldAbsorption) *
+                        (float) Config.ABSORPTION.GENERAL.recoveryHungerCost.get());
             }
         }
     }
@@ -290,14 +243,15 @@ public class HeartData implements IHeartData {
         // Update delay and determine amount to recover accordingly
         final int updateTime = Config.MAIN.GENERAL.updateTime.get();
         final float recovered;
-        if( getHealthDelay() > 0 ) {
-            if( getHealthDelay() < updateTime ) {
+
+        if(getHealthDelay() > 0) {
+            if(getHealthDelay() < updateTime) {
                 final int ticksPastZero = updateTime - getHealthDelay();
                 recovered = (float) (Config.HEALTH.GENERAL.recoveryRate.get() * ticksPastZero);
-                setHealthDelay( 0 );
+                setHealthDelay(0);
             }
             else {
-                reduceHealthDelay( updateTime );
+                reduceHealthDelay(updateTime);
                 return;
             }
         }
@@ -306,23 +260,23 @@ public class HeartData implements IHeartData {
         }
         
         // Handle hunger cost restrictions
-        if( owner.getFoodData().getFoodLevel() < Config.HEALTH.GENERAL.recoveryHungerRequired.get() ) {
+        if(owner.getFoodData().getFoodLevel() < Config.HEALTH.GENERAL.recoveryHungerRequired.get()) {
             return;
         }
         
         // Recover health, if needed
-        final float maxHealth = Math.min( (float) Config.HEALTH.GENERAL.recoveryMax.get(), owner.getMaxHealth() );
+        final float maxHealth = Math.min((float) Config.HEALTH.GENERAL.recoveryMax.get(), owner.getMaxHealth());
         final float oldHealth = owner.getHealth();
         
-        if( recovered > 0.0F && oldHealth < maxHealth ) {
+        if(recovered > 0.0F && oldHealth < maxHealth) {
             // Add health recovery
-            final float newHealth = Math.min( maxHealth, oldHealth + recovered );
-            owner.setHealth( newHealth );
+            final float newHealth = Math.min(maxHealth, oldHealth + recovered);
+            owner.setHealth(newHealth);
             
             // Apply hunger cost
-            if( newHealth - oldHealth > 0 && Config.HEALTH.GENERAL.recoveryHungerCost.get() > 0.0 ) {
-                owner.getFoodData().addExhaustion( (newHealth - oldHealth) *
-                        (float) Config.HEALTH.GENERAL.recoveryHungerCost.get() );
+            if(newHealth - oldHealth > 0 && Config.HEALTH.GENERAL.recoveryHungerCost.get() > 0.0) {
+                owner.getFoodData().addExhaustion((newHealth - oldHealth) *
+                        (float) Config.HEALTH.GENERAL.recoveryHungerCost.get());
             }
         }
     }
@@ -330,32 +284,6 @@ public class HeartData implements IHeartData {
     private HeartData(PlayerEntity player) {
         this.owner = player;
         this.saveTag = getModNBTTag();
-
-        // Natural absorption
-        if (saveTag.contains(TAG_NATURAL_ABSORPTION, NBT_TYPE_NUMERICAL)) {
-            this.setNaturalAbsorption(saveTag.getFloat(TAG_NATURAL_ABSORPTION), false);
-        }
-        else if (HeartManager.isAbsorptionEnabled()) {
-            // New player, give starting absorption
-            this.setNaturalAbsorption((float) Config.ABSORPTION.NATURAL.startingAmount.get(), true);
-            this.setAbsorption(this.getNaturalAbsorption());
-        }
-
-        // Equipment absorption
-        if (saveTag.contains(TAG_EQUIPMENT_ABSORPTION, NBT_TYPE_NUMERICAL)) {
-            this.setLastEquipmentAbsorption(saveTag.getFloat(TAG_EQUIPMENT_ABSORPTION));
-        }
-        else if (HeartManager.isAbsorptionEnabled()) {
-            // New player, assume nothing equipped grants max absorption
-            this.setLastEquipmentAbsorption(0.0F);
-        }
-
-        if (saveTag.contains(TAG_TC_MODIFIER_ABSORPTION, NBT_TYPE_NUMERICAL)) {
-            this.setTcModifierAbsorption(saveTag.getFloat(TAG_TC_MODIFIER_ABSORPTION));
-        }
-        else if (HeartManager.isAbsorptionEnabled()) {
-            this.setTcModifierAbsorption(0.0F);
-        }
 
         // Absorption delay
         if (saveTag.contains(TAG_DELAY_ABSORPTION, NBT_TYPE_NUMERICAL)) {

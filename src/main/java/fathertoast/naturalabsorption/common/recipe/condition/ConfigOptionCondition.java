@@ -17,7 +17,7 @@ public class ConfigOptionCondition implements ICondition {
 
     public enum Operation {
 
-        SPONGE_BOOK("sponge_book", Config.ABSORPTION.GENERAL.spongeBookEnabled::get);
+        SPONGE_BOOK("sponge_book", Config.ABSORPTION.NATURAL.spongeBookEnabled::get);
 
         Operation(String name, Supplier<Boolean> test) {
             this.name = name;

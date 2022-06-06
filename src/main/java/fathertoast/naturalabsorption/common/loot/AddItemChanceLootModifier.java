@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddItemChanceModifier extends LootModifier {
+public class AddItemChanceLootModifier extends LootModifier {
 
     protected final List<ResourceLocation> lootTables;
     protected final Item item;
@@ -28,7 +28,7 @@ public class AddItemChanceModifier extends LootModifier {
      *
      * @param conditionsIn the ILootConditions that need to be matched before the loot is modified.
      */
-    public AddItemChanceModifier(List<ResourceLocation> lootTables, Item item, double chance, ILootCondition[] conditionsIn) {
+    public AddItemChanceLootModifier(List<ResourceLocation> lootTables, Item item, double chance, ILootCondition[] conditionsIn) {
         super(conditionsIn);
         this.lootTables = lootTables;
         this.item = item;
@@ -46,10 +46,10 @@ public class AddItemChanceModifier extends LootModifier {
         return generatedLoot;
     }
 
-    public static class Serializer extends GlobalLootModifierSerializer<AddItemChanceModifier> {
+    public static class Serializer extends GlobalLootModifierSerializer<AddItemChanceLootModifier> {
 
         @Override
-        public AddItemChanceModifier read(ResourceLocation location, JsonObject jsonObject, ILootCondition[] conditions) {
+        public AddItemChanceLootModifier read(ResourceLocation location, JsonObject jsonObject, ILootCondition[] conditions) {
             if (jsonObject.has("item") && jsonObject.has("lootTables") && jsonObject.has("chance")) {
                 final ResourceLocation itemId = ResourceLocation.tryParse(jsonObject.get("item").getAsString());
 
@@ -82,7 +82,7 @@ public class AddItemChanceModifier extends LootModifier {
                 // Read the chance value
                 double chance = jsonObject.get("chance").getAsDouble();
 
-                return new AddItemChanceModifier(lootTableIds, item, chance, conditions);
+                return new AddItemChanceLootModifier(lootTableIds, item, chance, conditions);
             }
             else {
                 NaturalAbsorption.LOG.error("Failed to read global loot modifier of type \"{}\" as it is missing \"item\" and \"lootTables\"", location);
@@ -91,7 +91,7 @@ public class AddItemChanceModifier extends LootModifier {
         }
 
         @Override
-        public JsonObject write(AddItemChanceModifier instance) {
+        public JsonObject write(AddItemChanceLootModifier instance) {
             JsonObject jsonObject = new JsonObject();
             JsonArray jsonArray = new JsonArray();
 

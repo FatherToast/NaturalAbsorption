@@ -1,18 +1,19 @@
 package fathertoast.naturalabsorption.api.impl;
 
+import fathertoast.naturalabsorption.api.IAbsorptionAccessor;
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.INaturalAbsorption;
-import fathertoast.naturalabsorption.client.RenderEventHandler;
 import fathertoast.naturalabsorption.common.health.HeartData;
 import net.minecraft.entity.player.PlayerEntity;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * This is the API implementation. Woah!
  */
 public class NaturalAbsorptionAPI implements INaturalAbsorption {
+
+    private static final IAbsorptionAccessor absorptionAccessor = new AbsorptionAccessor();
 
     /**
      * Must be called server-side. Throws an
@@ -29,16 +30,10 @@ public class NaturalAbsorptionAPI implements INaturalAbsorption {
     }
 
     /**
-     * @return the player's natural absorption.
-     *         Can be called on both server and client.
+     * @return The API IAbsorptionAccessor instance.
      */
     @Override
-    public float getNaturalAbsorption(@Nonnull PlayerEntity player) {
-        if (player.level.isClientSide) {
-            return RenderEventHandler.PLAYER_NATURAL_ABSORPTION;
-        }
-        else {
-            return this.getHeartData(player).getNaturalAbsorption();
-        }
+    public IAbsorptionAccessor getAbsorptionAccessor() {
+        return absorptionAccessor;
     }
 }
