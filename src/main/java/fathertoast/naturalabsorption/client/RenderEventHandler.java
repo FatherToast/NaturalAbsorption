@@ -28,8 +28,6 @@ import java.util.Random;
 
 public class RenderEventHandler {
     
-    public static float PLAYER_NATURAL_ABSORPTION = -1.0F;
-    
     private final Random random = new Random();
     
     /** Used with to make the heart bar flash. */

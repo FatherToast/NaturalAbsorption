@@ -2,7 +2,9 @@ package fathertoast.naturalabsorption.common.core;
 
 import fathertoast.naturalabsorption.api.INaturalAbsorption;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
+import fathertoast.naturalabsorption.common.compat.tc.NaturalAbsorptionTC;
 import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.core.register.NALootModifiers;

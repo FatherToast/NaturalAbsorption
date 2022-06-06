@@ -232,6 +232,7 @@ public class HeartManager {
         if( saturation > 0.0F ) {
             healing += saturation * (float) Config.HEALTH.GENERAL.foodHealingPerSaturation.get();
         }
+        return healing;
     }
     
     /**

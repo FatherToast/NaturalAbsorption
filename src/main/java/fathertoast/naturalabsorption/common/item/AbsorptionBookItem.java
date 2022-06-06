@@ -1,6 +1,5 @@
 package fathertoast.naturalabsorption.common.item;
 
-import fathertoast.naturalabsorption.client.RenderEventHandler;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.health.AbsorptionHelper;
@@ -65,7 +64,7 @@ public class AbsorptionBookItem extends Item {
         final ItemStack book = player.getItemInHand( hand );
         
         if( !world.isClientSide ) {
-            final float naturalAbsorption = AbsorptionHelper.getNaturalAbsorption( player );
+            final double naturalAbsorption = AbsorptionHelper.getNaturalAbsorption( player );
             final int levelCost = getLevelCost( naturalAbsorption );
             
             // Give the player feedback on failure
@@ -83,14 +82,14 @@ public class AbsorptionBookItem extends Item {
                 player.giveExperienceLevels( -levelCost );
             }
             // Apply upgrade effects
-            Attribute naturalAbsorption = NAAttributes.NATURAL_ABSORPTION.get( );
+            Attribute attribute = NAAttributes.NATURAL_ABSORPTION.get( );
             double currentFromBook = 0.0D;
 
-            if ( player.getAttribute( naturalAbsorption ).getModifier( absorptionBookUUID ) != null) {
-                currentFromBook = player.getAttribute(naturalAbsorption).getModifier(absorptionBookUUID).getAmount();
+            if ( player.getAttribute( attribute ).getModifier( absorptionBookUUID ) != null) {
+                currentFromBook = player.getAttribute( attribute ).getModifier(absorptionBookUUID).getAmount();
             }
-            player.getAttribute( naturalAbsorption ).removeModifier( absorptionBookUUID );
-            player.getAttribute( naturalAbsorption ).addPermanentModifier( new AttributeModifier( absorptionBookUUID, "Absorption Book modifier", currentFromBook + Config.ABSORPTION.NATURAL.upgradeGain.get(), AttributeModifier.Operation.ADDITION ));
+            player.getAttribute( attribute ).removeModifier( absorptionBookUUID );
+            player.getAttribute( attribute ).addPermanentModifier( new AttributeModifier( absorptionBookUUID, "Absorption Book modifier", currentFromBook + Config.ABSORPTION.NATURAL.upgradeGain.get(), AttributeModifier.Operation.ADDITION ));
             player.awardStat( Stats.ITEM_USED.get( this ) );
 
             // Play sound to show success
@@ -112,22 +111,22 @@ public class AbsorptionBookItem extends Item {
         
         if ( naturalAbsorption >= 0.0F ) {
             
-            final float maxNaturalAbsorption = (float) Config.ABSORPTION.NATURAL.maximumAmount.get();
-            final float gainOnUse = naturalAbsorption >= maxNaturalAbsorption ? 0.0F :
-                    Math.min( (float) Config.ABSORPTION.NATURAL.upgradeGain.get(), maxNaturalAbsorption - naturalAbsorption );
+            final double maxNaturalAbsorption = Config.ABSORPTION.NATURAL.maximumAmount.get();
+            final double gainOnUse = naturalAbsorption >= maxNaturalAbsorption ? 0.0F :
+                    Math.min( Config.ABSORPTION.NATURAL.upgradeGain.get(), maxNaturalAbsorption - naturalAbsorption );
             
             // Extra tooltip info, if enabled
             if( Config.ABSORPTION.NATURAL.upgradeBookExtraTooltipInfo.get() ) {
                 tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.ABSORPTION_BOOK_CURRENT ).getString() ) );
                 tooltip.add( new TranslationTextComponent( TextFormatting.YELLOW + " " +
-                        References.prettyToString( naturalAbsorption ) + " / " + References.prettyToString( maxNaturalAbsorption ) ) );
+                        References.prettyToString( (float) naturalAbsorption ) + " / " + References.prettyToString( (float) maxNaturalAbsorption ) ) );
             }
             tooltip.add( new StringTextComponent( "" ) );
             
             if( gainOnUse > 0.0F ) {
                 // Tell player how much absorption they gain on use
                 tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
-                tooltip.add( new TranslationTextComponent( TextFormatting.BLUE + References.translate( References.BOOK_MAX, "+" + References.prettyToString( gainOnUse ) ).getString() ) );
+                tooltip.add( new TranslationTextComponent( TextFormatting.BLUE + References.translate( References.BOOK_MAX, "+" + References.prettyToString( (float) gainOnUse ) ).getString() ) );
                 
                 tooltip.add( new StringTextComponent( "" ) );
 

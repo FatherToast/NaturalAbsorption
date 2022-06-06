@@ -60,7 +60,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
 
             if( naturalAbsorption > 0.0F ) {
                 final float gainOnUse = (float) Config.ABSORPTION.NATURAL.upgradeGain.get();
-                final float newAbsorption = Math.max( 0.0F, naturalAbsorption - gainOnUse );
+                final double newAbsorption = Math.max( 0.0F, naturalAbsorption - gainOnUse );
 
                 // Consume costs
                 if( !isCreative ) {
@@ -74,7 +74,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
                     final int levelsReturned = (int) (levelRefundMulti * getLevelCost( newAbsorption ));
                     if( levelsReturned > 0 ) player.giveExperienceLevels( levelsReturned );
                 }
-                data.setNaturalAbsorption( newAbsorption, true );
+                AbsorptionHelper.setNaturalAbsorption( player, true, newAbsorption );
                 player.awardStat( Stats.ITEM_USED.get( this ) );
                 world.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.WOOL_PLACE, SoundCategory.PLAYERS, 0.9F, 1.0F );
                 world.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.75F, 1.0F );
@@ -93,7 +93,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
     @Override
     @OnlyIn( value = Dist.CLIENT )
     public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag ) {
-        if (!Config.ABSORPTION.GENERAL.spongeBookExtraTooltipInfo.get())
+        if (!Config.ABSORPTION.NATURAL.spongeBookEnabled.get())
             return;
 
         final PlayerEntity player = Minecraft.getInstance().player;
@@ -101,7 +101,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
         if( player == null )
             return;
 
-        final float naturalAbsorption = AbsorptionHelper.getNaturalAbsorption( player );
+        final double naturalAbsorption = AbsorptionHelper.getNaturalAbsorption( player );
         final float gainOnUse = (float) Config.ABSORPTION.NATURAL.upgradeGain.get();
         final float levelRefundMulti = (float) Config.ABSORPTION.NATURAL.spongeBookLevelRefundMulti.get();
         final int levelsReturned = (int) (levelRefundMulti * getLevelCost( naturalAbsorption - gainOnUse ));
