@@ -3,6 +3,7 @@ package fathertoast.naturalabsorption.common.health;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
+import fathertoast.naturalabsorption.common.item.AbsorptionBookItem;
 import fathertoast.naturalabsorption.common.network.NetworkHelper;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -244,16 +245,18 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event ) {
-        if( !event.getPlayer().level.isClientSide && !event.isEndConquered() ) {
-            final HeartData data = HeartData.get( event.getPlayer() );
-            
-            // Apply death penalty
-            if(isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0) {
-                final double naturalAbsorption = AbsorptionHelper.getNaturalAbsorption(event.getPlayer());
+        PlayerEntity player = event.getPlayer();
 
-                if(naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get()) {
-                    data.setNaturalAbsorption((float) Math.max(Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
-                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get()), true);
+        if( !player.level.isClientSide && !event.isEndConquered() ) {
+            final HeartData data = HeartData.get( player );
+            
+            // Apply death penalty (only applies to the absorption modifier the Book item uses)
+            if( isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0 ) {
+                final double naturalAbsorption = AbsorptionHelper.getNaturalAbsorption( player );
+
+                if( naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get() ) {
+                    AbsorptionHelper.changeAbsorptionModifier(player, true, AbsorptionBookItem.absorptionBookUUID, - Math.max(Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
+                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get()));
                 }
             }
             

@@ -75,7 +75,6 @@ public class HeartData implements IHeartData {
         
         if(data == null || player != data.owner) {
             data = new HeartData(player);
-            data.lastSteadyStateAbsorption = data.getSteadyStateMaxAbsorption();
             PLAYER_CACHE.put(uuid, data);
         }
         return data;
@@ -86,26 +85,7 @@ public class HeartData implements IHeartData {
 
     private int absorptionRecoveryDelay;
     private int healthRecoveryDelay;
-    private double lastSteadyStateAbsorption;
-    
-    // Absorption health capacity methods
-    
-    /** @return The player's natural absorption. */
-    public double getNaturalAbsorption() { return AbsorptionHelper.getNaturalAbsorption(this.owner); }
 
-    /**
-     * Sets the player's natural absorption. The player will gain or lose current absorption to match.
-     *
-     * @param updateActualAbsorption If true, the player's current absorption will be
-     *                               updated to match the total natural absorption.
-     */
-    public void setNaturalAbsorption(double value, boolean updateActualAbsorption) {
-        AbsorptionHelper.setNaturalAbsorption(this.owner, updateActualAbsorption, value);
-    }
-
-    public void setEquipmentAbsorption(double value, boolean updateActualAbsorption) {
-        AbsorptionHelper.setEquipmentAbsorption(this.owner, updateActualAbsorption, value);
-    }
 
     // Absorption recovery delay methods
     @Override
@@ -172,7 +152,6 @@ public class HeartData implements IHeartData {
         if(HeartManager.isAbsorptionEnabled()) {
             if (Config.ABSORPTION.GENERAL.recoveryDelay.get() >= 0) {
                 updateAbsorption();
-                lastSteadyStateAbsorption = getSteadyStateMaxAbsorption();
             }
         }
     }

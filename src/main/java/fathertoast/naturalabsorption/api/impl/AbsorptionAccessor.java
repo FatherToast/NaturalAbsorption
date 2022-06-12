@@ -4,50 +4,38 @@ import fathertoast.naturalabsorption.api.IAbsorptionAccessor;
 import fathertoast.naturalabsorption.common.health.AbsorptionHelper;
 import net.minecraft.entity.player.PlayerEntity;
 
+import javax.annotation.Nonnull;
+import java.util.UUID;
+
 public class AbsorptionAccessor implements IAbsorptionAccessor {
 
     @Override
-    public void setNaturalAbsorption(PlayerEntity player, boolean updateActualAbsorption, double value) {
-        AbsorptionHelper.setNaturalAbsorption(player, updateActualAbsorption, value);
-    }
-
-    @Override
-    public void addNaturalAbsorption(PlayerEntity player, boolean updateActualAbsorption, double amount) {
+    public void addNaturalAbsorption(@Nonnull PlayerEntity player, boolean updateActualAbsorption, double amount) {
         AbsorptionHelper.addNaturalAbsorption(player, updateActualAbsorption, amount);
     }
 
     @Override
-    public void removeNaturalAbsorption(PlayerEntity player, double amount) {
-        AbsorptionHelper.removeNaturalAbsorption(player, amount);
-    }
-
-    @Override
-    public double getNaturalAbsorption(PlayerEntity player) {
+    public double getNaturalAbsorption(@Nonnull PlayerEntity player) {
         return AbsorptionHelper.getNaturalAbsorption(player);
     }
 
     @Override
-    public void setEquipmentAbsorption(PlayerEntity player, boolean updateActualAbsorption, double value) {
-        AbsorptionHelper.setEquipmentAbsorption(player, updateActualAbsorption, value);
-    }
-
-    @Override
-    public void addEquipmentAbsorption(PlayerEntity player, boolean updateActualAbsorption, double amount) {
+    public void addEquipmentAbsorption(@Nonnull PlayerEntity player, boolean updateActualAbsorption, double amount) {
         AbsorptionHelper.addEquipmentAbsorption(player, updateActualAbsorption, amount);
     }
 
     @Override
-    public void removeEquipmentAbsorption(PlayerEntity player, double amount) {
-        AbsorptionHelper.removeEquipmentAbsorption(player, amount);
-    }
-
-    @Override
-    public double getEquipmentAbsorption(PlayerEntity player) {
+    public double getEquipmentAbsorption(@Nonnull PlayerEntity player) {
         return AbsorptionHelper.getEquipmentAbsorption(player);
     }
 
     @Override
-    public double getSteadyStateMaxAbsorption(PlayerEntity player) {
+    public double getSteadyStateMaxAbsorption(@Nonnull PlayerEntity player) {
         return AbsorptionHelper.getSteadyStateMaxAbsorption(player);
+    }
+
+    @Override
+    public void changeAbsorptionModifier(@Nonnull PlayerEntity player, boolean natural, UUID modifierId, double amount) {
+        AbsorptionHelper.changeAbsorptionModifier(player, natural, modifierId, amount);
     }
 }

@@ -74,7 +74,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
                     final int levelsReturned = (int) (levelRefundMulti * getLevelCost( newAbsorption ));
                     if( levelsReturned > 0 ) player.giveExperienceLevels( levelsReturned );
                 }
-                AbsorptionHelper.setNaturalAbsorption( player, true, newAbsorption );
+                AbsorptionHelper.addNaturalAbsorption( player, true, newAbsorption );
                 player.awardStat( Stats.ITEM_USED.get( this ) );
                 world.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.WOOL_PLACE, SoundCategory.PLAYERS, 0.9F, 1.0F );
                 world.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.75F, 1.0F );
