@@ -1,5 +1,6 @@
 package fathertoast.naturalabsorption.datagen;
 
+import fathertoast.naturalabsorption.common.compat.tc.NAModifiers;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
@@ -11,7 +12,7 @@ import java.util.HashMap;
 
 public class NALanguageProvider extends LanguageProvider {
     
-    /** All supported languages. */
+    /** All supported translations. */
     public enum TranslationKey {
         ENGLISH( "en" ), SPANISH( "es" ), PORTUGUESE( "pt" ), FRENCH( "fr" ), ITALIAN( "it" ),
         GERMAN( "de" ), PIRATE( "en" );
@@ -22,79 +23,107 @@ public class NALanguageProvider extends LanguageProvider {
     }
     
     /** This method provides helper tags to make linking translations up easier, and also enforces the correct array length. */
-    private static String[] Translations( String key, String en, String es, String pt, String fr, String it, String de, String pir ) {
+    private static String[] translations( String key, String en, String es, String pt, String fr, String it, String de, String pir ) {
         // Note that this must match up EXACTLY to the TranslationKey enum above
         String[] translation = { key, en, es, pt, fr, it, de, pir };
+        
+        // Fix the encoding to allow us to use accented characters in the translation string literals
+        // Note: If a translation uses any non-ASCII characters, make sure they are all in this matrix! (case-sensitive)
+        final String[][] utf8ToUnicode = {
+                { "à", "\u00E0" }, { "á", "\u00E1" }, { "ã", "\u00E3" }, { "ä", "\u00E4" },
+                { "ç", "\u00E7" },
+                { "é", "\u00E9" }, { "ê", "\u00EA" },
+                { "í", "\u00ED" },
+                { "ó", "\u00F3" }, { "ö", "\u00F6" },
+                { "ù", "\u00F9" }, { "û", "\u00FB" }, { "ü", "\u00FC" }
+        };
         for( int i = 1; i < translation.length; i++ ) {
-            //noinspection ConstantConditions NOTE: This is a dumb thing to do, but for some reason it fixes the encoding
-            translation[i] = translation[i]
-                    .replace( "à", "\u00E0" ).replace( "á", "\u00E1" ).replace( "ã", "\u00E3" ).replace( "ä", "\u00E4" )
-                    .replace( "ç", "\u00E7" )
-                    .replace( "é", "\u00E9" ).replace( "ê", "\u00EA" )
-                    .replace( "í", "\u00ED" )
-                    .replace( "ó", "\u00F3" ).replace( "ö", "\u00F6" )
-                    .replace( "ù", "\u00F9" ).replace( "û", "\u00FB" ).replace( "ü", "\u00FC" );
+            for( String[] fix : utf8ToUnicode )
+                translation[i] = translation[i].replace( fix[0], fix[1] ); // Note: This is kinda dumb, but it works so idc
         }
         return translation;
     }
     
-    /** Matrix linking the actual translations to their lang key. */
+    /**
+     * Matrix linking the actual translations to their lang key.
+     * <p>
+     * Each row of the matrix is one translation array.
+     * In each translation array, the lang key is at index 0 and the translation for a particular
+     * translation key is at index (translationKey.ordinal() + 1).
+     *
+     * @see #addTranslations()
+     */
     @SuppressWarnings( "SpellCheckingInspection" )
     private static final String[][] TRANSLATIONS = {
             
-            Translations( NAItems.ABSORPTION_BOOK.get().getDescriptionId(), "Book of Absorption",
+            // Items/equipment names
+            translations( NAItems.ABSORPTION_BOOK.get().getDescriptionId(), "Book of Absorption",
                     "Libro de absorción", "Livro de absorção", "Livre d'absorption",
                     "Libro di assorbimento", "Buch der Absorption", "Book of Magic Hearts" ),
-            Translations( NAItems.ABSORPTION_ABSORBING_BOOK.get().getDescriptionId(), "Absorption Absorbing Book",
+            translations( NAItems.ABSORPTION_ABSORBING_BOOK.get().getDescriptionId(), "Absorption Absorbing Book",
                     "Absorción libro absorbente", "Livro absorção absorção", "Absorption livre absorbant",
                     "Assorbimento libro assorbente", "Absorption Absorptionsbuch", "Magic Heart Plundering Book" ),
-            Translations( NAEnchantments.ABSORPTION_ENCHANTMENT.get().getDescriptionId(), "Absorption",
+            translations( NAEnchantments.ABSORPTION_ENCHANTMENT.get().getDescriptionId(), "Absorption",
                     "Absorción", "Absorção", "Absorption", "Assorbimento", "Absorption", "Heart o' Magic" ),
             
-            Translations( References.FOOD_HUNGER, "%s Hunger",
+            // Food extra tooltip info
+            translations( References.FOOD_HUNGER, "%s Hunger",
                     "%s Hambre", "%s Fome", "%s Faim",
                     "%s Fame", "%s Hunger", "%s Scurvy" ),
-            Translations( References.FOOD_SATURATION, "%s Saturation",
+            translations( References.FOOD_SATURATION, "%s Saturation",
                     "%s Saturación", "%s Saturação", "%s Saturation",
                     "%s Sazietà", "%s Sättigung", "%s Full Belly" ),
-            Translations( References.FOOD_HEALTH, "%s Health",
+            translations( References.FOOD_HEALTH, "%s Health",
                     "%s Salud", "%s Vida", "%s Vie",
                     "%s Salute", "%s Gesundheit", "%s Healin'" ),
             
-            Translations( References.BOOK_GAIN, "When used:",
+            // Book tooltips
+            translations( References.BOOK_GAIN, "When used:",
                     "Al usarse:", "Quando usado:", "Quand utilisé :",
                     "Quando usato:", "Auswirkungen:", "When us'd:" ),
-            Translations( References.BOOK_MAX, "%s Max Absorption",
+            translations( References.BOOK_MAX, "%s Max Absorption",
                     "Máx absorción: %s", "Absorção máxima: %s", "%s Max Absorption",
                     "Assorbimento massimo: %s", "%s Max Absorption", "%s Max Magic Hearts" ),
-            Translations( References.BOOK_CAN_USE, "Right click to use",
+            translations( References.BOOK_CAN_USE, "Right click to use",
                     "Haga clic derecho para usar", "Clique com o botão direito para usar", "Clic droit pour utiliser",
                     "Fare clic con il tasto destro per utilizzare", "Rechtsklick zum verwenden", "Right click to use" ),
-            Translations( References.BOOK_NO_USE, "You can't use this",
+            translations( References.BOOK_NO_USE, "You can't use this",
                     "No puedes usar esto", "Você não pode usar isso", "Tu ne peux pas utiliser ça",
                     "Non puoi usare questo", "Das kannst du nicht benutzen", "Ye can't be usin this" ),
-            Translations( References.ABSORPTION_BOOK_CURRENT, "Your absorption",
+            translations( References.ABSORPTION_BOOK_CURRENT, "Your absorption",
                     "Tu absorción", "Sua absorção", "Ton absorption",
                     "Il tuo assorbimento", "Deine absorption", "Yer magic hearts" ),
-            Translations( References.ABSORPTION_BOOK_COST, "Cost: %d levels",
+            translations( References.ABSORPTION_BOOK_COST, "Cost: %d levels",
                     "Coste: %d niveles", "Custo: %d níveis", "Coût: %d niveaux",
                     "Costo: %d livelli", "Levelkosten: %d", "Cost: %d levels" ),
-            Translations( References.SPONGE_BOOK_REFUND, "Refund: %d levels",
+            translations( References.SPONGE_BOOK_REFUND, "Refund: %d levels",
                     "Reembolso: %d niveles", "Reembolso: %d níveis", "Remboursement: %d niveaux",
                     "Rimborso: %d livelli", "Level-rückerstattung: %d", "Plunder: % levels" ),
             
-            Translations( References.ALREADY_MAX, "Cannot upgrade your natural absorption any higher",
+            // Feedback messages
+            translations( References.ALREADY_MAX, "Cannot upgrade your natural absorption any higher",
                     "No puedes mejorar tu absorción natural más", "Não é possível aumentar sua absorção natural",
                     "Tu ne peux pas améliorer ton absorption naturelle plus haut", "Non puoi migliorare il tuo assorbimento naturale più in alto",
                     "Kann ihre natürliche absorption nicht höher verbessern", "Ye can't hoist yer magic hearts any higher" ),
-            Translations( References.NOT_ENOUGH_LEVELS, "Requires at least %s levels to use",
+            translations( References.NOT_ENOUGH_LEVELS, "Requires at least %s levels to use",
                     "Requiere al menos %s niveles para usar", "Requer pelo menos %s níveis para usar",
                     "Nécessite au moins %s niveaux à utiliser", "Richiede almeno %s livelli per essere utilizzato",
                     "Benötigt mindestens %s levels zu verwenden", "Ye need at least %s levels to be usin this" ),
-            Translations( References.NOT_ENOUGH_ABSORPTION, "You have no natural absorption to convert",
+            translations( References.NOT_ENOUGH_ABSORPTION, "You have no natural absorption to convert",
                     "No tienes absorción natural para convertir", "Você não tem absorção natural para converter",
                     "Tu n'as pas d'absorption naturelle à convertir", "Non hai assorbimento naturale da convertire",
-                    "Sie haben keine natürliche absorption zu konvertieren", "Ye don't be havin any magic hearts to be doin that" )
+                    "Sie haben keine natürliche absorption zu konvertieren", "Ye don't be havin any magic hearts to be doin that" ),
+            
+            // Compat Features
+            translations( References.ED_ABSORPTION_INFO, "Increases your maximum absorption.",
+                    "Aumenta su máxima absorción.", "Aumenta sua absorção máxima.",
+                    "Augmente ton absorption maximale.", "Aumenta il massimo assorbimento.",
+                    "Erhöht ihre maximale absorption.", "Hoists yer magic hearts." ),
+            translations( NAModifiers.ARMOR_ABSORPTION.get().getTranslationKey(), "Absorption",
+                    "Absorción", "Absorção", "Absorption", "Assorbimento", "Absorption", "Heart o' Magic" ),
+            translations( References.TC_ARMOR_ABSORPTION, "+%s Max Absorption",
+                    "Máx absorción: +%s", "Absorção máxima: +%s", "+%s Max Absorption",
+                    "Assorbimento massimo: +%s", "+%s Max Absorption", "+%s Max Magic Hearts" )
     };
     
     /** Maps which translation key each lang code uses, allowing multiple lang codes to use the same translations. */
@@ -102,13 +131,13 @@ public class NALanguageProvider extends LanguageProvider {
     
     static {
         // Assign all specific locales to the translation we want to use
-        MapAll( TranslationKey.ENGLISH, "us" ); // We can ignore all other English locales, en_us is the fallback for all languages
-        MapAll( TranslationKey.SPANISH, "es", "ar", "cl", "ec", "mx", "uy", "ve" );
-        MapAll( TranslationKey.PORTUGUESE, "pt", "br" );
-        MapAll( TranslationKey.FRENCH, "fr", "ca" );
-        MapAll( TranslationKey.ITALIAN, "it" );
-        MapAll( TranslationKey.GERMAN, "de", "at", "ch" );
-        MapAll( TranslationKey.PIRATE, "pt" );
+        mapAll( TranslationKey.ENGLISH, "us" ); // We can ignore other English locales, en_us is the fallback for all languages
+        mapAll( TranslationKey.SPANISH, "es", "ar", "cl", "ec", "mx", "uy", "ve" );
+        mapAll( TranslationKey.PORTUGUESE, "pt", "br" );
+        mapAll( TranslationKey.FRENCH, "fr", "ca" );
+        mapAll( TranslationKey.ITALIAN, "it" );
+        mapAll( TranslationKey.GERMAN, "de", "at", "ch" );
+        mapAll( TranslationKey.PIRATE, "pt" );
         
         // Make sure all supported languages are completely implemented
         NaturalAbsorption.LOG.info( "Starting translation key verification..." );
@@ -127,19 +156,27 @@ public class NALanguageProvider extends LanguageProvider {
         NaturalAbsorption.LOG.info( "Translation key verification complete!" );
     }
     
-    private static void MapAll( TranslationKey translation, String... locales ) {
+    /** Maps any number of locale codes to a single translation. */
+    private static void mapAll( TranslationKey translation, String... locales ) {
         for( String locale : locales ) {
             LANG_CODE_MAP.put( translation.code + "_" + locale, translation );
         }
     }
     
+    /** The translation key to use for this locale. */
     private final TranslationKey translationKey;
     
+    /** Creates a language provider for a specific locale. This correlates to exactly one .json file. */
     public NALanguageProvider( DataGenerator gen, String locale, TranslationKey translateKey ) {
         super( gen, NaturalAbsorption.MOD_ID, locale );
         translationKey = translateKey;
     }
     
+    /**
+     * Build the .json file for this locale (based solely on its translation key).
+     *
+     * @see NALanguageProvider#TRANSLATIONS
+     */
     @Override
     protected void addTranslations() {
         final int k = translationKey.ordinal() + 1;
