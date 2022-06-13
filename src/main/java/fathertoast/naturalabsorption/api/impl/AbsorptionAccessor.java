@@ -1,41 +1,59 @@
 package fathertoast.naturalabsorption.api.impl;
 
 import fathertoast.naturalabsorption.api.IAbsorptionAccessor;
-import fathertoast.naturalabsorption.common.health.AbsorptionHelper;
+import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
 import net.minecraft.entity.player.PlayerEntity;
 
-import javax.annotation.Nonnull;
-import java.util.UUID;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public class AbsorptionAccessor implements IAbsorptionAccessor {
-
+    
     @Override
-    public void addNaturalAbsorption(@Nonnull PlayerEntity player, boolean updateActualAbsorption, double amount) {
-        AbsorptionHelper.addNaturalAbsorption(player, updateActualAbsorption, amount);
+    public double getMaxAbsorption( PlayerEntity player ) {
+        return AbsorptionHelper.getMaxAbsorption( player );
     }
-
+    
     @Override
-    public double getNaturalAbsorption(@Nonnull PlayerEntity player) {
-        return AbsorptionHelper.getNaturalAbsorption(player);
+    public double getSteadyStateMaxAbsorption( PlayerEntity player ) {
+        return AbsorptionHelper.getSteadyStateMaxAbsorption( player );
     }
-
+    
     @Override
-    public void addEquipmentAbsorption(@Nonnull PlayerEntity player, boolean updateActualAbsorption, double amount) {
-        AbsorptionHelper.addEquipmentAbsorption(player, updateActualAbsorption, amount);
+    public double getNaturalAbsorption( PlayerEntity player ) {
+        return AbsorptionHelper.getModifiedNaturalAbsorption( player );
     }
-
+    
     @Override
-    public double getEquipmentAbsorption(@Nonnull PlayerEntity player) {
-        return AbsorptionHelper.getEquipmentAbsorption(player);
+    public double getBaseNaturalAbsorption( PlayerEntity player ) {
+        return AbsorptionHelper.getBaseNaturalAbsorption( player );
     }
-
+    
     @Override
-    public double getSteadyStateMaxAbsorption(@Nonnull PlayerEntity player) {
-        return AbsorptionHelper.getSteadyStateMaxAbsorption(player);
+    public void setBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value ) {
+        AbsorptionHelper.setBaseNaturalAbsorption( player, updateActualAbsorption, value );
     }
-
+    
     @Override
-    public void changeAbsorptionModifier(@Nonnull PlayerEntity player, boolean natural, UUID modifierId, double amount) {
-        AbsorptionHelper.changeAbsorptionModifier(player, natural, modifierId, amount);
+    public void addBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value ) {
+        AbsorptionHelper.addBaseNaturalAbsorption( player, updateActualAbsorption, value );
+    }
+    
+    @Override
+    public void applyDeathPenalty( PlayerEntity player ) { AbsorptionHelper.applyDeathPenalty( player ); }
+    
+    @Override
+    public double getEquipmentAbsorption( PlayerEntity player ) {
+        return AbsorptionHelper.getEquipmentAbsorption( player );
+    }
+    
+    @Override
+    public double getEnchantmentAbsorption( PlayerEntity player ) {
+        return AbsorptionHelper.getEnchantmentAbsorption( player );
+    }
+    
+    @Override
+    public double getArmorReplacementAbsorption( PlayerEntity player ) {
+        return AbsorptionHelper.getArmorReplacementAbsorption( player );
     }
 }

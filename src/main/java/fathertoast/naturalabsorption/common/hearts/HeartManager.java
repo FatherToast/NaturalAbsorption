@@ -1,11 +1,12 @@
-package fathertoast.naturalabsorption.common.health;
+package fathertoast.naturalabsorption.common.hearts;
 
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
-import fathertoast.naturalabsorption.common.item.AbsorptionBookItem;
-import fathertoast.naturalabsorption.common.network.NetworkHelper;
-import net.minecraft.entity.ai.attributes.Attributes;
+import fathertoast.naturalabsorption.common.util.References;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.attributes.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Food;
@@ -14,11 +15,14 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,6 +31,7 @@ import net.minecraftforge.fml.LogicalSidedProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class HeartManager {
@@ -35,9 +40,6 @@ public class HeartManager {
     
     /** Map of all currently tracked players to their last known hunger state. */
     private static final HashMap<PlayerEntity, HungerState> PLAYER_HUNGER_STATE_TRACKER = new HashMap<>();
-    
-    /** Set of players that have had equipment changed this tick. */
-    private static final Set<PlayerEntity> PLAYER_EQUIPMENT_CHANGES = new HashSet<>();
     
     /** @return True if health features in this mod are enabled. */
     public static boolean isHealthEnabled() { return !Config.MAIN.GENERAL.disableHealthFeatures.get(); }
@@ -82,7 +84,7 @@ public class HeartManager {
     }
     
     private static void clearPlayerHungerState( PlayerEntity player ) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
-
+    
     /** @return The max absorption granted by potion effects. */
     public static float getPotionAbsorption( PlayerEntity player ) {
         if( player.hasEffect( Effects.ABSORPTION ) ) {
@@ -109,22 +111,21 @@ public class HeartManager {
     public void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
             final MinecraftServer server = LogicalSidedProvider.INSTANCE.get( LogicalSide.SERVER );
-
-            // Counter for cache cleanup
-            if( ++cleanupCounter >= 600 ) {
+            
+            // Counter for cache cleanup; very lazily do this every ~5.5 minutes
+            if( ++cleanupCounter >= 6666 ) {
                 cleanupCounter = 0;
                 PLAYER_HUNGER_STATE_TRACKER.clear();
                 clearSources();
-                HeartData.allSaveToPersistent( server.getPlayerList().getPlayers() );
                 HeartData.clearCache();
             }
-
-            // Counter for player shield update
+            
+            // Counter for player heart update
             if( ++updateCounter >= Config.MAIN.GENERAL.updateTime.get() ) {
                 updateCounter = 0;
-
+                
                 for( ServerPlayerEntity player : server.getPlayerList().getPlayers() ) {
-                    // Update each player's data
+                    // Update each player's heart data
                     if( player != null && player.isAlive() ) HeartData.get( player ).update();
                 }
             }
@@ -220,12 +221,42 @@ public class HeartManager {
             }
         }
     }
-
+    
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onItemTooltip( ItemTooltipEvent event ) {
+        final Food food = event.getItemStack().getItem().getFoodProperties();
+        if( food != null ) {
+            final int hunger = food.getNutrition();
+            final float saturation = calculateSaturation( hunger, food.getSaturationModifier() );
+            
+            if( Config.MAIN.GENERAL.foodExtraTooltipInfo.get() ) {
+                // Food nutrition values could theoretically be zero or negative, make sure we handle that
+                if( hunger != 0 ) {
+                    event.getToolTip().add( new TranslationTextComponent( (hunger > 0 ? TextFormatting.BLUE : TextFormatting.RED) +
+                            References.translate( References.FOOD_HUNGER, String.format( "%+d", -hunger ) ).getString() ) );
+                }
+                if( saturation != 0.0F ) {
+                    event.getToolTip().add( new TranslationTextComponent( (saturation > 0.0F ? TextFormatting.BLUE : TextFormatting.RED) +
+                            References.translate( References.FOOD_SATURATION, (saturation > 0.0F ? "+" : "") + References.prettyToString( saturation ) ).getString() ) );
+                }
+            }
+            if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingExtraTooltipInfo.get() ) {
+                // Calculate as if the food's entire nutritional value is used
+                final float maxHealing = Config.HEALTH.GENERAL.foodHealingMax.get() < 0.0 ? Float.POSITIVE_INFINITY :
+                        (float) Config.HEALTH.GENERAL.foodHealingMax.get();
+                final float healing = Math.min( getFoodHealing( hunger, saturation ), maxHealing );
+                if( healing > 0.0F ) {
+                    event.getToolTip().add( new TranslationTextComponent( TextFormatting.BLUE + References.translate( References.FOOD_HEALTH, "+" + References.prettyToString( healing ) ).getString() ) );
+                }
+            }
+        }
+    }
+    
     /** Calculates saturation value based on hunger and saturation modifier. */
-    public static float calculateSaturation( int hunger, float saturationModifier ) { return hunger * saturationModifier * 2.0F; }
-
+    private static float calculateSaturation( int hunger, float saturationModifier ) { return hunger * saturationModifier * 2.0F; }
+    
     /** Calculates amount of healing to provide based on hunger and saturation granted. */
-    public static float getFoodHealing( int hunger, float saturation ) {
+    private static float getFoodHealing( int hunger, float saturation ) {
         float healing = 0.0F;
         if( hunger > 0 ) {
             healing += hunger * (float) Config.HEALTH.GENERAL.foodHealingPerHunger.get();
@@ -245,22 +276,13 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event ) {
-        PlayerEntity player = event.getPlayer();
-
+        final PlayerEntity player = event.getPlayer();
         if( !player.level.isClientSide && !event.isEndConquered() ) {
-            final HeartData data = HeartData.get( player );
-            
-            // Apply death penalty (only applies to the absorption modifier the Book item uses)
-            if( isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0 ) {
-                final double naturalAbsorption = AbsorptionHelper.getNaturalAbsorption( player );
-
-                if( naturalAbsorption > Config.ABSORPTION.NATURAL.deathPenaltyLimit.get() ) {
-                    AbsorptionHelper.changeAbsorptionModifier(player, true, AbsorptionBookItem.absorptionBookUUID, - Math.max(Config.ABSORPTION.NATURAL.deathPenaltyLimit.get(),
-                            naturalAbsorption - Config.ABSORPTION.NATURAL.deathPenalty.get()));
-                }
-            }
+            // Apply death penalty
+            AbsorptionHelper.applyDeathPenalty( player );
             
             // Prepare the player for respawn
+            final HeartData data = HeartData.get( player );
             data.startRecoveryDelay();
             if( isHealthEnabled() && Config.HEALTH.GENERAL.respawnAmount.get() > 0.0F ) {
                 data.owner.setHealth( (float) Config.HEALTH.GENERAL.respawnAmount.get() );
@@ -270,7 +292,44 @@ public class HeartManager {
             }
         }
     }
-
+    
+    /**
+     * Ensure the base natural absorption modifier value is copied over to the new player entity.
+     */
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onPlayerClone( PlayerEvent.Clone event ) {
+        final double originalAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( event.getOriginal() );
+        AbsorptionHelper.setBaseNaturalAbsorption( event.getPlayer(), false, originalAbsorption );
+    }
+    
+    /**
+     * Update equipment absorption when the player changes armor items.
+     */
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void onPlayerEquipmentChange( LivingEquipmentChangeEvent event ) {
+        if( event.getEntityLiving() instanceof PlayerEntity ) {
+            // TODO figure out why armor replacement doesn't update correctly
+            AbsorptionHelper.updateEquipmentAbsorption( (PlayerEntity) event.getEntityLiving() );
+        }
+    }
+    
+    /**
+     * Adds our absorption attributes to the player entity type.
+     */
+    public static void onEntityAttributeCreation( EntityAttributeCreationEvent event ) {
+        AttributeModifierMap modifierMap = GlobalEntityTypeAttributes.getSupplier( EntityType.PLAYER );
+        AttributeModifierMap.MutableAttribute builder = AttributeModifierMap.builder();
+        
+        builder.add( NAAttributes.NATURAL_ABSORPTION.get(), 0.0 );
+        builder.add( NAAttributes.EQUIPMENT_ABSORPTION.get(), 0.0 );
+        AttributeModifierMap newModifierMap = builder.build();
+        Map<Attribute, ModifiableAttributeInstance> map = new HashMap<>();
+        
+        map.putAll( modifierMap.instances );
+        map.putAll( newModifierMap.instances );
+        modifierMap.instances = map;
+    }
+    
     /**
      * Called when a living entity is damaged - before armor, potions, and enchantments reduce damage.
      * <p>

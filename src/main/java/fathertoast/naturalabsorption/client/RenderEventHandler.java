@@ -5,8 +5,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
-import fathertoast.naturalabsorption.common.health.AbsorptionHelper;
-import fathertoast.naturalabsorption.common.health.HeartManager;
+import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
+import fathertoast.naturalabsorption.common.hearts.HeartManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
@@ -37,21 +37,21 @@ public class RenderEventHandler {
     private int displayHealth;
     /** The last recorded system time */
     private long lastHealthTime;
-
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void beforeRenderGameOverlay(RenderGameOverlayEvent.Pre event) {
-        if(HeartManager.isArmorReplacementEnabled() && Config.EQUIPMENT.ARMOR.hideArmorBar.get() &&
-                RenderGameOverlayEvent.ElementType.ARMOR.equals(event.getType())) {
-            event.setCanceled(true);
+    
+    @SubscribeEvent( priority = EventPriority.NORMAL )
+    public void beforeRenderGameOverlay( RenderGameOverlayEvent.Pre event ) {
+        if( HeartManager.isArmorReplacementEnabled() && Config.EQUIPMENT.ARMOR.hideArmorBar.get() &&
+                RenderGameOverlayEvent.ElementType.ARMOR.equals( event.getType() ) ) {
+            event.setCanceled( true );
         }
-        else if(Config.ABSORPTION.GENERAL.renderCapacityBackground.get() &&
-                RenderGameOverlayEvent.ElementType.HEALTH.equals(event.getType())) {
+        else if( Config.ABSORPTION.GENERAL.renderCapacityBackground.get() &&
+                RenderGameOverlayEvent.ElementType.HEALTH.equals( event.getType() ) ) {
             try {
-                renderAbsorptionCapacity(event);
+                renderAbsorptionCapacity( event );
             }
-            catch(Exception ex) {
-                NaturalAbsorption.LOG.error("Encountered exception during heart render tick", ex);
-                event.setCanceled(false); // In case we already canceled the vanilla event
+            catch( Exception ex ) {
+                NaturalAbsorption.LOG.error( "Encountered exception during heart render tick", ex );
+                event.setCanceled( false ); // In case we already canceled the vanilla event
             }
         }
     }
@@ -75,13 +75,13 @@ public class RenderEventHandler {
         // to smooth out rendering when we do render
         
         final PlayerEntity player = Minecraft.getInstance().player;
-
-        if(player == null) return;
-
-        final double naturalAbsorption = player.getAttributeValue(NAAttributes.NATURAL_ABSORPTION.get());
-
-        if (naturalAbsorption <= 0) return;
-
+        
+        if( player == null ) return;
+        
+        final float absorbMax = (float) AbsorptionHelper.getMaxAbsorption( player );
+        
+        if( absorbMax <= 0.0F ) return;
+        
         final int tickCount = Minecraft.getInstance().gui.getGuiTicks();
         
         final int health = MathHelper.ceil( player.getHealth() );
@@ -107,19 +107,6 @@ public class RenderEventHandler {
         
         final float healthMax = (float) player.getAttributeValue( Attributes.MAX_HEALTH );
         final float absorb = MathHelper.ceil( player.getAbsorptionAmount() );
-        final float globalMax = (float) Config.ABSORPTION.GENERAL.globalMax.get();
-        
-        // Calculate the effective absorption capacity
-        final double absorbMax;
-
-        if( globalMax < 0 ) {
-            absorbMax = naturalAbsorption + AbsorptionHelper.getEquipmentAbsorption(player) +
-                    HeartManager.getPotionAbsorption( player );
-        }
-        else {
-            absorbMax = Math.min( naturalAbsorption + AbsorptionHelper.getEquipmentAbsorption(player), globalMax ) +
-                    HeartManager.getPotionAbsorption( player );
-        }
         
         // Calculate number of hearts we want vs. number that vanilla would render
         int extraHearts = MathHelper.ceil( (healthMax + absorbMax) / 2.0F ) -

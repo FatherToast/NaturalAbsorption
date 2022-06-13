@@ -9,7 +9,7 @@ import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.core.register.NALootModifiers;
 import fathertoast.naturalabsorption.common.event.NAEventListener;
-import fathertoast.naturalabsorption.common.health.HeartManager;
+import fathertoast.naturalabsorption.common.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.network.PacketHandler;
 import fathertoast.naturalabsorption.common.recipe.CraftingUtil;
 import net.minecraft.util.ResourceLocation;
@@ -84,7 +84,7 @@ public class NaturalAbsorption {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         
         modBus.addListener( this::onInterModProcess );
-        modBus.addListener( NAEventListener::onEntityAttributeCreation );
+        modBus.addListener( HeartManager::onEntityAttributeCreation );
         
         NAItems.ITEMS.register( modBus );
         NAAttributes.ATTRIBUTES.register( modBus );

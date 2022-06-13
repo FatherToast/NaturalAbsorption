@@ -3,7 +3,7 @@ package fathertoast.naturalabsorption.common.config;
 import fathertoast.naturalabsorption.common.config.field.*;
 import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
 import fathertoast.naturalabsorption.common.config.file.TomlHelper;
-import fathertoast.naturalabsorption.common.health.HeartManager;
+import fathertoast.naturalabsorption.common.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.EnchantArmorType;
 import fathertoast.naturalabsorption.common.util.EnchantmentRarity;
 import fathertoast.naturalabsorption.common.util.References;
@@ -22,8 +22,8 @@ public class EquipmentConfig extends Config.AbstractConfig {
                 "This config contains options for features that apply to the Absorption enchantment and armor."
         );
         
-        ENCHANTMENT = new Enchantment(SPEC);
-        ARMOR = new Armor(SPEC);
+        ENCHANTMENT = new Enchantment( SPEC );
+        ARMOR = new Armor( SPEC );
     }
     
     public static class Enchantment extends Config.AbstractCategory {
