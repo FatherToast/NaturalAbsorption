@@ -1,5 +1,6 @@
 1.16.5-2.2.0
     - Absorption Absorbing Book!
+    - New & updated textures by Tutta
     - Now provides info about hunger, saturation, and health restored to food tooltips
     - Max absorption is now based on attributes, for easier mod interaction
     - Rewrote localization into new data gen system

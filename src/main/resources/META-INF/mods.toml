@@ -5,8 +5,8 @@ issueTrackerURL = "https://github.com/FatherToast/NaturalAbsorption/issues/"
 
 [[mods]]
 logoFile = "banner.png"
-authors = "FatherToast"
-credits = "Sarinsa (big brain), Mother Toast & Baby Toast"
+authors = "Father Toast"
+credits = "Sarinsa (big brain), Tutta (textures), Mother Toast & Baby Toast"
 version = "${file.jarVersion}"
 displayName = "Natural Absorption"
 modId = "naturalabsorption"
