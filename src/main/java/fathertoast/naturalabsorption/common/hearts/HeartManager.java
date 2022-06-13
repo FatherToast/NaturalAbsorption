@@ -19,6 +19,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -248,6 +250,14 @@ public class HeartManager {
         }
     }
     
+    /**
+     * Called when populating tooltip contents. Also called on client start with a null player for search indexing.
+     * <p>
+     * Adds extra tooltip info to food items, if enabled.
+     *
+     * @param event The event data.
+     */
+    @OnlyIn( Dist.CLIENT )
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemTooltip( ItemTooltipEvent event ) {
         final Food food = event.getItemStack().getItem().getFoodProperties();
