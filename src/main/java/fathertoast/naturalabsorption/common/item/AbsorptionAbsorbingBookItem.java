@@ -62,7 +62,8 @@ public class AbsorptionAbsorbingBookItem extends Item {
                 // Consume costs
                 if( !isCreative ) {
                     spongeBook.shrink( 1 );
-                    Block.popResource( world, player.blockPosition(), new ItemStack( NAItems.ABSORPTION_BOOK.get() ) );
+                    if( Config.ABSORPTION.NATURAL.spongeBookBookRefund.get() )
+                        Block.popResource( world, player.blockPosition(), new ItemStack( NAItems.ABSORPTION_BOOK.get() ) );
                 }
                 
                 // Apply downgrade effects and notify client

@@ -97,6 +97,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         
         public final BooleanField spongeBookEnabled;
         public final DoubleField spongeBookLevelRefundMulti;
+        public final BooleanField spongeBookBookRefund;
         
         // Insert here if a config for loot table injection for upgrade/sponge books is desired; see net.minecraftforge.event.LootTableLoadEvent
         
@@ -168,6 +169,8 @@ public class AbsorptionConfig extends Config.AbstractConfig {
                     "The percentage of the experience levels refunded when using an Absorption Absorbing Book.",
                     "For example, a value of 0.5 (50%) will restore half of the levels consumed by a Book of Absorption,",
                     "rounded down to the nearest whole number." ) );
+            spongeBookBookRefund = SPEC.define( new BooleanField( "downgrade_book.book_refund", true,
+                    "If enabled, a Book of Absorption will be refunded when using an Absorption Absorbing Book." ) );
         }
     }
 }
