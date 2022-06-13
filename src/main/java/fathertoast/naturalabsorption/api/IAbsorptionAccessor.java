@@ -32,35 +32,35 @@ public interface IAbsorptionAccessor {
     double getBaseNaturalAbsorption( PlayerEntity player );
     
     /**
-     * Sets base natural absorption, clamped in a valid range, optionally changing actual absorption.
+     * Sets base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed.
      *
      * <strong>Note:</strong>
      * This changes the value used by the Natural Absorption mod for upgrade/sponge books.
      * To change natural absorption without affecting Natural Absorption's books, use attribute modifiers.
      *
      * @param player                 The player to change the value for.
-     * @param updateActualAbsorption If true, the player's ACTUAL absorption hearts will be increased/reduced by
-     *                               the difference in value (accounting for modifiers).
+     * @param updateActualAbsorption If true, the player's ACTUAL absorption hearts will be reduced by the difference
+     *                               in max value, if it was lowered (accounting for modifiers).
      * @param value                  The new natural absorption value.
      */
     void setBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value );
     
     /**
-     * Adds (or removes) base natural absorption, clamped in a valid range, optionally changing actual absorption.
+     * Adds (or removes) base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed.
      *
      * <strong>Note:</strong>
      * This changes the value used by the Natural Absorption mod for upgrade/sponge books.
      * To change natural absorption without affecting Natural Absorption's books, use attribute modifiers.
      *
      * @param player                 The player to change the value for.
-     * @param updateActualAbsorption If true, the player's ACTUAL absorption hearts will be increased/reduced by
-     *                               the same value (accounting for modifiers).
+     * @param updateActualAbsorption If true, the player's ACTUAL absorption hearts will be reduced by the difference
+     *                               in max value, if it was lowered (accounting for modifiers).
      * @param value                  The amount of natural absorption to add (or remove, if negative).
      */
     void addBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value );
     
     /**
-     * Removes base natural absorption equal to the death penalty, down to a limit, changing actual absorption to match.
+     * Removes base natural absorption equal to the death penalty, down to a limit, reducing actual absorption to match.
      *
      * @param player The player to apply death penalty to.
      */

@@ -42,7 +42,7 @@ public class AbsorptionHelper {
         return getAbsorptionModifier( player, true, NATURAL_MODIFIER_BASE );
     }
     
-    /** Sets base natural absorption, clamped in a valid range, optionally changing actual absorption. */
+    /** Sets base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed. */
     public static void setBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value ) {
         if( HeartManager.isAbsorptionEnabled() ) {
             final double initialValue = updateActualAbsorption ? getModifiedNaturalAbsorption( player ) : 0.0;
@@ -52,7 +52,7 @@ public class AbsorptionHelper {
             
             if( updateActualAbsorption ) {
                 final double finalValue = getModifiedNaturalAbsorption( player );
-                if( initialValue != finalValue ) {
+                if( initialValue > finalValue ) {
                     final double netChange = finalValue - initialValue;
                     player.setAbsorptionAmount( player.getAbsorptionAmount() + (float) netChange );
                 }
@@ -60,12 +60,12 @@ public class AbsorptionHelper {
         }
     }
     
-    /** Adds (or removes) base natural absorption, clamped in a valid range, optionally changing actual absorption. */
+    /** Adds (or removes) base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed. */
     public static void addBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value ) {
         setBaseNaturalAbsorption( player, updateActualAbsorption, getBaseNaturalAbsorption( player ) + value );
     }
     
-    /** Removes base natural absorption equal to the death penalty, down to a limit, changing actual absorption to match. */
+    /** Removes base natural absorption equal to the death penalty, down to a limit, reducing actual absorption to match. */
     public static void applyDeathPenalty( PlayerEntity player ) {
         if( HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.deathPenalty.get() > 0.0 ) {
             final double initialValue = getBaseNaturalAbsorption( player );
@@ -92,23 +92,17 @@ public class AbsorptionHelper {
     }
     
     /** Recalculates and reapplies all equipment absorption modifiers. */
-    public static void updateEquipmentAbsorption( PlayerEntity player ) {
+    public static void updateEquipmentAbsorption( PlayerEntity player, double previousMaxAbsorb ) {
         if( HeartManager.isAbsorptionEnabled() ) {
-            final boolean updateActualAbsorption = hasAbsorptionModifier( player, false, EQUIP_MODIFIER_ENCHANT ) ||
-                    hasAbsorptionModifier( player, false, EQUIP_MODIFIER_ARMOR_REPLACE );
-            final double initialValue = updateActualAbsorption ? getEquipmentAbsorption( player ) : 0.0;
-            
             if( Config.EQUIPMENT.ENCHANTMENT.enabled.get() )
                 setAbsorptionModifier( player, false, EQUIP_MODIFIER_ENCHANT, AbsorptionEnchantment.getMaxAbsorptionBonus( player ) );
             if( HeartManager.isArmorReplacementEnabled() )
                 setAbsorptionModifier( player, false, EQUIP_MODIFIER_ARMOR_REPLACE, getArmorReplacementBonus( player ) );
             
-            if( updateActualAbsorption ) {
-                final double finalValue = getEquipmentAbsorption( player );
-                if( initialValue != finalValue ) {
-                    final double netChange = finalValue - initialValue;
-                    player.setAbsorptionAmount( player.getAbsorptionAmount() + (float) netChange );
-                }
+            final double finalMaxAbsorb = getMaxAbsorption( player );
+            if( previousMaxAbsorb > finalMaxAbsorb ) {
+                final double netChange = finalMaxAbsorb - previousMaxAbsorb;
+                player.setAbsorptionAmount( player.getAbsorptionAmount() + (float) netChange );
             }
         }
     }
@@ -117,7 +111,7 @@ public class AbsorptionHelper {
     private static double getArmorReplacementBonus( PlayerEntity player ) {
         double bonus = 0.0;
         if( Config.EQUIPMENT.ARMOR.armorMultiplier.get() > 0.0 ) {
-            final double armor = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
+            final double armor = player.getAttributeValue( Attributes.ARMOR );
             if( armor > 0.0F ) {
                 bonus += Config.EQUIPMENT.ARMOR.armorMultiplier.get() * armor;
             }

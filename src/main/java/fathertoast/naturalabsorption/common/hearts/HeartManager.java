@@ -3,10 +3,12 @@ package fathertoast.naturalabsorption.common.hearts;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
-import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.*;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifierMap;
+import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Food;
@@ -29,12 +31,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class HeartManager {
+    /** Map of all players that have had equipment changes since the last tick, linked to their previous max absorption. */
+    private static final HashMap<PlayerEntity, Double> PLAYER_EQUIPMENT_TRACKER = new HashMap<>();
+    
     /** Set of all currently altered damage sources. */
     private static final Set<DamageSource> MODDED_SOURCES = new HashSet<>();
     
@@ -49,6 +51,25 @@ public class HeartManager {
     
     /** @return True if armor replacement features in this mod are enabled. */
     public static boolean isArmorReplacementEnabled() { return Config.EQUIPMENT.ARMOR.enabled.get(); }
+    
+    /** Marks a player as having equipment changes and records their current max absorption. */
+    private static void trackPlayerEquipmentChange( PlayerEntity player ) {
+        // This will not be called multiple times per tick for the same player under normal circumstances; however, in
+        // case it does happen, we can safely ignore repeat calls since we only care about the initial & final states
+        if( !PLAYER_EQUIPMENT_TRACKER.containsKey( player ) ) {
+            PLAYER_EQUIPMENT_TRACKER.put( player, AbsorptionHelper.getMaxAbsorption( player ) );
+        }
+    }
+    
+    /** Updates all players' pending equipment absorption changes and updates their actual absorption as needed. */
+    private static void applyPlayerEquipmentChanges() {
+        if( PLAYER_EQUIPMENT_TRACKER.isEmpty() ) return;
+        
+        for( Map.Entry<PlayerEntity, Double> entry : PLAYER_EQUIPMENT_TRACKER.entrySet() ) {
+            AbsorptionHelper.updateEquipmentAbsorption( entry.getKey(), entry.getValue() );
+        }
+        PLAYER_EQUIPMENT_TRACKER.clear();
+    }
     
     /** Returns true if the given damage source is modified to ignore armor. */
     private static boolean isSourceModified( DamageSource source ) { return MODDED_SOURCES.contains( source ); }
@@ -73,6 +94,7 @@ public class HeartManager {
         MODDED_SOURCES.clear();
     }
     
+    /** Creates or updates a player's tracked hunger state. */
     private static void trackPlayerHungerState( PlayerEntity player ) {
         final HungerState hungerState = PLAYER_HUNGER_STATE_TRACKER.get( player );
         if( hungerState == null ) {
@@ -83,6 +105,7 @@ public class HeartManager {
         }
     }
     
+    /** Deletes a player's tracked hunger state. */
     private static void clearPlayerHungerState( PlayerEntity player ) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
     
     /** @return The max absorption granted by potion effects. */
@@ -111,6 +134,9 @@ public class HeartManager {
     public void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
             final MinecraftServer server = LogicalSidedProvider.INSTANCE.get( LogicalSide.SERVER );
+            
+            // Apply queued events
+            applyPlayerEquipmentChanges();
             
             // Counter for cache cleanup; very lazily do this every ~5.5 minutes
             if( ++cleanupCounter >= 6666 ) {
@@ -296,7 +322,7 @@ public class HeartManager {
     /**
      * Ensure the base natural absorption modifier value is copied over to the new player entity.
      */
-    @SubscribeEvent( priority = EventPriority.NORMAL )
+    @SubscribeEvent( priority = EventPriority.HIGHEST )
     public void onPlayerClone( PlayerEvent.Clone event ) {
         final double originalAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( event.getOriginal() );
         AbsorptionHelper.setBaseNaturalAbsorption( event.getPlayer(), false, originalAbsorption );
@@ -305,18 +331,17 @@ public class HeartManager {
     /**
      * Update equipment absorption when the player changes armor items.
      */
-    @SubscribeEvent( priority = EventPriority.NORMAL )
+    @SubscribeEvent( priority = EventPriority.HIGHEST )
     public void onPlayerEquipmentChange( LivingEquipmentChangeEvent event ) {
         if( event.getEntityLiving() instanceof PlayerEntity ) {
-            // TODO figure out why armor replacement doesn't update correctly
-            AbsorptionHelper.updateEquipmentAbsorption( (PlayerEntity) event.getEntityLiving() );
+            trackPlayerEquipmentChange( (PlayerEntity) event.getEntityLiving() );
         }
     }
     
     /**
-     * Adds our absorption attributes to the player entity type.
+     * Adds our absorption attributes to the player entity type. Individually registered to the mod event bus.
      */
-    public static void onEntityAttributeCreation( EntityAttributeCreationEvent event ) {
+    public static void onEntityAttributeCreation( @SuppressWarnings( "unused" ) EntityAttributeCreationEvent event ) {
         AttributeModifierMap modifierMap = GlobalEntityTypeAttributes.getSupplier( EntityType.PLAYER );
         AttributeModifierMap.MutableAttribute builder = AttributeModifierMap.builder();
         
