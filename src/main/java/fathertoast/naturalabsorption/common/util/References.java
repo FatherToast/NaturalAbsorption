@@ -1,6 +1,5 @@
 package fathertoast.naturalabsorption.common.util;
 
-import fathertoast.naturalabsorption.common.compat.tc.NAModifiers;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import net.minecraft.util.text.ITextComponent;
@@ -33,7 +32,10 @@ public class References {
     // Compat
     private static final String ED_SUFFIX = ".desc";
     public static final String ED_ABSORPTION_INFO = NAEnchantments.ABSORPTION_ENCHANTMENT.get().getDescriptionId() + ED_SUFFIX;
-    public static final String TC_ARMOR_ABSORPTION = NAModifiers.ARMOR_ABSORPTION.get().getTranslationKey() + ".tooltip.info";
+    // Lang key is derived below; commented out to avoid NoClassDefFoundError
+    // public static final String TC_ARMOR_ABSORPTION = NAModifiers.ARMOR_ABSORPTION.get().getTranslationKey();
+    public static final String TC_ARMOR_ABSORPTION = "modifier.naturalabsorption.armor_absorption";
+    public static final String TC_ARMOR_ABSORPTION_TOOLTIP = TC_ARMOR_ABSORPTION + ".tooltip.info";
     
     //---------------- FORMAT METHODS -------------------
     
@@ -53,8 +55,8 @@ public class References {
     public static final String GREATER_OR_EQUAL = "\u2265";
     
     
-    //------------ THE OBJECT SUPPLIER SUPPLIER --------------
+    //------------ THE OBJECT SUPPLIER SUPPLIER SUPPLIER --------------
     
-    /** A supplier that returns a supplier that creates a new object. */
-    public static final Supplier<Supplier<?>> OBJECT_SUPPLIER_SUPPLIER = () -> Object::new;
+    /** A supplier that returns a supplier that returns a supplier that creates a new object. */
+    public static final Supplier<Supplier<Supplier<?>>> OBJECT_SUPPLIER_SUPPLIER_SUPPLIER = () -> () -> Object::new;
 }

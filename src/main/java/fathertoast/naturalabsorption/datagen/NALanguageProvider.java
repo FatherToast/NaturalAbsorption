@@ -119,9 +119,9 @@ public class NALanguageProvider extends LanguageProvider {
                     "Aumenta su máxima absorción.", "Aumenta sua absorção máxima.",
                     "Augmente ton absorption maximale.", "Aumenta il massimo assorbimento.",
                     "Erhöht ihre maximale absorption.", "Hoists yer magic hearts." ),
-            translations( NAModifiers.ARMOR_ABSORPTION.get().getTranslationKey(), "Absorption",
+            translations( References.TC_ARMOR_ABSORPTION, "Absorption",
                     "Absorción", "Absorção", "Absorption", "Assorbimento", "Absorption", "Heart o' Magic" ),
-            translations( References.TC_ARMOR_ABSORPTION, "+%s Max Absorption",
+            translations( References.TC_ARMOR_ABSORPTION_TOOLTIP, "+%s Max Absorption",
                     "Máx absorción: +%s", "Absorção máxima: +%s", "+%s Max Absorption",
                     "Assorbimento massimo: +%s", "+%s Max Absorption", "+%s Max Magic Hearts" )
     };
