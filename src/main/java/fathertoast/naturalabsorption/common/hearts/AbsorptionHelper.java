@@ -22,13 +22,13 @@ public class AbsorptionHelper {
     
     /** @return The player's max absorption not counting buffs, limited by the global max absorption config. */
     public static double getSteadyStateMaxAbsorption( PlayerEntity player ) {
-        final double calculatedMax = getModifiedNaturalAbsorption( player ) + getEquipmentAbsorption( player );
+        final double calculatedMax = getNaturalAbsorption( player ) + getEquipmentAbsorption( player );
         return Config.ABSORPTION.GENERAL.globalMax.get() < 0.0 ? calculatedMax :
                 Math.min( calculatedMax, Config.ABSORPTION.GENERAL.globalMax.get() );
     }
     
     /** @return The player's max absorption granted by natural absorption. */
-    public static double getModifiedNaturalAbsorption( PlayerEntity player ) {
+    public static double getNaturalAbsorption( PlayerEntity player ) {
         return player.getAttributeValue( NAAttributes.NATURAL_ABSORPTION.get() );
     }
     
@@ -45,13 +45,13 @@ public class AbsorptionHelper {
     /** Sets base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed. */
     public static void setBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value ) {
         if( HeartManager.isAbsorptionEnabled() ) {
-            final double initialValue = updateActualAbsorption ? getModifiedNaturalAbsorption( player ) : 0.0;
+            final double initialValue = updateActualAbsorption ? getNaturalAbsorption( player ) : 0.0;
             
             setAbsorptionModifier( player, true, NATURAL_MODIFIER_BASE,
                     MathHelper.clamp( value, 0.0, Config.ABSORPTION.NATURAL.maximumAmount.get() ) );
             
             if( updateActualAbsorption ) {
-                final double finalValue = getModifiedNaturalAbsorption( player );
+                final double finalValue = getNaturalAbsorption( player );
                 if( initialValue > finalValue ) {
                     final double netChange = finalValue - initialValue;
                     player.setAbsorptionAmount( player.getAbsorptionAmount() + (float) netChange );

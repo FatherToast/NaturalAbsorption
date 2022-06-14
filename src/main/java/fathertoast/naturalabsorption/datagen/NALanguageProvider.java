@@ -1,6 +1,5 @@
 package fathertoast.naturalabsorption.datagen;
 
-import fathertoast.naturalabsorption.common.compat.tc.NAModifiers;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
@@ -32,10 +31,11 @@ public class NALanguageProvider extends LanguageProvider {
         final String[][] utf8ToUnicode = {
                 { "à", "\u00E0" }, { "á", "\u00E1" }, { "ã", "\u00E3" }, { "ä", "\u00E4" },
                 { "ç", "\u00E7" },
-                { "é", "\u00E9" }, { "ê", "\u00EA" },
+                { "è", "\u00E8" }, { "é", "\u00E9" }, { "ê", "\u00EA" },
                 { "í", "\u00ED" },
-                { "ó", "\u00F3" }, { "ö", "\u00F6" },
-                { "ù", "\u00F9" }, { "û", "\u00FB" }, { "ü", "\u00FC" }
+                { "ó", "\u00F3" }, { "õ", "\u00F5" }, { "ö", "\u00F6" },
+                { "ù", "\u00F9" }, { "û", "\u00FB" }, { "ü", "\u00FC" },
+                { "œ", "\u0153" }
         };
         for( int i = 1; i < translation.length; i++ ) {
             for( String[] fix : utf8ToUnicode )
@@ -123,7 +123,14 @@ public class NALanguageProvider extends LanguageProvider {
                     "Absorción", "Absorção", "Absorption", "Assorbimento", "Absorption", "Heart o' Magic" ),
             translations( References.TC_ARMOR_ABSORPTION_TOOLTIP, "+%s Max Absorption",
                     "Máx absorción: +%s", "Absorção máxima: +%s", "+%s Max Absorption",
-                    "Assorbimento massimo: +%s", "+%s Max Absorption", "+%s Max Magic Hearts" )
+                    "Assorbimento massimo: +%s", "+%s Max Absorption", "+%s Max Magic Hearts" ),
+            translations( References.TC_ARMOR_ABSORPTION_FLAVOR, "Heart of gold",
+                    "Corazón de oro", "Coração de ouro", "Cœur d'or",
+                    "Cuore d'oro", "Herz aus gold", "Heart o' gold" ),
+            translations( References.TC_ARMOR_ABSORPTION_DESCRIPTION, "Generates additional absorption hearts",
+                    "Genera corazones de absorción adicionales", "Gera corações de absorção adicionais",
+                    "Génère des cœurs d'absorption supplémentaires", "Genera cuori di assorbimento aggiuntivi",
+                    "Erzeugt zusätzliche absorptionsherzen", "Hoists yer magic hearts" )
     };
     
     /** Maps which translation key each lang code uses, allowing multiple lang codes to use the same translations. */

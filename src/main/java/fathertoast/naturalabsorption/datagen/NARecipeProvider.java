@@ -20,30 +20,30 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class NARecipeProvider extends RecipeProvider {
-
-    public NARecipeProvider(DataGenerator generator) {
-        super(generator);
+    
+    public NARecipeProvider( DataGenerator generator ) {
+        super( generator );
     }
-
+    
     @Override
-    protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
-        ShapelessRecipeBuilder.shapeless(NAItems.ABSORPTION_ABSORBING_BOOK.get())
-                .requires(Items.BOOK)
-                .requires(Items.SPONGE)
-                .unlockedBy("has_book", has(Items.BOOK))
-                .unlockedBy("has_sponge", has(Items.SPONGE))
-                .save(consumer);
-
-        this.handleDependencyRecipes(consumer);
+    protected void buildShapelessRecipes( Consumer<IFinishedRecipe> consumer ) {
+        ShapelessRecipeBuilder.shapeless( NAItems.ABSORPTION_ABSORBING_BOOK.get() )
+                .requires( Items.BOOK )
+                .requires( Items.SPONGE )
+                .unlockedBy( "has_book", has( Items.BOOK ) )
+                .unlockedBy( "has_sponge", has( Items.SPONGE ) )
+                .save( consumer );
+        
+        this.handleDependencyRecipes( consumer );
     }
-
-    private void handleDependencyRecipes(Consumer<IFinishedRecipe> consumer) {
-        if (ModList.get().isLoaded("tconstruct")) {
-            this.tinkersRecipes(consumer);
+    
+    private void handleDependencyRecipes( Consumer<IFinishedRecipe> consumer ) {
+        if( ModList.get().isLoaded( "tconstruct" ) ) {
+            this.tinkersRecipes( consumer );
         }
     }
-
-    private void tinkersRecipes(Consumer<IFinishedRecipe> consumer) {
+    
+    private void tinkersRecipes( Consumer<IFinishedRecipe> consumer ) {
         final String upgradeFolder = "tools/modifiers/upgrade/";
         final String abilityFolder = "tools/modifiers/ability/";
         final String slotlessFolder = "tools/modifiers/slotless/";
@@ -54,19 +54,19 @@ public class NARecipeProvider extends RecipeProvider {
         final String defenseSalvage = "tools/modifiers/salvage/defense/";
         final String compatFolder = "tools/modifiers/compat/";
         final String compatSalvage = "tools/modifiers/salvage/compat/";
-
-        ModifierRecipeBuilder.modifier(NAModifiers.ARMOR_ABSORPTION.get())
-                .addInput(NAItems.ABSORPTION_BOOK.get())
-                .addSalvage(NAItems.ABSORPTION_BOOK.get(), 0.5f)
-                .setTools(TinkerTags.Items.ARMOR)
-                .setSlots(SlotType.UPGRADE, 1)
-                .setMaxLevel(3)
-                .build(consumer, prefix("tconstruct", NAModifiers.ARMOR_ABSORPTION, upgradeFolder));
+        
+        ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION.get() )
+                .addInput( NAItems.ABSORPTION_BOOK.get() )
+                .addSalvage( NAItems.ABSORPTION_BOOK.get(), 0.5f )
+                .setTools( TinkerTags.Items.ARMOR )
+                .setSlots( SlotType.DEFENSE, 1 )
+                .setMaxLevel( 3 )
+                .build( consumer, prefix( "tconstruct", NAModifiers.ARMOR_ABSORPTION, defenseFolder ) );
     }
-
-
-    public ResourceLocation prefix(String modid, Supplier<? extends IForgeRegistryEntry<?>> entry, String prefix) {
-        ResourceLocation loc = Objects.requireNonNull(entry.get().getRegistryName());
-        return new ResourceLocation(modid, prefix + loc.getPath());
+    
+    
+    public ResourceLocation prefix( String modid, Supplier<? extends IForgeRegistryEntry<?>> entry, String prefix ) {
+        ResourceLocation loc = Objects.requireNonNull( entry.get().getRegistryName() );
+        return new ResourceLocation( modid, prefix + loc.getPath() );
     }
 }

@@ -35,7 +35,9 @@ public class References {
     // Lang key is derived below; commented out to avoid NoClassDefFoundError
     // public static final String TC_ARMOR_ABSORPTION = NAModifiers.ARMOR_ABSORPTION.get().getTranslationKey();
     public static final String TC_ARMOR_ABSORPTION = "modifier.naturalabsorption.armor_absorption";
-    public static final String TC_ARMOR_ABSORPTION_TOOLTIP = TC_ARMOR_ABSORPTION + ".tooltip.info";
+    public static final String TC_ARMOR_ABSORPTION_TOOLTIP = TC_ARMOR_ABSORPTION + ".tooltip";
+    public static final String TC_ARMOR_ABSORPTION_FLAVOR = TC_ARMOR_ABSORPTION + ".flavor";
+    public static final String TC_ARMOR_ABSORPTION_DESCRIPTION = TC_ARMOR_ABSORPTION + ".description";
     
     //---------------- FORMAT METHODS -------------------
     

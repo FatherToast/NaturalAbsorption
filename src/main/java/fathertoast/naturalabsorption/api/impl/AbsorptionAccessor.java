@@ -21,7 +21,7 @@ public class AbsorptionAccessor implements IAbsorptionAccessor {
     
     @Override
     public double getNaturalAbsorption( PlayerEntity player ) {
-        return AbsorptionHelper.getModifiedNaturalAbsorption( player );
+        return AbsorptionHelper.getNaturalAbsorption( player );
     }
     
     @Override
