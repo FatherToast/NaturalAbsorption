@@ -1,9 +1,7 @@
 package fathertoast.naturalabsorption.common.config;
 
-import fathertoast.naturalabsorption.common.config.field.BooleanField;
 import fathertoast.naturalabsorption.common.config.field.DoubleField;
 import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
-import org.spongepowered.asm.mixin.Pseudo;
 
 import java.io.File;
 
@@ -18,8 +16,7 @@ public class CompatConfig extends Config.AbstractConfig {
         );
         TC = new CompatConfig.TinkersConstruct( SPEC );
     }
-    
-    @Pseudo
+
     public static class TinkersConstruct extends Config.AbstractCategory {
         
         //public final BooleanField modifierEnabled;
