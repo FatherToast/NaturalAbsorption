@@ -29,7 +29,8 @@ public interface INaturalAbsorption {
     String TAG_DELAY_HEALTH = "HealthDelay";
     
     /**
-     * Gets or loads heart data for a player.
+     * Gets or loads heart data for a player.<br>
+     * <br>
      *
      * @param player The player to retrieve heart data from.
      * @return The given player's heart data.

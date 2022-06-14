@@ -32,7 +32,8 @@ public interface IAbsorptionAccessor {
     double getBaseNaturalAbsorption( PlayerEntity player );
     
     /**
-     * Sets base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed.
+     * Sets base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed.<br>
+     * <br>
      *
      * <strong>Note:</strong>
      * This changes the value used by the Natural Absorption mod for upgrade/sponge books.
@@ -46,7 +47,8 @@ public interface IAbsorptionAccessor {
     void setBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value );
     
     /**
-     * Adds (or removes) base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed.
+     * Adds (or removes) base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed.<br>
+     * <br>
      *
      * <strong>Note:</strong>
      * This changes the value used by the Natural Absorption mod for upgrade/sponge books.
