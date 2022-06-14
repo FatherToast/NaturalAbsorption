@@ -1,17 +1,15 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: bug
-assignees: ''
+name: Bug report about: Create a report to help us improve title: ''
+labels: bug assignees: ''
 
 ---
 
 **Setup**
+
 - Dedicated server? Yes/No
-- Special AI version: 
-- Forge version: 
-- Other involved mod version (if applicable): 
+- Natural Absorption version:
+- Forge version:
+- Other involved mod version (if applicable):
 
 **Describe the bug**
 A clear and concise description of what the bug is.
