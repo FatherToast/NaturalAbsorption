@@ -18,4 +18,4 @@ A clear and concise description of what the bug is.
 Steps to reproduce the behavior.
 
 **Reports**
-If applicable, add links to crash reports (for crashes), game logs (for freezes), and/or configs.
+If applicable, add links to crash reports (for crashes), game logs (for freezes), and/or configs. (For example use pastebin.com)
