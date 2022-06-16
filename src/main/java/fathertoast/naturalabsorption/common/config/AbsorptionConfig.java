@@ -1,8 +1,11 @@
 package fathertoast.naturalabsorption.common.config;
 
+import fathertoast.naturalabsorption.client.ClientUtil;
 import fathertoast.naturalabsorption.common.config.field.*;
 import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
 import fathertoast.naturalabsorption.common.recipe.condition.BookRecipeCondition;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 import java.io.File;
 
@@ -35,7 +38,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         public final IntField recoveryHungerRequired;
         public final DoubleField recoveryHungerCost;
         
-        public final BooleanField renderCapacityBackground;
+        public final InjectionWrapperField<BooleanField> renderCapacityBackground;
         
         General( ToastConfigSpec parent ) {
             super( parent, "absorption",
@@ -70,11 +73,13 @@ public class AbsorptionConfig extends Config.AbstractConfig {
             
             SPEC.newLine();
             
-            SPEC.comment( "NOTE: This option is not compatible with a lot of mods that do their own heart rendering stuff. For instance, " +
-                    "Mantle's heart stacker option that stacks hearts instead of vanilla drawing multiple rows, will break this feature." );
-            renderCapacityBackground = SPEC.define( new BooleanField( "render_capacity_background", true,
-                    "If true, the mod will render the empty heart background behind absorption hearts you are missing,",
-                    "but can regenerate back. This may not work right if another mod changes heart bar rendering." ) );
+            renderCapacityBackground = SPEC.define( new InjectionWrapperField<>(
+                    new BooleanField( "render_capacity_background", true,
+                            "If true, the mod will render the empty heart background behind absorption hearts you are missing,",
+                            "but can regenerate back. This may not work right if another mod changes heart bar rendering, or may override",
+                            "other mods' heart rendering (for example, Mantle's heart stacker option)." ),
+                    ( wrapped ) -> DistExecutor.safeRunWhenOn( Dist.CLIENT, () ->
+                            ClientUtil.toggleAbsorptionBackgroundRender( wrapped.get() ) ) ) );
         }
     }
     

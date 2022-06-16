@@ -1,5 +1,6 @@
 package fathertoast.naturalabsorption.common.config;
 
+import fathertoast.naturalabsorption.client.ClientUtil;
 import fathertoast.naturalabsorption.common.config.field.*;
 import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
 import fathertoast.naturalabsorption.common.config.file.TomlHelper;
@@ -8,6 +9,8 @@ import fathertoast.naturalabsorption.common.util.EnchantArmorType;
 import fathertoast.naturalabsorption.common.util.EnchantmentRarity;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.world.item.enchantment.ProtectionEnchantment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 import java.io.File;
 
@@ -114,7 +117,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
         public final BooleanField enabled;
         
         public final BooleanField disableArmor;
-        public final BooleanField hideArmorBar;
+        public final InjectionWrapperField<BooleanField> hideArmorBar;
         
         public final DoubleField armorMultiplier;
         public final DoubleField armorRecovery;
@@ -132,16 +135,22 @@ public class EquipmentConfig extends Config.AbstractConfig {
                     "All features in this section are disabled by default by one master toggle. Take care to go through",
                     "this entire category if enabled, as the default options may be considered extreme." );
             
-            enabled = SPEC.define( new BooleanField( "enable_section", false,
-                    "Set this to true to enable this entire config category. Be warned, the default settings make",
-                    "extreme changes to vanilla mechanics." ) );
+            enabled = SPEC.define( new InjectionWrapperField<>(
+                    new BooleanField( "enable_section", false,
+                            "Set this to true to enable this entire config category. Be warned, the default settings make",
+                            "extreme changes to vanilla mechanics." ),
+                    ( wrapped ) -> DistExecutor.safeRunWhenOn( Dist.CLIENT, () ->
+                            ClientUtil.setArmorFeaturesEnabled( wrapped.get() ) ) ) ).field();
             
             SPEC.newLine();
             
             disableArmor = SPEC.define( new BooleanField( "disable_armor_damage_reduction", true,
                     "If true, armor will not reduce any damage taken. Only applies to players." ) );
-            hideArmorBar = SPEC.define( new BooleanField( "hide_armor_bar", true,
-                    "If true, the (perhaps now much less useful) armor bar will not be rendered." ) );
+            hideArmorBar = SPEC.define( new InjectionWrapperField<>(
+                    new BooleanField( "hide_armor_bar", true,
+                            "If true, the (perhaps now much less useful) armor bar will not be rendered." ),
+                    ( wrapped ) -> DistExecutor.safeRunWhenOn( Dist.CLIENT, () ->
+                            ClientUtil.setHideArmorBar( wrapped.get() ) ) ) );
             
             SPEC.newLine();
             
