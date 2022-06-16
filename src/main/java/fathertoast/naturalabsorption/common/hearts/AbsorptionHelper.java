@@ -94,10 +94,10 @@ public class AbsorptionHelper {
     /** Recalculates and reapplies all equipment absorption modifiers. */
     public static void updateEquipmentAbsorption( Player player, double previousMaxAbsorb ) {
         if( HeartManager.isAbsorptionEnabled() ) {
-            if( Config.EQUIPMENT.ENCHANTMENT.enabled.get() )
-                setAbsorptionModifier( player, false, EQUIP_MODIFIER_ENCHANT, AbsorptionEnchantment.getMaxAbsorptionBonus( player ) );
-            if( HeartManager.isArmorReplacementEnabled() )
-                setAbsorptionModifier( player, false, EQUIP_MODIFIER_ARMOR_REPLACE, getArmorReplacementBonus( player ) );
+            setAbsorptionModifier( player, false, EQUIP_MODIFIER_ENCHANT, Config.EQUIPMENT.ENCHANTMENT.enabled.get() ?
+                    AbsorptionEnchantment.getMaxAbsorptionBonus( player ) : 0.0 );
+            setAbsorptionModifier( player, false, EQUIP_MODIFIER_ARMOR_REPLACE, HeartManager.isArmorReplacementEnabled() ?
+                    getArmorReplacementBonus( player ) : 0.0 );
             
             final double finalMaxAbsorb = getMaxAbsorption( player );
             if( previousMaxAbsorb > finalMaxAbsorb ) {
@@ -179,7 +179,8 @@ public class AbsorptionHelper {
         if( natural ) {
             instance.addPermanentModifier( newModifier );
         }
-        else {
+        else if( value != 0.0 ) {
+            // Do not re-apply transient modifiers with no value
             instance.addTransientModifier( newModifier );
         }
     }
