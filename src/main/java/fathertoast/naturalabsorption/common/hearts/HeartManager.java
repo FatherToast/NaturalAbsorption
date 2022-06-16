@@ -127,15 +127,15 @@ public class HeartManager {
     private int cleanupCounter = 0;
     // The counter to the next update.
     private int updateCounter = 0;
-
+    
     private MinecraftServer server = null;
-
+    
     /**
      * Called when the minecraft server is starting.
      * Here we retrieve the server instance for later use.
      */
     @SubscribeEvent
-    public void onServerStart(ServerStartingEvent event) {
+    public void onServerStart( ServerStartingEvent event ) {
         this.server = event.getServer();
     }
     
@@ -225,7 +225,7 @@ public class HeartManager {
             if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingMax.get() != 0.0 ) {
                 // Apply healing from food
                 final ItemStack stack = event.getItem();
-                if( !stack.isEmpty() && stack.getItem().getFoodProperties() != null ) {
+                if( !stack.isEmpty() && stack.getItem().getFoodProperties( stack, player ) != null ) {
                     // Ignore the max if setting is negative
                     final float maxHealing = Config.HEALTH.GENERAL.foodHealingMax.get() < 0.0 ? Float.POSITIVE_INFINITY :
                             (float) Config.HEALTH.GENERAL.foodHealingMax.get();
@@ -239,9 +239,15 @@ public class HeartManager {
                         NaturalAbsorption.LOG.warn( "Failed to calculate actual hunger/saturation gained from eating! Item:[{}]",
                                 stack.toString() );
                         
-                        final FoodProperties food = stack.getItem().getFoodProperties(stack, player);
-                        hunger = food.getNutrition();
-                        saturation = calculateSaturation( hunger, food.getSaturationModifier() );
+                        final FoodProperties food = stack.getItem().getFoodProperties( stack, player );
+                        if( food == null ) {
+                            hunger = 0;
+                            saturation = 0.0F;
+                        }
+                        else {
+                            hunger = food.getNutrition();
+                            saturation = calculateSaturation( hunger, food.getSaturationModifier() );
+                        }
                     }
                     else {
                         // Calculate actual hunger and saturation gained
@@ -272,8 +278,8 @@ public class HeartManager {
     @OnlyIn( Dist.CLIENT )
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemTooltip( ItemTooltipEvent event ) {
-        final FoodProperties food = event.getItemStack().getItem().getFoodProperties(event.getItemStack(), event.getPlayer());
-
+        final FoodProperties food = event.getItemStack().getItem().getFoodProperties( event.getItemStack(), event.getPlayer() );
+        
         if( food != null ) {
             final int hunger = food.getNutrition();
             final float saturation = calculateSaturation( hunger, food.getSaturationModifier() );
