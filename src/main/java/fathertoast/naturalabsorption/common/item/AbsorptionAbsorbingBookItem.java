@@ -5,30 +5,27 @@ import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.Block;
+import net.minecraft.ChatFormatting;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+
 import java.util.List;
 
 import static fathertoast.naturalabsorption.common.item.AbsorptionBookItem.getLevelCost;
@@ -39,20 +36,20 @@ public class AbsorptionAbsorbingBookItem extends Item {
     
     public AbsorptionAbsorbingBookItem() {
         super( new Item.Properties()
-                .tab( ItemGroup.TAB_COMBAT )
+                .tab( CreativeModeTab.TAB_COMBAT )
                 .stacksTo( 1 ) );
     }
     
     @Override
-    public ActionResult<ItemStack> use( World world, PlayerEntity player, Hand hand ) {
+    public InteractionResultHolder<ItemStack> use( Level level, Player player, InteractionHand hand ) {
         // Check if this item is enabled in the config
         if( !HeartManager.isAbsorptionEnabled() || !Config.ABSORPTION.NATURAL.spongeBookEnabled.get() ) {
-            return super.use( world, player, hand );
+            return super.use( level, player, hand );
         }
         final boolean isCreative = player.isCreative();
         final ItemStack spongeBook = player.getItemInHand( hand );
         
-        if( !world.isClientSide ) {
+        if( !level.isClientSide ) {
             final double naturalAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( player );
             
             if( naturalAbsorption > 0.0F ) {
@@ -63,7 +60,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
                 if( !isCreative ) {
                     spongeBook.shrink( 1 );
                     if( Config.ABSORPTION.NATURAL.spongeBookBookRefund.get() )
-                        Block.popResource( world, player.blockPosition(), new ItemStack( NAItems.ABSORPTION_BOOK.get() ) );
+                        Block.popResource( level, player.blockPosition(), new ItemStack( NAItems.ABSORPTION_BOOK.get() ) );
                 }
                 
                 // Apply downgrade effects and notify client
@@ -74,27 +71,27 @@ public class AbsorptionAbsorbingBookItem extends Item {
                 }
                 AbsorptionHelper.addBaseNaturalAbsorption( player, true, -Config.ABSORPTION.NATURAL.upgradeGain.get() );
                 player.awardStat( Stats.ITEM_USED.get( this ) );
-                world.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.WOOL_PLACE, SoundCategory.PLAYERS, 0.9F, 1.0F );
-                world.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.75F, 1.0F );
+                level.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.WOOL_PLACE, SoundSource.PLAYERS, 0.9F, 1.0F );
+                level.playSound( null, player.getX(), player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.75F, 1.0F );
                 
-                return ActionResult.consume( spongeBook );
+                return InteractionResultHolder.consume( spongeBook );
             }
             else {
                 // Give the player feedback on failure
-                player.displayClientMessage( new TranslationTextComponent( References.NOT_ENOUGH_ABSORPTION ), true );
-                return ActionResult.fail( spongeBook );
+                player.displayClientMessage( new TranslatableComponent( References.NOT_ENOUGH_ABSORPTION ), true );
+                return InteractionResultHolder.fail( spongeBook );
             }
         }
-        return ActionResult.success( spongeBook );
+        return InteractionResultHolder.success( spongeBook );
     }
     
     @Override
     @OnlyIn( value = Dist.CLIENT )
-    public void appendHoverText( ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag ) {
+    public void appendHoverText( ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag ) {
         if( !Config.ABSORPTION.NATURAL.spongeBookEnabled.get() )
             return;
         
-        final PlayerEntity player = Minecraft.getInstance().player;
+        final Player player = Minecraft.getInstance().player;
         
         if( player == null )
             return;
@@ -104,26 +101,26 @@ public class AbsorptionAbsorbingBookItem extends Item {
         final float levelRefundMulti = (float) Config.ABSORPTION.NATURAL.spongeBookLevelRefundMulti.get();
         final int levelsReturned = (int) (levelRefundMulti * getLevelCost( naturalAbsorption - gainOnUse ));
         
-        tooltip.add( new StringTextComponent( "" ) );
+        tooltip.add( new TextComponent( "" ) );
         
         // Tell player how much absorption they lose on use
-        tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
-        tooltip.add( new TranslationTextComponent( TextFormatting.RED + References.translate( References.BOOK_MAX, "-" + References.prettyToString( gainOnUse ) ).getString() ) );
+        tooltip.add( new TranslatableComponent( ChatFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
+        tooltip.add( new TranslatableComponent( ChatFormatting.RED + References.translate( References.BOOK_MAX, "-" + References.prettyToString( gainOnUse ) ).getString() ) );
         
-        tooltip.add( new StringTextComponent( "" ) );
+        tooltip.add( new TextComponent( "" ) );
         
         // Provide feedback on usability
         if( levelRefundMulti > 0.0F ) {
-            tooltip.add( new TranslationTextComponent( TextFormatting.GREEN + References.translate( References.SPONGE_BOOK_REFUND, levelsReturned ).getString() ) );
+            tooltip.add( new TranslatableComponent( ChatFormatting.GREEN + References.translate( References.SPONGE_BOOK_REFUND, levelsReturned ).getString() ) );
         }
         if( naturalAbsorption > 0.0F ) {
-            tooltip.add( new TranslationTextComponent( TextFormatting.GRAY + References.translate( References.BOOK_CAN_USE ).getString() ) );
+            tooltip.add( new TranslatableComponent( ChatFormatting.GRAY + References.translate( References.BOOK_CAN_USE ).getString() ) );
         }
         else {
-            tooltip.add( new TranslationTextComponent( TextFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
+            tooltip.add( new TranslatableComponent( ChatFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
         }
     }
     
     @Override
-    public Rarity getRarity( ItemStack stack ) { return Rarity.RARE; }
+    public Rarity getRarity(ItemStack stack ) { return Rarity.RARE; }
 }

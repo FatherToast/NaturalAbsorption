@@ -1,6 +1,6 @@
 package fathertoast.naturalabsorption.api;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nonnull;
 
@@ -37,7 +37,7 @@ public interface INaturalAbsorption {
      * @throws IllegalArgumentException if called on client.
      */
     @Nonnull
-    IHeartData getHeartData( @Nonnull PlayerEntity player );
+    IHeartData getHeartData( @Nonnull Player player );
     
     /**
      * @return The API IAbsorptionAccessor instance.

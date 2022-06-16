@@ -4,7 +4,7 @@ import fathertoast.naturalabsorption.api.IAbsorptionAccessor;
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.INaturalAbsorption;
 import fathertoast.naturalabsorption.common.hearts.HeartData;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nonnull;
 
@@ -24,7 +24,7 @@ public class NaturalAbsorptionAPI implements INaturalAbsorption {
      */
     @Nonnull
     @Override
-    public IHeartData getHeartData( @Nonnull PlayerEntity player ) { return HeartData.get( player ); }
+    public IHeartData getHeartData( @Nonnull Player player ) { return HeartData.get( player ); }
     
     /**
      * @return The API IAbsorptionAccessor instance.

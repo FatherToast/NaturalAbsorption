@@ -4,10 +4,10 @@ import fathertoast.naturalabsorption.common.config.file.TomlHelper;
 import fathertoast.naturalabsorption.common.config.util.EntityEntry;
 import fathertoast.naturalabsorption.common.config.util.EntityList;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;

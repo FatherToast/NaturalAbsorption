@@ -2,18 +2,18 @@ package fathertoast.naturalabsorption.common.enchantment;
 
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.DungeonHooks;
 
 public
 class AbsorptionEnchantment extends Enchantment {
     
-    private static final EquipmentSlotType[] VALID_SLOTS = {
-            EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD
+    private static final EquipmentSlot[] VALID_SLOTS = {
+            EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD
     };
     
     public AbsorptionEnchantment() {
@@ -21,7 +21,7 @@ class AbsorptionEnchantment extends Enchantment {
     }
     
     /** @return The maximum absorption granted by enchantments. */
-    public static float getMaxAbsorptionBonus( PlayerEntity player ) {
+    public static float getMaxAbsorptionBonus( Player player ) {
         // Calculate enchantment level
         int enchantLevel;
         

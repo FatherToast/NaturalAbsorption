@@ -2,7 +2,7 @@ package fathertoast.naturalabsorption.common.config.field;
 
 import fathertoast.naturalabsorption.common.config.file.TomlHelper;
 import fathertoast.naturalabsorption.common.config.util.BlockList;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

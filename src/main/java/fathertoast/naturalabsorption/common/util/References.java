@@ -2,8 +2,8 @@ package fathertoast.naturalabsorption.common.util;
 
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.function.Supplier;
 
@@ -41,7 +41,7 @@ public class References {
     
     //---------------- FORMAT METHODS -------------------
     
-    public static ITextComponent translate( String key, Object... args ) { return new TranslationTextComponent( key, args ); }
+    public static Component translate(String key, Object... args ) { return new TranslatableComponent( key, args ); }
     
     public static String prettyToString( float value ) {
         return Math.round( value ) == value ? Integer.toString( Math.round( value ) ) : Float.toString( Math.round( value * 100.0F ) / 100.0F );

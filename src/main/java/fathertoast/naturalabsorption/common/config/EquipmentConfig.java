@@ -7,7 +7,7 @@ import fathertoast.naturalabsorption.common.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.EnchantArmorType;
 import fathertoast.naturalabsorption.common.util.EnchantmentRarity;
 import fathertoast.naturalabsorption.common.util.References;
-import net.minecraft.enchantment.ProtectionEnchantment;
+import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 
 import java.io.File;
 

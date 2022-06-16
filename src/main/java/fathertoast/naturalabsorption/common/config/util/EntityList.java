@@ -2,8 +2,8 @@ package fathertoast.naturalabsorption.common.config.util;
 
 import fathertoast.naturalabsorption.common.config.field.IStringArray;
 import fathertoast.naturalabsorption.common.config.file.TomlHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.ArrayList;
 import java.util.List;
