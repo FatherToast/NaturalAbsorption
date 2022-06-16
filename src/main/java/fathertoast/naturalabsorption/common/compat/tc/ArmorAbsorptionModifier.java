@@ -19,7 +19,6 @@ import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 import slimeknights.tconstruct.library.utils.TooltipKey;
-import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -39,9 +38,6 @@ public class ArmorAbsorptionModifier extends Modifier {
     public ArmorAbsorptionModifier() {
         super( );
     }
-
-    //TODO - Color
-    // 0xFFF923
 
     @Override
     public void addVolatileData( ToolRebuildContext context, int level, ModDataNBT volatileData ) {

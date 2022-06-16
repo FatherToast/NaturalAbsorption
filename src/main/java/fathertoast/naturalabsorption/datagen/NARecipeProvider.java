@@ -12,6 +12,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.modifiers.Modifier;
+import slimeknights.tconstruct.library.modifiers.ModifierId;
 import slimeknights.tconstruct.library.recipe.modifiers.adding.IncrementalModifierRecipeBuilder;
 import slimeknights.tconstruct.library.recipe.modifiers.adding.ModifierRecipeBuilder;
 import slimeknights.tconstruct.library.tools.SlotType;
@@ -56,17 +57,17 @@ public class NARecipeProvider extends RecipeProvider {
         final String compatFolder = "tools/modifiers/compat/";
         final String compatSalvage = "tools/modifiers/salvage/compat/";
         
-        ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION.getId() )
+        ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION_ID )
                 .addInput( NAItems.ABSORPTION_BOOK.get() )
                 .setTools( TinkerTags.Items.ARMOR )
                 .setSlots( SlotType.DEFENSE, 1 )
                 .setMaxLevel( 3 )
-                .save( consumer, prefix( "tconstruct", NAModifiers.ARMOR_ABSORPTION, upgradeFolder ) );
+                .save( consumer, prefix( "tconstruct", NAModifiers.ARMOR_ABSORPTION_ID, upgradeFolder ) );
     }
     
     
-    public ResourceLocation prefix(String modid, Modifier modifier, String prefix ) {
-        ResourceLocation loc = Objects.requireNonNull( modifier.getId() );
+    public ResourceLocation prefix(String modid, ModifierId modifierId, String prefix ) {
+        ResourceLocation loc = Objects.requireNonNull( modifierId );
         return new ResourceLocation( modid, prefix + loc.getPath() );
     }
 }
