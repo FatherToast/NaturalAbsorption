@@ -1,20 +1,17 @@
 package fathertoast.naturalabsorption.common.compat.tc;
 
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.registries.DeferredRegister;
-import slimeknights.tconstruct.library.modifiers.Modifier;
-
-import java.util.function.Supplier;
+import net.minecraft.resources.ResourceLocation;
+import slimeknights.tconstruct.library.modifiers.ModifierId;
+import slimeknights.tconstruct.library.modifiers.ModifierManager;
 
 public class NAModifiers {
 
-    public static final DeferredRegister<Modifier> MODIFIERS = DeferredRegister.create(Modifier.class, NaturalAbsorption.MOD_ID);
+    public static final ModifierId ARMOR_ABSORPTION_ID = new ModifierId(NaturalAbsorption.resourceLoc("armor_absorption"));
+    public static final ArmorAbsorptionModifier ARMOR_ABSORPTION = new ArmorAbsorptionModifier();
 
-    public static final RegistryObject<ArmorAbsorptionModifier> ARMOR_ABSORPTION = register("armor_absorption", ArmorAbsorptionModifier::new);
 
-
-    private static <T extends Modifier> RegistryObject<T> register(String name, Supplier<T> supplier) {
-        return MODIFIERS.register(name, supplier);
+    public static void onModifierRegister(ModifierManager.ModifierRegistrationEvent event) {
+        event.registerStatic(ARMOR_ABSORPTION_ID, ARMOR_ABSORPTION);
     }
 }

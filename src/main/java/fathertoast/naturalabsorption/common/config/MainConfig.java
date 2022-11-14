@@ -2,7 +2,7 @@ package fathertoast.naturalabsorption.common.config;
 
 import fathertoast.naturalabsorption.common.config.field.*;
 import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
-import net.minecraft.world.GameRules;
+import net.minecraft.world.level.GameRules;
 
 import java.io.File;
 

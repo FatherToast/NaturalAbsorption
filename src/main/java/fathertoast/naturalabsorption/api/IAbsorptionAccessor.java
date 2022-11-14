@@ -1,6 +1,6 @@
 package fathertoast.naturalabsorption.api;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -14,22 +14,22 @@ public interface IAbsorptionAccessor {
     /**
      * @return The player's max absorption, from all sources combined. In other words, the actual limit on absorption recovery.
      */
-    double getMaxAbsorption( PlayerEntity player );
+    double getMaxAbsorption( Player player );
     
     /**
      * @return The player's max absorption not counting buffs, limited by the global max absorption config.
      */
-    double getSteadyStateMaxAbsorption( PlayerEntity player );
+    double getSteadyStateMaxAbsorption( Player player );
     
     /**
      * @return The player's max absorption granted by natural absorption.
      */
-    double getNaturalAbsorption( PlayerEntity player );
+    double getNaturalAbsorption( Player player );
     
     /**
      * @return The player's natural absorption, ignoring all attribute modifiers.
      */
-    double getBaseNaturalAbsorption( PlayerEntity player );
+    double getBaseNaturalAbsorption( Player player );
     
     /**
      * Sets base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed.<br>
@@ -44,7 +44,7 @@ public interface IAbsorptionAccessor {
      *                               in max value, if it was lowered (accounting for modifiers).
      * @param value                  The new natural absorption value.
      */
-    void setBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value );
+    void setBaseNaturalAbsorption( Player player, boolean updateActualAbsorption, double value );
     
     /**
      * Adds (or removes) base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed.<br>
@@ -59,27 +59,27 @@ public interface IAbsorptionAccessor {
      *                               in max value, if it was lowered (accounting for modifiers).
      * @param value                  The amount of natural absorption to add (or remove, if negative).
      */
-    void addBaseNaturalAbsorption( PlayerEntity player, boolean updateActualAbsorption, double value );
+    void addBaseNaturalAbsorption( Player player, boolean updateActualAbsorption, double value );
     
     /**
      * Removes base natural absorption equal to the death penalty, down to a limit, reducing actual absorption to match.
      *
      * @param player The player to apply death penalty to.
      */
-    void applyDeathPenalty( PlayerEntity player );
+    void applyDeathPenalty( Player player );
     
     /**
      * @return The player's max absorption granted by equipment. That is, how much they would lose by unequipping everything.
      */
-    double getEquipmentAbsorption( PlayerEntity player );
+    double getEquipmentAbsorption( Player player );
     
     /**
      * @return The player's equipment absorption from enchantments, ignoring all attribute modifiers.
      */
-    double getEnchantmentAbsorption( PlayerEntity player );
+    double getEnchantmentAbsorption( Player player );
     
     /**
      * @return The player's equipment absorption from armor replacement, ignoring all attribute modifiers.
      */
-    double getArmorReplacementAbsorption( PlayerEntity player );
+    double getArmorReplacementAbsorption( Player player );
 }

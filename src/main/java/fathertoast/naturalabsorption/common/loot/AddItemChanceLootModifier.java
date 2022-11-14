@@ -4,11 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -28,7 +28,7 @@ public class AddItemChanceLootModifier extends LootModifier {
      *
      * @param conditionsIn the ILootConditions that need to be matched before the loot is modified.
      */
-    public AddItemChanceLootModifier(List<ResourceLocation> lootTables, Item item, double chance, ILootCondition[] conditionsIn) {
+    public AddItemChanceLootModifier(List<ResourceLocation> lootTables, Item item, double chance, LootItemCondition[] conditionsIn) {
         super(conditionsIn);
         this.lootTables = lootTables;
         this.item = item;
@@ -49,7 +49,7 @@ public class AddItemChanceLootModifier extends LootModifier {
     public static class Serializer extends GlobalLootModifierSerializer<AddItemChanceLootModifier> {
 
         @Override
-        public AddItemChanceLootModifier read(ResourceLocation location, JsonObject jsonObject, ILootCondition[] conditions) {
+        public AddItemChanceLootModifier read(ResourceLocation location, JsonObject jsonObject, LootItemCondition[] conditions) {
             if (jsonObject.has("item") && jsonObject.has("lootTables") && jsonObject.has("chance")) {
                 final ResourceLocation itemId = ResourceLocation.tryParse(jsonObject.get("item").getAsString());
 

@@ -3,10 +3,10 @@ package fathertoast.naturalabsorption.common.hearts;
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
 import fathertoast.naturalabsorption.common.config.Config;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class HeartData implements IHeartData {
      * @return The player's heart data.
      */
     @Nonnull
-    public static HeartData get( @Nonnull PlayerEntity player ) {
+    public static HeartData get( @Nonnull Player player ) {
         if( player.level.isClientSide ) {
             throw new IllegalArgumentException( "Heart data is only stored on the server side!" );
         }
@@ -45,8 +45,8 @@ public class HeartData implements IHeartData {
         return data;
     }
     
-    public final PlayerEntity owner;
-    private final CompoundNBT saveTag;
+    public final Player owner;
+    private final CompoundTag saveTag;
     
     private int absorptionRecoveryDelay;
     private int healthRecoveryDelay;
@@ -93,7 +93,7 @@ public class HeartData implements IHeartData {
     
     /** Helper method to set the player's current absorption; clamps the value between 0 and the player's personal maximum. */
     public void setAbsorption( float value ) {
-        owner.setAbsorptionAmount( MathHelper.clamp( value, 0.0F, (float) AbsorptionHelper.getMaxAbsorption( owner ) ) );
+        owner.setAbsorptionAmount( Mth.clamp( value, 0.0F, (float) AbsorptionHelper.getMaxAbsorption( owner ) ) );
     }
     
     /** Updates the player's absorption and health values by the number of ticks since this was last updated. */
@@ -211,7 +211,7 @@ public class HeartData implements IHeartData {
         }
     }
     
-    private HeartData( PlayerEntity player ) {
+    private HeartData( Player player ) {
         owner = player;
         saveTag = getModNBTTag( player );
         
@@ -238,13 +238,13 @@ public class HeartData implements IHeartData {
     }
     
     /** @return The nbt tag compound that holds all of this mod's data. */
-    private static CompoundNBT getModNBTTag( PlayerEntity player ) {
+    private static CompoundTag getModNBTTag( Player player ) {
         // Start with the base entity forge data
-        CompoundNBT tag = player.getPersistentData().getCompound( PlayerEntity.PERSISTED_NBT_TAG );
+        CompoundTag tag = player.getPersistentData().getCompound( Player.PERSISTED_NBT_TAG );
         
         // Get/make a tag unique to this mod
         if( !tag.contains( NaturalAbsorptionAPI.TAG_BASE, tag.getId() ) ) {
-            tag.put( NaturalAbsorptionAPI.TAG_BASE, new CompoundNBT() );
+            tag.put( NaturalAbsorptionAPI.TAG_BASE, new CompoundTag() );
         }
         return tag.getCompound( NaturalAbsorptionAPI.TAG_BASE );
     }

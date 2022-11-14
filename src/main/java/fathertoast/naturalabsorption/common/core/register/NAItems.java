@@ -3,10 +3,10 @@ package fathertoast.naturalabsorption.common.core.register;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.item.AbsorptionAbsorbingBookItem;
 import fathertoast.naturalabsorption.common.item.AbsorptionBookItem;
-import net.minecraft.item.Item;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class NAItems {
     

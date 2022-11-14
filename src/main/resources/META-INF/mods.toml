@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[36,)"
+loaderVersion = "[40,)"
 license = "GNU General Public License v3.0"
 issueTrackerURL = "https://github.com/FatherToast/NaturalAbsorption/issues/"
 
@@ -29,20 +29,20 @@ Sarinsa's Discord: https://discord.gg/8FhRDZGAvX
 [[dependencies.naturalabsorption]]
 modId = "forge"
 mandatory = true
-versionRange = "[36.1.4,)"
+versionRange = "[40.0.0,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.naturalabsorption]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.16.5,1.17)"
+versionRange = "[1.18.2,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.naturalabsorption]]
 modId = "tconstruct"
 mandatory = false
-versionRange = "[3.3.4.335,)"
+versionRange = "[3.5.1.31,)"
 ordering = "BEFORE"
 side = "BOTH"

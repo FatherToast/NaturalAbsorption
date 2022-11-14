@@ -4,21 +4,22 @@ import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Food;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
@@ -28,22 +29,24 @@ import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.LogicalSidedProvider;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class HeartManager {
     /** Map of all players that have had equipment changes since the last tick, linked to their previous max absorption. */
-    private static final HashMap<PlayerEntity, Double> PLAYER_EQUIPMENT_TRACKER = new HashMap<>();
+    private static final HashMap<Player, Double> PLAYER_EQUIPMENT_TRACKER = new HashMap<>();
     
     /** Set of all currently altered damage sources. */
     private static final Set<DamageSource> MODDED_SOURCES = new HashSet<>();
     
     /** Map of all currently tracked players to their last known hunger state. */
-    private static final HashMap<PlayerEntity, HungerState> PLAYER_HUNGER_STATE_TRACKER = new HashMap<>();
+    private static final HashMap<Player, HungerState> PLAYER_HUNGER_STATE_TRACKER = new HashMap<>();
     
     /** @return True if health features in this mod are enabled. */
     public static boolean isHealthEnabled() { return !Config.MAIN.GENERAL.disableHealthFeatures.get(); }
@@ -55,7 +58,7 @@ public class HeartManager {
     public static boolean isArmorReplacementEnabled() { return Config.EQUIPMENT.ARMOR.enabled.get(); }
     
     /** Marks a player as having equipment changes and records their current max absorption. */
-    private static void trackPlayerEquipmentChange( PlayerEntity player ) {
+    private static void trackPlayerEquipmentChange( Player player ) {
         // This will not be called multiple times per tick for the same player under normal circumstances; however, in
         // case it does happen, we can safely ignore repeat calls since we only care about the initial & final states
         if( !PLAYER_EQUIPMENT_TRACKER.containsKey( player ) ) {
@@ -67,7 +70,7 @@ public class HeartManager {
     private static void applyPlayerEquipmentChanges() {
         if( PLAYER_EQUIPMENT_TRACKER.isEmpty() ) return;
         
-        for( Map.Entry<PlayerEntity, Double> entry : PLAYER_EQUIPMENT_TRACKER.entrySet() ) {
+        for( Map.Entry<Player, Double> entry : PLAYER_EQUIPMENT_TRACKER.entrySet() ) {
             AbsorptionHelper.updateEquipmentAbsorption( entry.getKey(), entry.getValue() );
         }
         PLAYER_EQUIPMENT_TRACKER.clear();
@@ -97,7 +100,7 @@ public class HeartManager {
     }
     
     /** Creates or updates a player's tracked hunger state. */
-    private static void trackPlayerHungerState( PlayerEntity player ) {
+    private static void trackPlayerHungerState( Player player ) {
         final HungerState hungerState = PLAYER_HUNGER_STATE_TRACKER.get( player );
         if( hungerState == null ) {
             PLAYER_HUNGER_STATE_TRACKER.put( player, new HungerState( player ) );
@@ -108,12 +111,12 @@ public class HeartManager {
     }
     
     /** Deletes a player's tracked hunger state. */
-    private static void clearPlayerHungerState( PlayerEntity player ) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
+    private static void clearPlayerHungerState( Player player ) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
     
     /** @return The max absorption granted by potion effects. */
-    public static float getPotionAbsorption( PlayerEntity player ) {
-        if( player.hasEffect( Effects.ABSORPTION ) ) {
-            final EffectInstance absorptionPotion = player.getEffect( Effects.ABSORPTION );
+    public static float getPotionAbsorption( Player player ) {
+        if( player.hasEffect( MobEffects.ABSORPTION ) ) {
+            final MobEffectInstance absorptionPotion = player.getEffect( MobEffects.ABSORPTION );
             if( absorptionPotion != null )
                 return 4.0F * (absorptionPotion.getAmplifier() + 1);
         }
@@ -125,6 +128,17 @@ public class HeartManager {
     // The counter to the next update.
     private int updateCounter = 0;
     
+    private MinecraftServer server = null;
+    
+    /**
+     * Called when the minecraft server is starting.
+     * Here we retrieve the server instance for later use.
+     */
+    @SubscribeEvent
+    public void onServerStart( ServerStartingEvent event ) {
+        this.server = event.getServer();
+    }
+    
     /**
      * Called each server tick.
      * <p>
@@ -135,7 +149,6 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
-            final MinecraftServer server = LogicalSidedProvider.INSTANCE.get( LogicalSide.SERVER );
             
             // Apply queued events
             applyPlayerEquipmentChanges();
@@ -152,7 +165,7 @@ public class HeartManager {
             if( ++updateCounter >= Config.MAIN.GENERAL.updateTime.get() ) {
                 updateCounter = 0;
                 
-                for( ServerPlayerEntity player : server.getPlayerList().getPlayers() ) {
+                for( ServerPlayer player : server.getPlayerList().getPlayers() ) {
                     // Update each player's heart data
                     if( player != null && player.isAlive() ) HeartData.get( player ).update();
                 }
@@ -167,9 +180,9 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseStart( LivingEntityUseItemEvent.Start event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
             // Start watching hunger
-            trackPlayerHungerState( (PlayerEntity) event.getEntityLiving() );
+            trackPlayerHungerState( player );
         }
     }
     
@@ -180,9 +193,9 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseTick( LivingEntityUseItemEvent.Tick event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
             // Update watched hunger, just in case anything changes mid-use
-            trackPlayerHungerState( (PlayerEntity) event.getEntityLiving() );
+            trackPlayerHungerState( player );
         }
     }
     
@@ -193,9 +206,9 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseStop( LivingEntityUseItemEvent.Stop event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
+        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
             // Stop watching hunger; item was not food or eating was canceled
-            clearPlayerHungerState( (PlayerEntity) event.getEntityLiving() );
+            clearPlayerHungerState( player );
         }
     }
     
@@ -208,12 +221,11 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseFinish( LivingEntityUseItemEvent.Finish event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
-            final PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
             if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingMax.get() != 0.0 ) {
                 // Apply healing from food
                 final ItemStack stack = event.getItem();
-                if( !stack.isEmpty() && stack.getItem().getFoodProperties() != null ) {
+                if( !stack.isEmpty() && stack.getItem().getFoodProperties( stack, player ) != null ) {
                     // Ignore the max if setting is negative
                     final float maxHealing = Config.HEALTH.GENERAL.foodHealingMax.get() < 0.0 ? Float.POSITIVE_INFINITY :
                             (float) Config.HEALTH.GENERAL.foodHealingMax.get();
@@ -227,9 +239,15 @@ public class HeartManager {
                         NaturalAbsorption.LOG.warn( "Failed to calculate actual hunger/saturation gained from eating! Item:[{}]",
                                 stack.toString() );
                         
-                        final Food food = stack.getItem().getFoodProperties();
-                        hunger = food.getNutrition();
-                        saturation = calculateSaturation( hunger, food.getSaturationModifier() );
+                        final FoodProperties food = stack.getItem().getFoodProperties( stack, player );
+                        if( food == null ) {
+                            hunger = 0;
+                            saturation = 0.0F;
+                        }
+                        else {
+                            hunger = food.getNutrition();
+                            saturation = calculateSaturation( hunger, food.getSaturationModifier() );
+                        }
                     }
                     else {
                         // Calculate actual hunger and saturation gained
@@ -260,7 +278,8 @@ public class HeartManager {
     @OnlyIn( Dist.CLIENT )
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemTooltip( ItemTooltipEvent event ) {
-        final Food food = event.getItemStack().getItem().getFoodProperties();
+        final FoodProperties food = event.getItemStack().getItem().getFoodProperties( event.getItemStack(), event.getPlayer() );
+        
         if( food != null ) {
             final int hunger = food.getNutrition();
             final float saturation = calculateSaturation( hunger, food.getSaturationModifier() );
@@ -268,11 +287,11 @@ public class HeartManager {
             if( Config.MAIN.GENERAL.foodExtraTooltipInfo.get() ) {
                 // Food nutrition values could theoretically be zero or negative, make sure we handle that
                 if( hunger != 0 ) {
-                    event.getToolTip().add( new TranslationTextComponent( (hunger > 0 ? TextFormatting.BLUE : TextFormatting.RED) +
+                    event.getToolTip().add( new TranslatableComponent( (hunger > 0 ? ChatFormatting.BLUE : ChatFormatting.RED) +
                             References.translate( References.FOOD_HUNGER, String.format( "%+d", -hunger ) ).getString() ) );
                 }
                 if( saturation != 0.0F ) {
-                    event.getToolTip().add( new TranslationTextComponent( (saturation > 0.0F ? TextFormatting.BLUE : TextFormatting.RED) +
+                    event.getToolTip().add( new TranslatableComponent( (saturation > 0.0F ? ChatFormatting.BLUE : ChatFormatting.RED) +
                             References.translate( References.FOOD_SATURATION, (saturation > 0.0F ? "+" : "") + References.prettyToString( saturation ) ).getString() ) );
                 }
             }
@@ -282,7 +301,7 @@ public class HeartManager {
                         (float) Config.HEALTH.GENERAL.foodHealingMax.get();
                 final float healing = Math.min( getFoodHealing( hunger, saturation ), maxHealing );
                 if( healing > 0.0F ) {
-                    event.getToolTip().add( new TranslationTextComponent( TextFormatting.BLUE + References.translate( References.FOOD_HEALTH, "+" + References.prettyToString( healing ) ).getString() ) );
+                    event.getToolTip().add( new TranslatableComponent( ChatFormatting.BLUE + References.translate( References.FOOD_HEALTH, "+" + References.prettyToString( healing ) ).getString() ) );
                 }
             }
         }
@@ -312,7 +331,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event ) {
-        final PlayerEntity player = event.getPlayer();
+        final Player player = event.getPlayer();
         if( !player.level.isClientSide && !event.isEndConquered() ) {
             // Apply death penalty
             AbsorptionHelper.applyDeathPenalty( player );
@@ -343,8 +362,8 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.HIGHEST )
     public void onPlayerEquipmentChange( LivingEquipmentChangeEvent event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity ) {
-            trackPlayerEquipmentChange( (PlayerEntity) event.getEntityLiving() );
+        if( event.getEntityLiving() instanceof Player player ) {
+            trackPlayerEquipmentChange( player );
         }
     }
     
@@ -352,17 +371,17 @@ public class HeartManager {
      * Adds our absorption attributes to the player entity type. Individually registered to the mod event bus.
      */
     public static void onEntityAttributeCreation( @SuppressWarnings( "unused" ) EntityAttributeCreationEvent event ) {
-        AttributeModifierMap modifierMap = GlobalEntityTypeAttributes.getSupplier( EntityType.PLAYER );
-        AttributeModifierMap.MutableAttribute builder = AttributeModifierMap.builder();
+        AttributeSupplier attributeSupplier = DefaultAttributes.getSupplier( EntityType.PLAYER );
+        AttributeSupplier.Builder builder = AttributeSupplier.builder();
         
         builder.add( NAAttributes.NATURAL_ABSORPTION.get(), 0.0 );
         builder.add( NAAttributes.EQUIPMENT_ABSORPTION.get(), 0.0 );
-        AttributeModifierMap newModifierMap = builder.build();
-        Map<Attribute, ModifiableAttributeInstance> map = new HashMap<>();
+        AttributeSupplier newAttributeSupplier = builder.build();
+        Map<Attribute, AttributeInstance> map = new HashMap<>();
         
-        map.putAll( modifierMap.instances );
-        map.putAll( newModifierMap.instances );
-        modifierMap.instances = map;
+        map.putAll( attributeSupplier.instances );
+        map.putAll( newAttributeSupplier.instances );
+        attributeSupplier.instances = map;
     }
     
     /**
@@ -374,8 +393,8 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public void onLivingHurt( LivingHurtEvent event ) {
-        if( event.getEntityLiving() instanceof PlayerEntity && !event.getEntityLiving().level.isClientSide ) {
-            HeartData data = HeartData.get( (PlayerEntity) event.getEntityLiving() );
+        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
+            HeartData data = HeartData.get( player );
             
             // Interrupt recovery
             data.startRecoveryDelay();
@@ -423,7 +442,7 @@ public class HeartManager {
     
     // Used to degrade armor durability when armor damage reduction is disabled.
     private void damageArmor( LivingHurtEvent event ) {
-        final PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+        final Player player = (Player) event.getEntityLiving();
         
         float durabilityDamage = event.getAmount();
         
@@ -436,7 +455,7 @@ public class HeartManager {
         
         // Degrade armor durability
         if( !event.getSource().isBypassInvul() && durabilityDamage > 0.0F ) {
-            player.inventory.hurtArmor( event.getSource(), durabilityDamage );
+            player.getInventory().hurtArmor( event.getSource(), durabilityDamage, Inventory.ALL_ARMOR_SLOTS );
         }
     }
     
@@ -447,9 +466,9 @@ public class HeartManager {
         int food;
         float saturation;
         
-        HungerState( PlayerEntity player ) { update( player ); }
+        HungerState( Player player ) { update( player ); }
         
-        void update( PlayerEntity player ) {
+        void update( Player player ) {
             food = player.getFoodData().getFoodLevel();
             saturation = player.getFoodData().getSaturationLevel();
         }

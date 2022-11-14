@@ -3,14 +3,16 @@ package fathertoast.naturalabsorption.datagen;
 import fathertoast.naturalabsorption.common.compat.tc.NAModifiers;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.RecipeProvider;
-import net.minecraft.data.ShapelessRecipeBuilder;
-import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import slimeknights.tconstruct.common.TinkerTags;
+import slimeknights.tconstruct.library.modifiers.Modifier;
+import slimeknights.tconstruct.library.modifiers.ModifierId;
 import slimeknights.tconstruct.library.recipe.modifiers.adding.IncrementalModifierRecipeBuilder;
 import slimeknights.tconstruct.library.recipe.modifiers.adding.ModifierRecipeBuilder;
 import slimeknights.tconstruct.library.tools.SlotType;
@@ -26,7 +28,7 @@ public class NARecipeProvider extends RecipeProvider {
     }
     
     @Override
-    protected void buildShapelessRecipes( Consumer<IFinishedRecipe> consumer ) {
+    protected void buildCraftingRecipes( Consumer<FinishedRecipe> consumer ) {
         ShapelessRecipeBuilder.shapeless( NAItems.ABSORPTION_ABSORBING_BOOK.get() )
                 .requires( Items.BOOK )
                 .requires( Items.SPONGE )
@@ -37,13 +39,13 @@ public class NARecipeProvider extends RecipeProvider {
         this.handleDependencyRecipes( consumer );
     }
     
-    private void handleDependencyRecipes( Consumer<IFinishedRecipe> consumer ) {
+    private void handleDependencyRecipes( Consumer<FinishedRecipe> consumer ) {
         if( ModList.get().isLoaded( "tconstruct" ) ) {
             this.tinkersRecipes( consumer );
         }
     }
     
-    private void tinkersRecipes( Consumer<IFinishedRecipe> consumer ) {
+    private void tinkersRecipes( Consumer<FinishedRecipe> consumer ) {
         final String upgradeFolder = "tools/modifiers/upgrade/";
         final String abilityFolder = "tools/modifiers/ability/";
         final String slotlessFolder = "tools/modifiers/slotless/";
@@ -55,18 +57,17 @@ public class NARecipeProvider extends RecipeProvider {
         final String compatFolder = "tools/modifiers/compat/";
         final String compatSalvage = "tools/modifiers/salvage/compat/";
         
-        ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION.get() )
+        ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION_ID )
                 .addInput( NAItems.ABSORPTION_BOOK.get() )
-                .addSalvage( NAItems.ABSORPTION_BOOK.get(), 0.5f )
                 .setTools( TinkerTags.Items.ARMOR )
                 .setSlots( SlotType.DEFENSE, 1 )
                 .setMaxLevel( 3 )
-                .build( consumer, prefix( "tconstruct", NAModifiers.ARMOR_ABSORPTION, defenseFolder ) );
+                .save( consumer, prefix( "tconstruct", NAModifiers.ARMOR_ABSORPTION_ID, upgradeFolder ) );
     }
     
     
-    public ResourceLocation prefix( String modid, Supplier<? extends IForgeRegistryEntry<?>> entry, String prefix ) {
-        ResourceLocation loc = Objects.requireNonNull( entry.get().getRegistryName() );
+    public ResourceLocation prefix(String modid, ModifierId modifierId, String prefix ) {
+        ResourceLocation loc = Objects.requireNonNull( modifierId );
         return new ResourceLocation( modid, prefix + loc.getPath() );
     }
 }

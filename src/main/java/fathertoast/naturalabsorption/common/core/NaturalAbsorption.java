@@ -12,7 +12,7 @@ import fathertoast.naturalabsorption.common.event.NAEventListener;
 import fathertoast.naturalabsorption.common.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.network.PacketHandler;
 import fathertoast.naturalabsorption.common.recipe.CraftingUtil;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
@@ -25,7 +25,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Mod( NaturalAbsorption.MOD_ID )
 public class NaturalAbsorption {
@@ -99,17 +98,24 @@ public class NaturalAbsorption {
     /**
      * Hands the mod API to mods that ask for it.
      */
+    @SuppressWarnings("unchecked")
     private void onInterModProcess( InterModProcessEvent event ) {
         event.getIMCStream().forEach( ( message ) -> {
-            if( message.getMethod().equals( "getNaturalAbsorptionAPI" ) ) {
-                Supplier<Function<INaturalAbsorption, Void>> supplier = message.getMessageSupplier();
-                supplier.get().apply( modApi );
+            if( message.method().equals( "getNaturalAbsorptionAPI" ) ) {
+                Object o = message.messageSupplier().get();
+
+                try {
+                    ((Function<INaturalAbsorption, Void>) o).apply( modApi );
+                }
+                catch (Exception ignored) {
+                    LOG.warn("Mod with ID \"{}\" asked for our API instance, but something went wrong!", message.senderModId());
+                }
             }
         } );
     }
     
     /** @return A ResourceLocation with the mod's namespace. */
-    public static ResourceLocation resourceLoc( String path ) { return new ResourceLocation( MOD_ID, path ); }
+    public static ResourceLocation resourceLoc(String path ) { return new ResourceLocation( MOD_ID, path ); }
     
     /** @return Returns a Forge registry entry as a string, or "null" if it is null. */
     public static String toString( @Nullable ForgeRegistryEntry<?> regEntry ) { return regEntry == null ? "null" : toString( regEntry.getRegistryName() ); }

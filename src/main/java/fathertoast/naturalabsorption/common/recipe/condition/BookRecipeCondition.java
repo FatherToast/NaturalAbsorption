@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.hearts.HeartManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 
@@ -34,11 +34,18 @@ public class BookRecipeCondition implements ICondition {
     public ResourceLocation getID() { return ID; }
     
     @Override
-    public boolean test() {
+    public boolean test(IContext context) {
         return HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.upgradeGain.get() > 0.0 &&
                 Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().equalsIgnoreCase( this.styleName );
     }
-    
+
+    // Deprecated. Only present to fulfill ICondition implementation
+    @SuppressWarnings("all")
+    @Override
+    public boolean test() {
+        return false;
+    }
+
     public static class Serializer implements IConditionSerializer<BookRecipeCondition> {
         
         public Serializer() { }
