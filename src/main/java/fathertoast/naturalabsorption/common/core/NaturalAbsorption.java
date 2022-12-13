@@ -2,6 +2,7 @@ package fathertoast.naturalabsorption.common.core;
 
 import fathertoast.naturalabsorption.api.INaturalAbsorption;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
+import fathertoast.naturalabsorption.common.command.CommandRegister;
 import fathertoast.naturalabsorption.common.compat.tc.NaturalAbsorptionTC;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
@@ -80,6 +81,7 @@ public class NaturalAbsorption {
         
         MinecraftForge.EVENT_BUS.register( new NAEventListener() );
         MinecraftForge.EVENT_BUS.register( new HeartManager() );
+        MinecraftForge.EVENT_BUS.addListener( CommandRegister::register );
         
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         

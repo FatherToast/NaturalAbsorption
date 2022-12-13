@@ -130,7 +130,11 @@ public class NALanguageProvider extends LanguageProvider {
             translations( References.TC_ARMOR_ABSORPTION_DESCRIPTION, "Generates additional absorption hearts",
                     "Genera corazones de absorción adicionales", "Gera corações de absorção adicionais",
                     "Génère des cœurs d'absorption supplémentaires", "Genera cuori di assorbimento aggiuntivi",
-                    "Erzeugt zusätzliche absorptionsherzen", "Hoists yer magic hearts" )
+                    "Erzeugt zusätzliche absorptionsherzen", "Hoists yer magic hearts" ),
+
+            // Commands
+            translations( References.CMD_CHANGE_ABSORPTION_SINGLE, "Updated max natural absorption for player %s", "", "", "", "", "", "" ),
+            translations( References.CMD_CHANGE_ABSORPTION_MULTIPLE, "Updated max natural absorption for %s players", "", "", "", "", "", "" )
     };
     
     /** Maps which translation key each lang code uses, allowing multiple lang codes to use the same translations. */
