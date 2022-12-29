@@ -29,8 +29,8 @@ public class References {
     public static final String ABSORPTION_BOOK_COST = ITEM_ROOT + "absorption_book.tooltip.cost";
     public static final String SPONGE_BOOK_REFUND = ITEM_ROOT + "sponge_book.tooltip.refund";
 
-    public static final String CMD_CHANGE_ABSORPTION_SINGLE = "naturalabsorption.command.change_absorption.message.single";
-    public static final String CMD_CHANGE_ABSORPTION_MULTIPLE = "naturalabsorption.command.change_absorption.message.multiple";
+    public static final String CMD_CHANGE_ABSORPTION_SINGLE = "commands.naturalabsorption.change_absorption.single.success";
+    public static final String CMD_CHANGE_ABSORPTION_MULTIPLE = "commands.naturalabsorption.change_absorption.multiple.success";
     
     // Compat
     private static final String ED_SUFFIX = ".desc";
@@ -62,6 +62,6 @@ public class References {
     
     //------------ THE OBJECT SUPPLIER SUPPLIER SUPPLIER --------------
     
-    /** A supplier that returns a supplier that returns a supplier that creates a new object. */
-    public static final Supplier<Supplier<Supplier<?>>> OBJECT_SUPPLIER_SUPPLIER_SUPPLIER = () -> () -> Object::new;
+    /** A supplier that returns a supplier that returns a supplier that returns a supplier that returns a supplier that creates a new object. */
+    public static final Supplier<Supplier<Supplier<Supplier<Supplier<?>>>>> OBJECT_SUPPLIER_SUPPLIER_SUPPLIER_SUPPLIER_SUPPLIER = () -> () -> () -> () -> Object::new;
 }
