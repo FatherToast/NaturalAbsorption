@@ -12,6 +12,8 @@ public class ClientUtil {
     
     private static boolean armorFeaturesEnabled;
     private static boolean hideArmorBar;
+
+    public static boolean OVERLAY_ENABLED = true;
     
     /** Sets whether the user wants armor features enabled, and toggles rendering if needed. */
     public static DistExecutor.SafeRunnable setArmorFeaturesEnabled( boolean value ) {
@@ -51,8 +53,7 @@ public class ClientUtil {
         return new DistExecutor.SafeRunnable() {
             @Override
             public void run() {
-                OverlayRegistry.enableOverlay( ForgeIngameGui.PLAYER_HEALTH_ELEMENT, !enable );
-                OverlayRegistry.enableOverlay( ClientRegister.ABSORPTION_BACKGROUND, enable );
+                ClientUtil.OVERLAY_ENABLED = enable;
             }
         };
     }

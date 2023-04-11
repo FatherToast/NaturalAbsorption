@@ -39,18 +39,20 @@ public class AbsorptionBackgroundOverlay implements IIngameOverlay {
     public void render( ForgeIngameGui gui, PoseStack poseStack, float partialTick, int width, int height ) {
         // Moved below; only should be done once we decide to cancel the vanilla render
         //RenderSystem.enableBlend();
-        
+
         // We still want to do the below even if we don't commit to rendering anything,
         // to smooth out rendering when we do render
         
         final Player player = Minecraft.getInstance().player;
         
-        if( player == null ) return;
+        if( player == null || !ClientUtil.OVERLAY_ENABLED ) return;
         
         final float absorbMax = (float) AbsorptionHelper.getMaxAbsorption( player );
-        
+
         if( absorbMax <= 0.0F ) return;
-        
+
+        RenderSystem.setShaderTexture(0, ForgeIngameGui.GUI_ICONS_LOCATION);
+
         final int tickCount = Minecraft.getInstance().gui.getGuiTicks();
         
         final int health = Mth.ceil( player.getHealth() );
@@ -96,7 +98,7 @@ public class AbsorptionBackgroundOverlay implements IIngameOverlay {
         random.setSeed( tickCount * 312871L );
         
         final int left = width / 2 - 91;
-        final int top = height - gui.left_height;
+        final int top = height - 39;
         gui.left_height += (healthRows * rowHeight);
         if( rowHeight != 10 ) gui.left_height += 10 - rowHeight;
         
