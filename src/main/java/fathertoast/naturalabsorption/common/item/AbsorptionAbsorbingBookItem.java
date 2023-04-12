@@ -9,8 +9,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -78,7 +76,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
             }
             else {
                 // Give the player feedback on failure
-                player.displayClientMessage( new TranslatableComponent( References.NOT_ENOUGH_ABSORPTION ), true );
+                player.displayClientMessage( Component.translatable( References.NOT_ENOUGH_ABSORPTION ), true );
                 return InteractionResultHolder.fail( spongeBook );
             }
         }
@@ -101,23 +99,23 @@ public class AbsorptionAbsorbingBookItem extends Item {
         final float levelRefundMulti = (float) Config.ABSORPTION.NATURAL.spongeBookLevelRefundMulti.get();
         final int levelsReturned = (int) (levelRefundMulti * getLevelCost( naturalAbsorption - gainOnUse ));
         
-        tooltip.add( new TextComponent( "" ) );
+        tooltip.add( Component.literal( "" ) );
         
         // Tell player how much absorption they lose on use
-        tooltip.add( new TranslatableComponent( ChatFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
-        tooltip.add( new TranslatableComponent( ChatFormatting.RED + References.translate( References.BOOK_MAX, "-" + References.prettyToString( gainOnUse ) ).getString() ) );
+        tooltip.add( Component.translatable( ChatFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
+        tooltip.add( Component.translatable( ChatFormatting.RED + References.translate( References.BOOK_MAX, "-" + References.prettyToString( gainOnUse ) ).getString() ) );
         
-        tooltip.add( new TextComponent( "" ) );
+        tooltip.add( Component.literal( "" ) );
         
         // Provide feedback on usability
         if( levelRefundMulti > 0.0F ) {
-            tooltip.add( new TranslatableComponent( ChatFormatting.GREEN + References.translate( References.SPONGE_BOOK_REFUND, levelsReturned ).getString() ) );
+            tooltip.add( Component.translatable( ChatFormatting.GREEN + References.translate( References.SPONGE_BOOK_REFUND, levelsReturned ).getString() ) );
         }
         if( naturalAbsorption > 0.0F ) {
-            tooltip.add( new TranslatableComponent( ChatFormatting.GRAY + References.translate( References.BOOK_CAN_USE ).getString() ) );
+            tooltip.add( Component.translatable( ChatFormatting.GRAY + References.translate( References.BOOK_CAN_USE ).getString() ) );
         }
         else {
-            tooltip.add( new TranslatableComponent( ChatFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
+            tooltip.add( Component.translatable( ChatFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
         }
     }
     

@@ -20,7 +20,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -122,7 +122,9 @@ public class NaturalAbsorption {
     public static ResourceLocation resourceLoc(String path ) { return new ResourceLocation( MOD_ID, path ); }
     
     /** @return Returns a Forge registry entry as a string, or "null" if it is null. */
-    public static String toString( @Nullable ForgeRegistryEntry<?> regEntry ) { return regEntry == null ? "null" : toString( regEntry.getRegistryName() ); }
+    public static <T> String toString( @Nullable T object, IForgeRegistry<T> registry ) {
+        return object == null || !registry.containsValue(object) ? "null" : toString( registry.getKey(object) );
+    }
     
     /** @return Returns the resource location as a string, or "null" if it is null. */
     public static String toString( @Nullable ResourceLocation res ) { return res == null ? "null" : res.toString(); }

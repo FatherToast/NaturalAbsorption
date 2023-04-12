@@ -28,11 +28,11 @@ public record ConfigOptionCondition(Operation operation) implements ICondition {
         final Supplier<Boolean> test;
 
         public String getName() {
-            return this.name;
+            return name;
         }
 
         public boolean test() {
-            return this.test.get();
+            return test.get();
         }
 
         @Nullable
@@ -53,14 +53,7 @@ public record ConfigOptionCondition(Operation operation) implements ICondition {
 
     @Override
     public boolean test(IContext context) {
-        return this.operation.test();
-    }
-
-    // Deprecated. Only present to fulfill ICondition implementation
-    @SuppressWarnings("all")
-    @Override
-    public boolean test() {
-        return false;
+        return operation.test();
     }
 
     public static class Serializer implements IConditionSerializer<ConfigOptionCondition> {

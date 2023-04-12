@@ -9,7 +9,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Collection;
@@ -49,10 +48,10 @@ public class NABaseCommand {
             Component message;
 
             if (players.size() == 1) {
-                message = new TranslatableComponent(References.CMD_CHANGE_ABSORPTION_SINGLE, players.iterator().next().getDisplayName());
+                message = Component.translatable(References.CMD_CHANGE_ABSORPTION_SINGLE, players.iterator().next().getDisplayName());
             }
             else {
-                message = new TranslatableComponent(References.CMD_CHANGE_ABSORPTION_MULTIPLE, players.size());
+                message = Component.translatable(References.CMD_CHANGE_ABSORPTION_MULTIPLE, players.size());
             }
             source.sendSuccess(message, true);
             return players.size();
@@ -66,10 +65,10 @@ public class NABaseCommand {
             Component message;
 
             if (players.size() == 1) {
-                message = new TranslatableComponent(References.CMD_CHANGE_ABSORPTION_SINGLE, players.iterator().next().getDisplayName());
+                message = Component.translatable(References.CMD_CHANGE_ABSORPTION_SINGLE, players.iterator().next().getDisplayName());
             }
             else {
-                message = new TranslatableComponent(References.CMD_CHANGE_ABSORPTION_MULTIPLE, players.size());
+                message = Component.translatable(References.CMD_CHANGE_ABSORPTION_MULTIPLE, players.size());
             }
             source.sendSuccess(message, true);
             return players.size();

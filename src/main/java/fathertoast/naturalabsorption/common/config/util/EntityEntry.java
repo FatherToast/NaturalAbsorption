@@ -91,7 +91,7 @@ public class EntityEntry {
     @Override
     public String toString() {
         // Start with the entity type registry key
-        ResourceLocation resource = TYPE == null ? null : ForgeRegistries.ENTITIES.getKey( TYPE );
+        ResourceLocation resource = TYPE == null ? null : ForgeRegistries.ENTITY_TYPES.getKey( TYPE );
         StringBuilder str = new StringBuilder( resource == null ? EntityListField.REG_KEY_DEFAULT : resource.toString() );
         // Insert "specific" prefix if not extendable
         if( !EXTEND ) {

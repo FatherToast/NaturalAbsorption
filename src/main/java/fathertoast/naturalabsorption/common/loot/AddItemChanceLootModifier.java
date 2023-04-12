@@ -3,107 +3,87 @@ package fathertoast.naturalabsorption.common.loot;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.ListCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.core.register.NALootModifiers;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
+import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.function.Supplier;
 
 public class AddItemChanceLootModifier extends LootModifier {
 
-    protected final List<ResourceLocation> lootTables;
-    protected final Item item;
-    protected final double chance;
+    private static final ListCodec<ResourceLocation> RL_LIST_CODEC = new ListCodec<>(ResourceLocation.CODEC);
+
+    public final Item itemToAdd;
+    public final double chance;
+    public final int maxStackCount;
+    public final int minStackCount;
+    public final List<ResourceLocation> lootTables;
+
+
+    public static final Supplier<Codec<AddItemChanceLootModifier>> CODEC = () -> RecordCodecBuilder.create(inst -> LootModifier.codecStart(inst)
+            .and(inst.group(
+                            ForgeRegistries.ITEMS.getCodec()
+                                    .fieldOf("item")
+                                    .forGetter(m -> m.itemToAdd),
+                            Codec.DOUBLE.fieldOf("chance")
+                                    .forGetter(m -> m.chance),
+                            Codec.INT.fieldOf("maxCount")
+                                    .forGetter(m -> m.maxStackCount),
+                            Codec.INT.fieldOf("minCount")
+                                    .forGetter(m -> m.minStackCount),
+                            RL_LIST_CODEC
+                                    .fieldOf("lootTable")
+                                    .forGetter(m -> m.lootTables)
+                    )
+            )
+            .apply(inst, AddItemChanceLootModifier::new)
+    );
 
     /**
      * Constructs a LootModifier.
      *
      * @param conditionsIn the ILootConditions that need to be matched before the loot is modified.
      */
-    public AddItemChanceLootModifier(List<ResourceLocation> lootTables, Item item, double chance, LootItemCondition[] conditionsIn) {
+    public AddItemChanceLootModifier(LootItemCondition[] conditionsIn, Item itemToAdd, double chance, int maxStackCount, int minStackCount, List<ResourceLocation> lootTables) {
         super(conditionsIn);
-        this.lootTables = lootTables;
-        this.item = item;
+        this.itemToAdd = itemToAdd;
         this.chance = chance;
+        this.maxStackCount = maxStackCount;
+        this.minStackCount = minStackCount;
+        this.lootTables = lootTables;
     }
 
     @Nonnull
     @Override
-    protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
-        if (this.lootTables.contains(context.getQueriedLootTableId())) {
-            if (context.getRandom().nextDouble() <= this.chance) {
-                generatedLoot.add(new ItemStack(this.item));
+    protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
+        if (lootTables.contains(context.getQueriedLootTableId())) {
+            Random random = new Random();
+
+            if (random.nextDouble() <= chance) {
+                ItemStack stack = new ItemStack(this.itemToAdd, random.nextInt(this.maxStackCount + 1));
+                generatedLoot.add(stack);
             }
         }
         return generatedLoot;
     }
 
-    public static class Serializer extends GlobalLootModifierSerializer<AddItemChanceLootModifier> {
-
-        @Override
-        public AddItemChanceLootModifier read(ResourceLocation location, JsonObject jsonObject, LootItemCondition[] conditions) {
-            if (jsonObject.has("item") && jsonObject.has("lootTables") && jsonObject.has("chance")) {
-                final ResourceLocation itemId = ResourceLocation.tryParse(jsonObject.get("item").getAsString());
-
-                // Read the Item
-                if (itemId == null) {
-                    NaturalAbsorption.LOG.error("Failed to read global loot modifier of type \"{}\" as \"item\" did not contain a valid ResourceLocation", location);
-                    return null;
-                }
-                Item item = ForgeRegistries.ITEMS.getValue(itemId);
-
-                if (item == null) {
-                    NaturalAbsorption.LOG.error("Failed to read global loot modifier of type \"{}\" as \"item\" did not contain the ID of an Item present in the Forge registry", location);
-                }
-
-                // Read the list of loot table IDs
-                final List<ResourceLocation> lootTableIds = new ArrayList<>();
-                JsonArray jsonArray = jsonObject.getAsJsonArray("lootTables");
-
-                for (JsonElement element : jsonArray) {
-                    final String s = element.getAsString();
-                    ResourceLocation lootTableId = ResourceLocation.tryParse(s);
-
-                    if (lootTableId == null) {
-                        NaturalAbsorption.LOG.error("Global loot modifier of type \"{}\" contains invalid loot table ID: \"{}\"", location, s);
-                        continue;
-                    }
-                    lootTableIds.add(lootTableId);
-                }
-
-                // Read the chance value
-                double chance = jsonObject.get("chance").getAsDouble();
-
-                return new AddItemChanceLootModifier(lootTableIds, item, chance, conditions);
-            }
-            else {
-                NaturalAbsorption.LOG.error("Failed to read global loot modifier of type \"{}\" as it is missing \"item\" and \"lootTables\"", location);
-                return null;
-            }
-        }
-
-        @Override
-        public JsonObject write(AddItemChanceLootModifier instance) {
-            JsonObject jsonObject = new JsonObject();
-            JsonArray jsonArray = new JsonArray();
-
-            jsonObject.addProperty("item", instance.item.getRegistryName().toString());
-
-            for (ResourceLocation lootTableId : instance.lootTables) {
-                jsonArray.add(lootTableId.toString());
-            }
-            jsonObject.add("lootTables", jsonArray);
-            jsonObject.addProperty("chance", instance.chance);
-
-            return jsonObject;
-        }
+    @Override
+    public Codec<? extends IGlobalLootModifier> codec() {
+        return NALootModifiers.ADD_ITEM_CHANCE.get();
     }
 }

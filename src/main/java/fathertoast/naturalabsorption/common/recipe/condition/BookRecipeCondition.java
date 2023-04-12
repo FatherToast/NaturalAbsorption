@@ -39,13 +39,6 @@ public class BookRecipeCondition implements ICondition {
                 Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().equalsIgnoreCase( this.styleName );
     }
 
-    // Deprecated. Only present to fulfill ICondition implementation
-    @SuppressWarnings("all")
-    @Override
-    public boolean test() {
-        return false;
-    }
-
     public static class Serializer implements IConditionSerializer<BookRecipeCondition> {
         
         public Serializer() { }

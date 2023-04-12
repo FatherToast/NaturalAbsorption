@@ -9,9 +9,11 @@ buildscript {
         //classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
     }
 }
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+}
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 //apply plugin: "org.spongepowered.mixin"
 
 // The mod's version and id
@@ -21,7 +23,7 @@ group = "fathertoast.${archivesBaseName}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: 'official', version: "${mc_version}"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -45,6 +47,20 @@ minecraft {
 
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+
+            mods {
+                naturalabsorption {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        gameTestServer {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'naturalabsorption'
 
             mods {
                 naturalabsorption {
@@ -90,8 +106,10 @@ dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
-    implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
-    implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
+
+    // Wait for TC to update
+    //implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
+    //implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
 }
 
 jar {
@@ -134,4 +152,8 @@ publishing {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

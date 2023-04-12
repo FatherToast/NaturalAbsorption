@@ -5,26 +5,18 @@ import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.TooltipFlag;
-import slimeknights.tconstruct.library.modifiers.Modifier;
-import slimeknights.tconstruct.library.tools.context.EquipmentChangeContext;
-import slimeknights.tconstruct.library.tools.context.ToolRebuildContext;
-import slimeknights.tconstruct.library.tools.item.IModifiable;
-import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
-import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
-import slimeknights.tconstruct.library.utils.TooltipKey;
+
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.UUID;
 
+
+// TODO - Wait for TC to update
+public class ArmorAbsorptionModifier {
+
+/*
 @ParametersAreNonnullByDefault
 public class ArmorAbsorptionModifier extends Modifier {
     
@@ -68,4 +60,6 @@ public class ArmorAbsorptionModifier extends Modifier {
             player.getAttribute( NAAttributes.EQUIPMENT_ABSORPTION.get() ).addTransientModifier( modifier );
         }
     }
+
+ */
 }

@@ -8,8 +8,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -58,11 +56,11 @@ public class AbsorptionBookItem extends Item {
             
             // Give the player feedback on failure
             if( naturalAbsorption >= Config.ABSORPTION.NATURAL.maximumAmount.get() ) {
-                player.displayClientMessage( new TranslatableComponent( References.ALREADY_MAX ), true );
+                player.displayClientMessage( Component.translatable( References.ALREADY_MAX ), true );
                 return InteractionResultHolder.fail( book );
             }
             if( !isCreative && player.experienceLevel < levelCost ) {
-                player.displayClientMessage( new TranslatableComponent( References.NOT_ENOUGH_LEVELS, levelCost ), true );
+                player.displayClientMessage( Component.translatable( References.NOT_ENOUGH_LEVELS, levelCost ), true );
                 return InteractionResultHolder.fail( book );
             }
             // Consume costs
@@ -99,33 +97,33 @@ public class AbsorptionBookItem extends Item {
             
             // Extra tooltip info, if enabled
             if( Config.ABSORPTION.NATURAL.upgradeBookExtraTooltipInfo.get() ) {
-                tooltip.add( new TranslatableComponent( ChatFormatting.GRAY + References.translate( References.ABSORPTION_BOOK_CURRENT ).getString() ) );
-                tooltip.add( new TranslatableComponent( ChatFormatting.YELLOW + " " +
+                tooltip.add( Component.translatable( ChatFormatting.GRAY + References.translate( References.ABSORPTION_BOOK_CURRENT ).getString() ) );
+                tooltip.add( Component.translatable( ChatFormatting.YELLOW + " " +
                         References.prettyToString( (float) naturalAbsorption ) + " / " + References.prettyToString( (float) maxNaturalAbsorption ) ) );
             }
-            tooltip.add( new TextComponent( "" ) );
+            tooltip.add( Component.literal( "" ) );
             
             if( gainOnUse > 0.0F ) {
                 // Tell player how much absorption they gain on use
-                tooltip.add( new TranslatableComponent( ChatFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
-                tooltip.add( new TranslatableComponent( ChatFormatting.BLUE + References.translate( References.BOOK_MAX, "+" + References.prettyToString( (float) gainOnUse ) ).getString() ) );
+                tooltip.add( Component.translatable( ChatFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
+                tooltip.add( Component.translatable( ChatFormatting.BLUE + References.translate( References.BOOK_MAX, "+" + References.prettyToString( (float) gainOnUse ) ).getString() ) );
                 
-                tooltip.add( new TextComponent( "" ) );
+                tooltip.add( Component.translatable( "" ) );
                 
                 // Provide feedback on cost and usability
                 final int levelCost = getLevelCost( naturalAbsorption );
                 if( levelCost > 0 ) {
-                    tooltip.add( new TranslatableComponent( ChatFormatting.GREEN + References.translate( References.ABSORPTION_BOOK_COST, levelCost ).getString() ) );
+                    tooltip.add( Component.translatable( ChatFormatting.GREEN + References.translate( References.ABSORPTION_BOOK_COST, levelCost ).getString() ) );
                 }
                 if( levelCost <= player.experienceLevel || player.isCreative() ) {
-                    tooltip.add( new TranslatableComponent( ChatFormatting.GRAY + References.translate( References.BOOK_CAN_USE ).getString() ) );
+                    tooltip.add( Component.translatable( ChatFormatting.GRAY + References.translate( References.BOOK_CAN_USE ).getString() ) );
                 }
                 else {
-                    tooltip.add( new TranslatableComponent( ChatFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
+                    tooltip.add( Component.translatable( ChatFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
                 }
             }
             else {
-                tooltip.add( new TranslatableComponent( ChatFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
+                tooltip.add( Component.translatable( ChatFormatting.RED + References.translate( References.BOOK_NO_USE ).getString() ) );
             }
         }
     }

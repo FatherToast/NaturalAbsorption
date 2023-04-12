@@ -2,9 +2,9 @@ package fathertoast.naturalabsorption.datagen;
 
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import net.minecraft.data.DataGenerator;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 import java.util.Map;
 
@@ -17,12 +17,12 @@ public class DataGatherListener {
         
         if( event.includeClient() ) {
             for( Map.Entry<String, NALanguageProvider.TranslationKey> entry : NALanguageProvider.LANG_CODE_MAP.entrySet() ) {
-                generator.addProvider( new NALanguageProvider( generator, entry.getKey(), entry.getValue() ) );
+                generator.addProvider( true, new NALanguageProvider( generator, entry.getKey(), entry.getValue() ) );
             }
         }
         if( event.includeServer() ) {
-            generator.addProvider( new NALootModifierProvider( generator ) );
-            generator.addProvider( new NARecipeProvider( generator ) );
+            generator.addProvider( true, new NALootModifierProvider( generator ) );
+            generator.addProvider( true, new NARecipeProvider( generator ) );
         }
     }
 }

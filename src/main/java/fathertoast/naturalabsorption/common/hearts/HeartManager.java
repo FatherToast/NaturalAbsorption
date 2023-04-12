@@ -5,7 +5,7 @@ import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -180,7 +180,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseStart( LivingEntityUseItemEvent.Start event ) {
-        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
             // Start watching hunger
             trackPlayerHungerState( player );
         }
@@ -193,7 +193,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseTick( LivingEntityUseItemEvent.Tick event ) {
-        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
             // Update watched hunger, just in case anything changes mid-use
             trackPlayerHungerState( player );
         }
@@ -206,7 +206,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseStop( LivingEntityUseItemEvent.Stop event ) {
-        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
             // Stop watching hunger; item was not food or eating was canceled
             clearPlayerHungerState( player );
         }
@@ -221,7 +221,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseFinish( LivingEntityUseItemEvent.Finish event ) {
-        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
             if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingMax.get() != 0.0 ) {
                 // Apply healing from food
                 final ItemStack stack = event.getItem();
@@ -278,7 +278,7 @@ public class HeartManager {
     @OnlyIn( Dist.CLIENT )
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemTooltip( ItemTooltipEvent event ) {
-        final FoodProperties food = event.getItemStack().getItem().getFoodProperties( event.getItemStack(), event.getPlayer() );
+        final FoodProperties food = event.getItemStack().getItem().getFoodProperties( event.getItemStack(), event.getEntity() );
         
         if( food != null ) {
             final int hunger = food.getNutrition();
@@ -287,11 +287,11 @@ public class HeartManager {
             if( Config.MAIN.GENERAL.foodExtraTooltipInfo.get() ) {
                 // Food nutrition values could theoretically be zero or negative, make sure we handle that
                 if( hunger != 0 ) {
-                    event.getToolTip().add( new TranslatableComponent( (hunger > 0 ? ChatFormatting.BLUE : ChatFormatting.RED) +
+                    event.getToolTip().add( Component.translatable( (hunger > 0 ? ChatFormatting.BLUE : ChatFormatting.RED) +
                             References.translate( References.FOOD_HUNGER, String.format( "%+d", -hunger ) ).getString() ) );
                 }
                 if( saturation != 0.0F ) {
-                    event.getToolTip().add( new TranslatableComponent( (saturation > 0.0F ? ChatFormatting.BLUE : ChatFormatting.RED) +
+                    event.getToolTip().add( Component.translatable( (saturation > 0.0F ? ChatFormatting.BLUE : ChatFormatting.RED) +
                             References.translate( References.FOOD_SATURATION, (saturation > 0.0F ? "+" : "") + References.prettyToString( saturation ) ).getString() ) );
                 }
             }
@@ -301,7 +301,7 @@ public class HeartManager {
                         (float) Config.HEALTH.GENERAL.foodHealingMax.get();
                 final float healing = Math.min( getFoodHealing( hunger, saturation ), maxHealing );
                 if( healing > 0.0F ) {
-                    event.getToolTip().add( new TranslatableComponent( ChatFormatting.BLUE + References.translate( References.FOOD_HEALTH, "+" + References.prettyToString( healing ) ).getString() ) );
+                    event.getToolTip().add( Component.translatable( ChatFormatting.BLUE + References.translate( References.FOOD_HEALTH, "+" + References.prettyToString( healing ) ).getString() ) );
                 }
             }
         }
@@ -331,7 +331,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event ) {
-        final Player player = event.getPlayer();
+        final Player player = event.getEntity();
         if( !player.level.isClientSide && !event.isEndConquered() ) {
             // Apply death penalty
             AbsorptionHelper.applyDeathPenalty( player );
@@ -354,7 +354,7 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.HIGHEST )
     public void onPlayerClone( PlayerEvent.Clone event ) {
         final double originalAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( event.getOriginal() );
-        AbsorptionHelper.setBaseNaturalAbsorption( event.getPlayer(), false, originalAbsorption );
+        AbsorptionHelper.setBaseNaturalAbsorption( event.getEntity(), false, originalAbsorption );
     }
     
     /**
@@ -362,7 +362,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.HIGHEST )
     public void onPlayerEquipmentChange( LivingEquipmentChangeEvent event ) {
-        if( event.getEntityLiving() instanceof Player player ) {
+        if( event.getEntity() instanceof Player player ) {
             trackPlayerEquipmentChange( player );
         }
     }
@@ -393,7 +393,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public void onLivingHurt( LivingHurtEvent event ) {
-        if( event.getEntityLiving() instanceof Player player && !event.getEntityLiving().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
             HeartData data = HeartData.get( player );
             
             // Interrupt recovery
@@ -442,7 +442,7 @@ public class HeartManager {
     
     // Used to degrade armor durability when armor damage reduction is disabled.
     private void damageArmor( LivingHurtEvent event ) {
-        final Player player = (Player) event.getEntityLiving();
+        final Player player = (Player) event.getEntity();
         
         float durabilityDamage = event.getAmount();
         

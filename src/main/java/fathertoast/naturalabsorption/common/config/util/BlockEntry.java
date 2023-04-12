@@ -88,7 +88,7 @@ public class BlockEntry implements Cloneable {
     @Override
     public String toString() {
         // Block name
-        String registryName = NaturalAbsorption.toString( BLOCK );
+        String registryName = NaturalAbsorption.toString( BLOCK, ForgeRegistries.BLOCKS );
         if( MATCHERS.isEmpty() ) {
             return registryName;
         }
@@ -103,7 +103,7 @@ public class BlockEntry implements Cloneable {
     /** Used to sort this object in a hash table. */
     @Override
     public int hashCode() {
-        ResourceLocation regKey = BLOCK.getRegistryName();
+        ResourceLocation regKey = ForgeRegistries.BLOCKS.getKey(BLOCK);
         return regKey == null ? 0 : regKey.hashCode();
     }
     
@@ -166,7 +166,7 @@ public class BlockEntry implements Cloneable {
                     propertyNames.add( allowed.getName() );
                 }
                 NaturalAbsorption.LOG.warn( "Invalid block property key for {} \"{}\". Valid property keys for '{}' are {}. " +
-                                "Deleting property. Invalid property: {}", field.getClass(), field.getKey(), NaturalAbsorption.toString( block ),
+                                "Deleting property. Invalid property: {}", field.getClass(), field.getKey(), NaturalAbsorption.toString( block, ForgeRegistries.BLOCKS ),
                         TomlHelper.literalList( propertyNames ), combinedEntry.trim() );
                 continue;
             }
