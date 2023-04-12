@@ -89,7 +89,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
-    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
+    runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
     implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
     implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
 }

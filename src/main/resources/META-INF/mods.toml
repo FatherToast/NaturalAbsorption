@@ -29,7 +29,7 @@ Sarinsa's Discord: https://discord.gg/8FhRDZGAvX
 [[dependencies.naturalabsorption]]
 modId = "forge"
 mandatory = true
-versionRange = "[40.0.0,)"
+versionRange = "[40,)"
 ordering = "NONE"
 side = "BOTH"
 
