@@ -11,12 +11,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.IIngameOverlay;
+import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
 import java.util.Random;
 
-public class AbsorptionBackgroundOverlay implements IIngameOverlay {
+public class AbsorptionBackgroundOverlay implements IGuiOverlay {
     
     private final Random random = new Random();
     
@@ -33,10 +33,10 @@ public class AbsorptionBackgroundOverlay implements IIngameOverlay {
      * <p>
      * Based strongly on the vanilla render method, with variables made final where possible.
      *
-     * @see ForgeIngameGui#renderHealth(int, int, PoseStack)
+     * @see ForgeGui#renderHealth(int, int, PoseStack)
      */
     @Override
-    public void render( ForgeIngameGui gui, PoseStack poseStack, float partialTick, int width, int height ) {
+    public void render( ForgeGui gui, PoseStack poseStack, float partialTick, int width, int height ) {
         // Moved below; only should be done once we decide to cancel the vanilla render
         //RenderSystem.enableBlend();
 
@@ -51,7 +51,7 @@ public class AbsorptionBackgroundOverlay implements IIngameOverlay {
 
         if( absorbMax <= 0.0F ) return;
 
-        RenderSystem.setShaderTexture(0, ForgeIngameGui.GUI_ICONS_LOCATION);
+        RenderSystem.setShaderTexture(0, ForgeGui.GUI_ICONS_LOCATION);
 
         final int tickCount = Minecraft.getInstance().gui.getGuiTicks();
         
@@ -99,8 +99,8 @@ public class AbsorptionBackgroundOverlay implements IIngameOverlay {
         
         final int left = width / 2 - 91;
         final int top = height - 39;
-        gui.left_height += (healthRows * rowHeight);
-        if( rowHeight != 10 ) gui.left_height += 10 - rowHeight;
+        gui.leftHeight += (healthRows * rowHeight);
+        if( rowHeight != 10 ) gui.leftHeight += 10 - rowHeight;
         
         final int regen = player.hasEffect( MobEffects.REGENERATION ) ? tickCount % 25 : -1;
         
@@ -186,6 +186,6 @@ public class AbsorptionBackgroundOverlay implements IIngameOverlay {
         bufferbuilder.vertex( matrix4f, (float) x1, (float) y0, z ).uv( u1, v0 ).endVertex();
         bufferbuilder.vertex( matrix4f, (float) x0, (float) y0, z ).uv( u0, v0 ).endVertex();
         bufferbuilder.end();
-        BufferUploader.end( bufferbuilder );
+        BufferUploader.drawWithShader( bufferbuilder.end() );
     }
 }

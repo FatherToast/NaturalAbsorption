@@ -1,7 +1,5 @@
 package fathertoast.naturalabsorption.client;
 
-import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.fml.DistExecutor;
 
 /**
@@ -14,7 +12,9 @@ public class ClientUtil {
     private static boolean hideArmorBar;
 
     public static boolean OVERLAY_ENABLED = true;
-    
+    public static boolean RENDER_ARMOR = true;
+
+
     /** Sets whether the user wants armor features enabled, and toggles rendering if needed. */
     public static DistExecutor.SafeRunnable setArmorFeaturesEnabled( boolean value ) {
         // Non-lambda function is required to pass Forge's validation
@@ -43,7 +43,7 @@ public class ClientUtil {
     
     /** Disables (or enables) the vanilla armor bar renderer. */
     private static void toggleArmorBarRender( boolean disable ) {
-        OverlayRegistry.enableOverlay( ForgeIngameGui.ARMOR_LEVEL_ELEMENT, !disable );
+        RENDER_ARMOR = !disable;
     }
     
     /** Swaps the vanilla heart bar renderer for ours, or the other way around. */
