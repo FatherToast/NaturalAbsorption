@@ -119,12 +119,12 @@ public class EntityListField extends GenericField<EntityList> {
         else {
             // Normal entry
             final ResourceLocation regKey = new ResourceLocation( args[0].trim() );
-            if( !ForgeRegistries.ENTITIES.containsKey( regKey ) ) {
+            if( !ForgeRegistries.ENTITY_TYPES.containsKey( regKey ) ) {
                 NaturalAbsorption.LOG.warn( "Invalid entry for {} \"{}\"! Deleting entry. Invalid entry: {}",
                         getClass(), getKey(), line );
                 return null;
             }
-            entityType = ForgeRegistries.ENTITIES.getValue( regKey );
+            entityType = ForgeRegistries.ENTITY_TYPES.getValue( regKey );
         }
         final List<Double> valuesList = new ArrayList<>();
         final int reqValues = valueDefault.getRequiredValues();

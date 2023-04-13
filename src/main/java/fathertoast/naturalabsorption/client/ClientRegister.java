@@ -4,6 +4,8 @@ import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -15,11 +17,11 @@ public class ClientRegister {
 
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
-        // Register above, since the configs will probably need this value before client setup
-        //ABSORPTION_BACKGROUND = OverlayRegistry.registerOverlayBelow( ForgeIngameGui.PLAYER_HEALTH_ELEMENT, "NAAbsorptionBackgroundCapacity", new AbsorptionBackgroundOverlay() );
+        MinecraftForge.EVENT_BUS.register(new ClientEvents());
     }
 
+    @SubscribeEvent
     public static void onGuiOverlayRegister(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("NAAbsorptionBackgroundCapacity", ABSORPTION_BACKGROUND);
+        event.registerAbove(VanillaGuiOverlay.PLAYER_HEALTH.id(), "absorption_background_capacity", ABSORPTION_BACKGROUND);
     }
 }

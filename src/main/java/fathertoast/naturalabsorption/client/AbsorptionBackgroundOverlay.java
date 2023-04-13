@@ -6,6 +6,7 @@ import com.mojang.math.Matrix4f;
 import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
@@ -16,6 +17,11 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
 import java.util.Random;
 
+/**
+ * Essentially a copy-paste of the vanilla player health render code,
+ * but tweaked to render empty hearts depending on the player's
+ * maximum natural/equipment absorption.
+ */
 public class AbsorptionBackgroundOverlay implements IGuiOverlay {
     
     private final Random random = new Random();
@@ -42,122 +48,117 @@ public class AbsorptionBackgroundOverlay implements IGuiOverlay {
 
         // We still want to do the below even if we don't commit to rendering anything,
         // to smooth out rendering when we do render
-        
-        final Player player = Minecraft.getInstance().player;
-        
-        if( player == null || !ClientUtil.OVERLAY_ENABLED ) return;
-        
-        final float absorbMax = (float) AbsorptionHelper.getMaxAbsorption( player );
 
-        if( absorbMax <= 0.0F ) return;
+        final Player player = getCameraPlayer();
 
-        RenderSystem.setShaderTexture(0, ForgeGui.GUI_ICONS_LOCATION);
+        if (player == null || !ClientUtil.OVERLAY_ENABLED || player.isCreative()) return;
 
-        final int tickCount = Minecraft.getInstance().gui.getGuiTicks();
-        
-        final int health = Mth.ceil( player.getHealth() );
-        final boolean highlight = healthBlinkTime > (long) tickCount && (healthBlinkTime - (long) tickCount) / 3L % 2L == 1L;
-        
-        if( health < lastHealth && player.invulnerableTime > 0 ) {
-            lastHealthTime = Util.getMillis();
-            healthBlinkTime = tickCount + 20;
+        final float absorbMax = (float) AbsorptionHelper.getSteadyStateMaxAbsorption(player);
+
+        if (absorbMax <= 0.0F) return;
+
+        int health = Mth.ceil(player.getHealth());
+        boolean blink = healthBlinkTime > (long) gui.getGuiTicks() && (healthBlinkTime - (long) gui.getGuiTicks()) / 3L % 2L == 1L;
+        long millis = Util.getMillis();
+
+        if (health < lastHealth && player.invulnerableTime > 0) {
+            lastHealthTime = millis;
+            healthBlinkTime = gui.getGuiTicks() + 20;
         }
-        else if( health > lastHealth && player.invulnerableTime > 0 ) {
-            lastHealthTime = Util.getMillis();
-            healthBlinkTime = tickCount + 10;
+        else if (health > lastHealth && player.invulnerableTime > 0) {
+            lastHealthTime = millis;
+            healthBlinkTime = gui.getGuiTicks() + 10;
         }
-        
-        if( Util.getMillis() - lastHealthTime > 1000L ) {
-            lastHealth = health;
+
+        if (millis - lastHealthTime > 1000L) {
             displayHealth = health;
-            lastHealthTime = Util.getMillis();
+            lastHealthTime = millis;
         }
-        
+
         lastHealth = health;
-        final int healthLast = displayHealth;
-        
-        // Don't render hearts for creative mode players
-        if( player.isCreative() ) return;
-        
-        final float healthMax = (float) player.getAttributeValue( Attributes.MAX_HEALTH );
-        final float absorb = Mth.ceil( player.getAbsorptionAmount() );
-        
-        // Calculate number of hearts we want vs. number that vanilla would render
-        int extraHearts = Mth.ceil( (healthMax + absorbMax) / 2.0F ) -
-                Mth.ceil( (healthMax + absorb) / 2.0F );
-        //noinspection StatementWithEmptyBody
-        if( player.isCreative() || extraHearts <= 0 ) {
-            // All backgrounds will be handled normally, no need for render override
-            //return; NOTE: We are currently always overriding
+        random.setSeed(gui.getGuiTicks() * 312871L);
+        int x = width / 2 - 91;
+        int j1 = width / 2 + 91;
+        int y = height - 39;
+        float maxHealth = Math.max((float) player.getAttributeValue(Attributes.MAX_HEALTH), (float) Math.max(displayHealth, health));
+        int absorption = Mth.ceil(player.getAbsorptionAmount());
+        int maxAbsorption = Mth.ceil(absorbMax);
+        int healthRows = Mth.ceil((maxHealth + (float) maxAbsorption) / 2.0F / 10.0F);
+        int rowHeight = Math.max(10 - (healthRows - 2), 3);
+        int k2 = y - (healthRows - 1) * rowHeight - 10;
+        int l2 = y - 10;
+        int j3 = -1;
+
+        if (player.hasEffect(MobEffects.REGENERATION)) {
+            j3 = gui.getGuiTicks() % Mth.ceil(maxHealth + 5.0F);
         }
-        RenderSystem.enableBlend();
-        
-        final int healthRows = Mth.ceil( (healthMax + absorbMax) / 2.0F / 10.0F );
-        final int rowHeight = Math.max( 10 - (healthRows - 2), 3 );
-        
-        random.setSeed( tickCount * 312871L );
-        
-        final int left = width / 2 - 91;
-        final int top = height - 39;
-        gui.leftHeight += (healthRows * rowHeight);
-        if( rowHeight != 10 ) gui.leftHeight += 10 - rowHeight;
-        
-        final int regen = player.hasEffect( MobEffects.REGENERATION ) ? tickCount % 25 : -1;
-        
-        final int TOP = 9 * (Minecraft.getInstance().level != null && Minecraft.getInstance().level.getLevelData().isHardcore() ? 5 : 0);
-        final int BACKGROUND = (highlight ? 25 : 16);
-        
-        int MARGIN = 16;
-        if( player.hasEffect( MobEffects.POISON ) ) MARGIN += 36;
-        else if( player.hasEffect( MobEffects.WITHER ) ) MARGIN += 72;
-        
-        float absorbRemaining = absorb;
-        
-        for( int i = Mth.ceil( (healthMax + absorbMax) / 2.0F ) - 1; i >= 0; --i ) {
-            
-            final int row = Mth.ceil( (float) (i + 1) / 10.0F ) - 1;
-            final int x = left + i % 10 * 8;
-            int y = top - row * rowHeight;
-            
-            if( health <= 4 ) y += random.nextInt( 2 );
-            if( i == regen ) y -= 2;
-            
-            // Health for half-heart on current heart
-            final int halfHeartHealth = i * 2 + 1;
-            
-            blit( poseStack, x, y, BACKGROUND, TOP, 9, 9 );
-            
-            if( highlight ) {
-                if( halfHeartHealth < healthLast )
-                    blit( poseStack, x, y, MARGIN + 54, TOP, 9, 9 ); //6
-                else if( halfHeartHealth == healthLast )
-                    blit( poseStack, x, y, MARGIN + 63, TOP, 9, 9 ); //7
-            }
-            
-            // Simply skip the fill logic until we're back to the vanilla heart count
-            if( extraHearts > 0 ) {
-                extraHearts--;
-            }
-            else if( absorbRemaining > 0.0F ) {
-                if( absorbRemaining == absorb && absorb % 2.0F == 1.0F ) {
-                    blit( poseStack, x, y, MARGIN + 153, TOP, 9, 9 ); //17
-                    absorbRemaining -= 1.0F;
-                }
-                else {
-                    blit( poseStack, x, y, MARGIN + 144, TOP, 9, 9 ); //16
-                    absorbRemaining -= 2.0F;
-                }
-            }
-            else {
-                if( halfHeartHealth < health )
-                    blit( poseStack, x, y, MARGIN + 36, TOP, 9, 9 ); //4
-                else if( halfHeartHealth == health )
-                    blit( poseStack, x, y, MARGIN + 45, TOP, 9, 9 ); //5
-            }
-        }
-        RenderSystem.disableBlend();
+        // Assume the vanilla health renderer is inactive while we render,
+        // so we must add the offset ourselves.
+        gui.leftHeight += (healthRows * rowHeight) + 1;
+
+        renderHearts(poseStack, player, x, y, rowHeight, j3, maxHealth, health, displayHealth, absorption, maxAbsorption, blink);
     }
-    
+
+    protected void renderHearts(PoseStack poseStack, Player player, int x, int y, int rowHeight, int p_168694_, float maxHealth, int health, int displayHealth, int absorption, int maxAbsorption, boolean blink) {
+        Gui.HeartType heartType = Gui.HeartType.forPlayer(player);
+        int vOffset = 9 * (player.level.getLevelData().isHardcore() ? 5 : 0);
+        int healthHearts = Mth.ceil((double)maxHealth / 2.0D);
+        int absorptionHearts = Mth.ceil((double)maxAbsorption / 2.0D);
+        int l = healthHearts * 2;
+
+        for(int hearts = healthHearts + absorptionHearts - 1; hearts >= 0; --hearts) {
+            int j1 = hearts / 10;
+            int k1 = hearts % 10;
+            int xPos = x + k1 * 8;
+            int yPos = y - j1 * rowHeight;
+
+            if (health + absorption <= 4) {
+                yPos += random.nextInt(2);
+            }
+
+            if (hearts < healthHearts && hearts == p_168694_) {
+                yPos -= 2;
+            }
+            renderHeart(poseStack, Gui.HeartType.CONTAINER, xPos, yPos, vOffset, blink, false);
+            int j2 = hearts * 2;
+            boolean flag = hearts >= healthHearts;
+
+            if (flag) {
+                int k2 = j2 - l;
+
+                if (k2 < absorption) {
+                    boolean flag1 = k2 + 1 == absorption;
+                    renderHeart(poseStack, heartType == Gui.HeartType.WITHERED ? heartType : Gui.HeartType.ABSORBING, xPos, yPos, vOffset, false, flag1);
+                }
+            }
+
+            if (blink && j2 < displayHealth) {
+                boolean jump = j2 + 1 == displayHealth;
+                renderHeart(poseStack, heartType, xPos, yPos, vOffset, true, jump);
+            }
+
+            if (j2 < health) {
+                boolean jump = j2 + 1 == health;
+                renderHeart(poseStack, heartType, xPos, yPos, vOffset, false, jump);
+            }
+        }
+
+    }
+
+    private void renderHeart(PoseStack poseStack, Gui.HeartType heartType, int x, int y, int v, boolean blink, boolean jump) {
+        blit(poseStack, x, y, heartType.getX(jump, blink), v, 9, 9);
+    }
+
+    /**
+     * @return The camera entity if it is the player.
+     */
+    private Player getCameraPlayer() {
+        return !(Minecraft.getInstance().getCameraEntity() instanceof Player)
+                ? null
+                : (Player) Minecraft.getInstance().getCameraEntity();
+    }
+
+
     /**
      * Renders a 2D texture in the GUI using the default depth (aka blitOffset) and texture resolution.
      *
@@ -185,7 +186,6 @@ public class AbsorptionBackgroundOverlay implements IGuiOverlay {
         bufferbuilder.vertex( matrix4f, (float) x1, (float) y1, z ).uv( u1, v1 ).endVertex();
         bufferbuilder.vertex( matrix4f, (float) x1, (float) y0, z ).uv( u1, v0 ).endVertex();
         bufferbuilder.vertex( matrix4f, (float) x0, (float) y0, z ).uv( u0, v0 ).endVertex();
-        bufferbuilder.end();
         BufferUploader.drawWithShader( bufferbuilder.end() );
     }
 }
