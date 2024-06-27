@@ -5,10 +5,16 @@ import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -78,25 +84,30 @@ public class HeartManager {
     
     /** Returns true if the given damage source is modified to ignore armor. */
     private static boolean isSourceModified( DamageSource source ) { return MODDED_SOURCES.contains( source ); }
-    
+
+    // TODO - modifying damage sources is no longer possible.
+    //        properties like "bypassesArmor" and "isMagic" are now damage type tags.
     /** Modifies a source to ignore armor. */
     private static void modifySource( DamageSource source ) {
-        if( source.isBypassInvul() ) return;
-        source.bypassArmor = true;
+        //if( source.is( DamageTypeTags.BYPASSES_INVULNERABILITY) ) return;
+        //source.bypassArmor = true;
     }
     
     /** Undoes any modification done to a damage source. */
     private static void restoreSource( DamageSource source ) {
-        source.bypassArmor = false;
-        MODDED_SOURCES.remove( source );
+        //source.bypassArmor = false;
+        //MODDED_SOURCES.remove( source );
     }
     
     /** Undoes all modification done to all damage sources. */
     public static void clearSources() {
+        /*
         for( DamageSource source : MODDED_SOURCES ) {
             source.bypassArmor = false;
         }
         MODDED_SOURCES.clear();
+
+         */
     }
     
     /** Creates or updates a player's tracked hunger state. */
@@ -180,7 +191,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseStart( LivingEntityUseItemEvent.Start event ) {
-        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             // Start watching hunger
             trackPlayerHungerState( player );
         }
@@ -193,7 +204,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseTick( LivingEntityUseItemEvent.Tick event ) {
-        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             // Update watched hunger, just in case anything changes mid-use
             trackPlayerHungerState( player );
         }
@@ -206,7 +217,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseStop( LivingEntityUseItemEvent.Stop event ) {
-        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             // Stop watching hunger; item was not food or eating was canceled
             clearPlayerHungerState( player );
         }
@@ -221,7 +232,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseFinish( LivingEntityUseItemEvent.Finish event ) {
-        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingMax.get() != 0.0 ) {
                 // Apply healing from food
                 final ItemStack stack = event.getItem();
@@ -332,7 +343,7 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event ) {
         final Player player = event.getEntity();
-        if( !player.level.isClientSide && !event.isEndConquered() ) {
+        if( !player.level().isClientSide && !event.isEndConquered() ) {
             // Apply death penalty
             AbsorptionHelper.applyDeathPenalty( player );
             
@@ -393,7 +404,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public void onLivingHurt( LivingHurtEvent event ) {
-        if( event.getEntity() instanceof Player player && !event.getEntity().level.isClientSide ) {
+        if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             HeartData data = HeartData.get( player );
             
             // Interrupt recovery
@@ -402,12 +413,12 @@ public class HeartManager {
             // Handle armor replacement, if enabled
             if( isArmorReplacementEnabled() ) {
                 // Force damage to ignore armor
-                if( Config.EQUIPMENT.ARMOR.disableArmor.get() && !event.getSource().isBypassArmor() ) {
+                if( Config.EQUIPMENT.ARMOR.disableArmor.get() && !event.getSource().is( DamageTypeTags.BYPASSES_ARMOR ) ) {
                     modifySource( event.getSource() );
                 }
                 // Degrade armor manually (armor ignoring damage otherwise won't)
                 if( event.getAmount() > Config.EQUIPMENT.ARMOR.durabilityThreshold.get() &&
-                        !event.getSource().isBypassInvul() && !"thorns".equalsIgnoreCase( event.getSource().getMsgId() ) ) {
+                        !event.getSource().is( DamageTypeTags.BYPASSES_INVULNERABILITY ) && !"thorns".equalsIgnoreCase( event.getSource().getMsgId() ) ) {
                     
                     switch( Config.EQUIPMENT.ARMOR.durabilityTrigger.get() ) {
                         case NONE:
@@ -429,15 +440,22 @@ public class HeartManager {
     // Determines whether a damage source is damage-over-time.
     private boolean isSourceDamageOverTime( DamageSource source, float amount ) {
         // Potion degeneration
-        return source == DamageSource.MAGIC && amount <= 1.0F /* Hopefully poison damage */ || source == DamageSource.WITHER ||
+        ResourceKey<DamageType> typeId = source.typeHolder().unwrapKey().orElse( null );
+
+        if ( typeId == null ) {
+            NaturalAbsorption.LOG.error("No ID (resource key) found for damage type '{}'", source.type());
+            return false;
+        }
+
+        return typeId == DamageTypes.MAGIC && amount <= 1.0F /* Hopefully poison damage */ || typeId == DamageTypes.WITHER ||
                 // Burning damage
-                source == DamageSource.ON_FIRE || source == DamageSource.IN_FIRE ||
-                source == DamageSource.LAVA || source == DamageSource.HOT_FLOOR ||
+                typeId == DamageTypes.ON_FIRE || typeId == DamageTypes.IN_FIRE ||
+                typeId == DamageTypes.LAVA || typeId == DamageTypes.HOT_FLOOR ||
                 // Damaging plants
-                source == DamageSource.CACTUS || source == DamageSource.SWEET_BERRY_BUSH ||
+                typeId == DamageTypes.CACTUS || typeId == DamageTypes.SWEET_BERRY_BUSH ||
                 // Unfortunate states
-                source == DamageSource.IN_WALL || source == DamageSource.CRAMMING ||
-                source == DamageSource.DROWN || source == DamageSource.STARVE || source == DamageSource.DRY_OUT;
+                typeId == DamageTypes.IN_WALL || typeId == DamageTypes.CRAMMING ||
+                typeId == DamageTypes.DROWN || typeId == DamageTypes.STARVE || typeId == DamageTypes.DRY_OUT;
     }
     
     // Used to degrade armor durability when armor damage reduction is disabled.
@@ -454,7 +472,7 @@ public class HeartManager {
         durabilityDamage *= Config.EQUIPMENT.ARMOR.durabilityMultiplier.get();
         
         // Degrade armor durability
-        if( !event.getSource().isBypassInvul() && durabilityDamage > 0.0F ) {
+        if( !event.getSource().is( DamageTypeTags.BYPASSES_INVULNERABILITY ) && durabilityDamage > 0.0F ) {
             player.getInventory().hurtArmor( event.getSource(), durabilityDamage, Inventory.ALL_ARMOR_SLOTS );
         }
     }

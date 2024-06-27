@@ -12,5 +12,5 @@ public class NAEnchantments {
     public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, NaturalAbsorption.MOD_ID);
 
 
-    public static final RegistryObject<Enchantment> ABSORPTION_ENCHANTMENT = ENCHANTMENTS.register("absorption", AbsorptionEnchantment::new);
+    public static final RegistryObject<AbsorptionEnchantment> ABSORPTION_ENCHANTMENT = ENCHANTMENTS.register("absorption", AbsorptionEnchantment::new);
 }

@@ -42,7 +42,7 @@ public class NABaseCommand {
 
         private static int addAbsorption(CommandSourceStack source, Collection<ServerPlayer> players, int absorption) {
             for (ServerPlayer player  : players) {
-                double currentMaxAbsorption = AbsorptionHelper.getMaxAbsorption(player);
+                double currentMaxAbsorption = AbsorptionHelper.getBaseNaturalAbsorption(player);
                 AbsorptionHelper.setBaseNaturalAbsorption(player, false, currentMaxAbsorption + absorption);
             }
             Component message;
@@ -53,13 +53,13 @@ public class NABaseCommand {
             else {
                 message = Component.translatable(References.CMD_CHANGE_ABSORPTION_MULTIPLE, players.size());
             }
-            source.sendSuccess(message, true);
+            source.sendSuccess(() -> message, true);
             return players.size();
         }
 
         private static int removeAbsorption(CommandSourceStack source, Collection<ServerPlayer> players, int absorption) {
             for (ServerPlayer player  : players) {
-                double currentMaxAbsorption = AbsorptionHelper.getMaxAbsorption(player);
+                double currentMaxAbsorption = AbsorptionHelper.getBaseNaturalAbsorption(player);
                 AbsorptionHelper.setBaseNaturalAbsorption(player, true, currentMaxAbsorption - absorption);
             }
             Component message;
@@ -70,7 +70,7 @@ public class NABaseCommand {
             else {
                 message = Component.translatable(References.CMD_CHANGE_ABSORPTION_MULTIPLE, players.size());
             }
-            source.sendSuccess(message, true);
+            source.sendSuccess(() -> message, true);
             return players.size();
         }
     }

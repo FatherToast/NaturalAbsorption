@@ -1,26 +1,29 @@
 package fathertoast.naturalabsorption.common.config;
 
-import fathertoast.naturalabsorption.common.config.field.*;
-import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.AbstractConfigFile;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.field.BooleanField;
+import fathertoast.crust.api.config.common.field.DoubleField;
+import fathertoast.crust.api.config.common.field.IntField;
+import fathertoast.crust.api.config.common.field.ScaledDoubleField;
 
-import java.io.File;
-
-public class HealthConfig extends Config.AbstractConfig {
+public class HealthConfig extends AbstractConfigFile {
     
     public final General GENERAL;
     
     /** Builds the config spec that should be used for this config. */
-    HealthConfig( File dir, String fileName ) {
-        super( dir, fileName,
+    HealthConfig( ConfigManager manager, String fileName ) {
+        super( manager, fileName,
                 "This config contains most options for features that apply to health (red hearts).",
                 "Does NOT contain any armor or enchantment options - see the 'armor_and_enchant' config for those.",
                 "Also contains hunger options related specifically to health recovery and healing from food."
         );
         
-        GENERAL = new General( SPEC );
+        GENERAL = new General( this );
     }
     
-    public static class General extends Config.AbstractCategory {
+    public static class General extends AbstractConfigCategory<HealthConfig> {
         
         public final DoubleField respawnAmount;
         
@@ -39,7 +42,7 @@ public class HealthConfig extends Config.AbstractConfig {
         
         public final BooleanField foodHealingExtraTooltipInfo;
         
-        General( ToastConfigSpec parent ) {
+        General( HealthConfig parent ) {
             super( parent, "health",
                     "Options that apply to health (red hearts).",
                     "", "Note: All health amounts are in half-hearts." );

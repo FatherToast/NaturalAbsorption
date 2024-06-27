@@ -1,26 +1,30 @@
 package fathertoast.naturalabsorption.common.config;
 
-import fathertoast.naturalabsorption.common.config.field.*;
-import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.AbstractConfigFile;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.field.BooleanField;
+import fathertoast.crust.api.config.common.field.InjectionWrapperField;
+import fathertoast.crust.api.config.common.field.IntField;
 import net.minecraft.world.level.GameRules;
 
 import java.io.File;
 
-public class MainConfig extends Config.AbstractConfig {
+public class MainConfig extends AbstractConfigFile {
     
     public final General GENERAL;
     
     /** Builds the config spec that should be used for this config. */
-    MainConfig( File dir, String fileName ) {
-        super( dir, fileName,
+    MainConfig( ConfigManager manager, String fileName ) {
+        super( manager, fileName,
                 "This config contains options that apply to the mod as a whole, including some master disable",
                 "toggles for convenience."
         );
         
-        GENERAL = new General( SPEC );
+        GENERAL = new General( this );
     }
     
-    public static class General extends Config.AbstractCategory {
+    public static class General extends AbstractConfigCategory<MainConfig> {
         
         public final IntField updateTime;
         
@@ -32,7 +36,7 @@ public class MainConfig extends Config.AbstractConfig {
         public final BooleanField disableHealthFeatures;
         //public final BooleanField disableHungerFeatures; // NOTE: If/when hunger features are added, also move food configs from health
         
-        General( ToastConfigSpec parent ) {
+        General( MainConfig parent ) {
             super( parent, "general",
                     "Options for customizing the mod as a whole." );
             

@@ -1,28 +1,25 @@
 package fathertoast.naturalabsorption.datagen;
 
-import fathertoast.naturalabsorption.common.compat.tc.NAModifiers;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.ModList;
 
-import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class NARecipeProvider extends RecipeProvider {
     
     public NARecipeProvider( DataGenerator generator ) {
-        super( generator );
+        super( generator.getPackOutput() );
     }
     
     @Override
-    protected void buildCraftingRecipes( Consumer<FinishedRecipe> consumer ) {
-        ShapelessRecipeBuilder.shapeless( NAItems.ABSORPTION_ABSORBING_BOOK.get() )
+    protected void buildRecipes( Consumer<FinishedRecipe> consumer ) {
+        ShapelessRecipeBuilder.shapeless( RecipeCategory.MISC, NAItems.ABSORPTION_ABSORBING_BOOK.get() )
                 .requires( Items.BOOK )
                 .requires( Items.SPONGE )
                 .unlockedBy( "has_book", has( Items.BOOK ) )

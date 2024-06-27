@@ -1,9 +1,11 @@
 package fathertoast.naturalabsorption.common.config;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.AbstractConfigFile;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.field.*;
+import fathertoast.crust.api.config.common.file.TomlHelper;
 import fathertoast.naturalabsorption.client.ClientUtil;
-import fathertoast.naturalabsorption.common.config.field.*;
-import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
-import fathertoast.naturalabsorption.common.config.file.TomlHelper;
 import fathertoast.naturalabsorption.common.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.EnchantArmorType;
 import fathertoast.naturalabsorption.common.util.EnchantmentRarity;
@@ -12,24 +14,22 @@ import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 
-import java.io.File;
-
-public class EquipmentConfig extends Config.AbstractConfig {
+public class EquipmentConfig extends AbstractConfigFile {
     
     public final Enchantment ENCHANTMENT;
     public final Armor ARMOR;
     
     /** Builds the config spec that should be used for this config. */
-    EquipmentConfig( File dir, String fileName ) {
-        super( dir, fileName,
+    EquipmentConfig( ConfigManager manager, String fileName ) {
+        super( manager, fileName,
                 "This config contains options for features that apply to the Absorption enchantment and armor."
         );
         
-        ENCHANTMENT = new Enchantment( SPEC );
-        ARMOR = new Armor( SPEC );
+        ENCHANTMENT = new Enchantment( this );
+        ARMOR = new Armor( this );
     }
     
-    public static class Enchantment extends Config.AbstractCategory {
+    public static class Enchantment extends AbstractConfigCategory<EquipmentConfig> {
         
         public final BooleanField enabled;
         
@@ -48,7 +48,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
         public final IntField costBase;
         public final IntField costPerLevel;
         
-        Enchantment( ToastConfigSpec parent ) {
+        Enchantment( EquipmentConfig parent ) {
             super( parent, "enchantment",
                     "Options for the Absorption enchantment added by this mod." );
             
@@ -112,7 +112,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
         }
     }
     
-    public static class Armor extends Config.AbstractCategory {
+    public static class Armor extends AbstractConfigCategory<EquipmentConfig> {
         
         public final BooleanField enabled;
         
@@ -129,7 +129,7 @@ public class EquipmentConfig extends Config.AbstractConfig {
         public final DoubleField durabilityThreshold;
         public final EnumField<HeartManager.EnumDurabilityTrigger> durabilityTrigger;
         
-        Armor( ToastConfigSpec parent ) {
+        Armor( EquipmentConfig parent ) {
             super( parent, "armor",
                     "Options that relate to armor and the replacement of armor with absorption (yellow hearts).",
                     "All features in this section are disabled by default by one master toggle. Take care to go through",

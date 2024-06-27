@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "item/generated",
   "textures": {
-    "layer0": "naturalabsorption:items/absorption_absorbing_book"
+    "layer0": "naturalabsorption:item/absorption_absorbing_book"
   }
 }

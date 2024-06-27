@@ -185,7 +185,7 @@ public class NALanguageProvider extends LanguageProvider {
     
     /** Creates a language provider for a specific locale. This correlates to exactly one .json file. */
     public NALanguageProvider( DataGenerator gen, String locale, TranslationKey translateKey ) {
-        super( gen, NaturalAbsorption.MOD_ID, locale );
+        super( gen.getPackOutput(), NaturalAbsorption.MOD_ID, locale );
         translationKey = translateKey;
     }
     

@@ -30,7 +30,6 @@ public class AbsorptionBookItem extends Item {
     
     public AbsorptionBookItem() {
         super( new Item.Properties()
-                .tab( CreativeModeTab.TAB_COMBAT )
                 .stacksTo( 1 ) );
     }
     

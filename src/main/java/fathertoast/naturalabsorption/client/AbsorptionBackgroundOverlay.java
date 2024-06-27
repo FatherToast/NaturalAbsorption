@@ -1,13 +1,11 @@
 package fathertoast.naturalabsorption.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -23,7 +21,9 @@ import java.util.Random;
  * maximum natural/equipment absorption.
  */
 public class AbsorptionBackgroundOverlay implements IGuiOverlay {
-    
+
+    private static final ResourceLocation GUI_ICONS_LOCATION = new ResourceLocation("textures/gui/icons.png");
+
     private final Random random = new Random();
     
     /** Used with to make the heart bar flash. */
@@ -39,10 +39,10 @@ public class AbsorptionBackgroundOverlay implements IGuiOverlay {
      * <p>
      * Based strongly on the vanilla render method, with variables made final where possible.
      *
-     * @see ForgeGui#renderHealth(int, int, PoseStack)
+     * @see ForgeGui#renderHealth(int, int, GuiGraphics)
      */
     @Override
-    public void render( ForgeGui gui, PoseStack poseStack, float partialTick, int width, int height ) {
+    public void render( ForgeGui gui, GuiGraphics graphics, float partialTick, int width, int height ) {
         // Moved below; only should be done once we decide to cancel the vanilla render
         //RenderSystem.enableBlend();
 
@@ -78,30 +78,27 @@ public class AbsorptionBackgroundOverlay implements IGuiOverlay {
         lastHealth = health;
         random.setSeed(gui.getGuiTicks() * 312871L);
         int x = width / 2 - 91;
-        int j1 = width / 2 + 91;
         int y = height - 39;
         float maxHealth = Math.max((float) player.getAttributeValue(Attributes.MAX_HEALTH), (float) Math.max(displayHealth, health));
         int absorption = Mth.ceil(player.getAbsorptionAmount());
         int maxAbsorption = Mth.ceil(absorbMax);
         int healthRows = Mth.ceil((maxHealth + (float) maxAbsorption) / 2.0F / 10.0F);
         int rowHeight = Math.max(10 - (healthRows - 2), 3);
-        int k2 = y - (healthRows - 1) * rowHeight - 10;
-        int l2 = y - 10;
-        int j3 = -1;
+        int shake = -1;
 
         if (player.hasEffect(MobEffects.REGENERATION)) {
-            j3 = gui.getGuiTicks() % Mth.ceil(maxHealth + 5.0F);
+            shake = gui.getGuiTicks() % Mth.ceil(maxHealth + 5.0F);
         }
         // Assume the vanilla health renderer is inactive while we render,
         // so we must add the offset ourselves.
         gui.leftHeight += (healthRows * rowHeight) + 1;
 
-        renderHearts(poseStack, player, x, y, rowHeight, j3, maxHealth, health, displayHealth, absorption, maxAbsorption, blink);
+        renderHearts(graphics, player, x, y, rowHeight, shake, maxHealth, health, displayHealth, absorption, maxAbsorption, blink);
     }
 
-    protected void renderHearts(PoseStack poseStack, Player player, int x, int y, int rowHeight, int p_168694_, float maxHealth, int health, int displayHealth, int absorption, int maxAbsorption, boolean blink) {
+    protected void renderHearts(GuiGraphics graphics, Player player, int x, int y, int rowHeight, int shake, float maxHealth, int health, int displayHealth, int absorption, int maxAbsorption, boolean blink) {
         Gui.HeartType heartType = Gui.HeartType.forPlayer(player);
-        int vOffset = 9 * (player.level.getLevelData().isHardcore() ? 5 : 0);
+        int vOffset = 9 * (player.level().getLevelData().isHardcore() ? 5 : 0);
         int healthHearts = Mth.ceil((double)maxHealth / 2.0D);
         int absorptionHearts = Mth.ceil((double)maxAbsorption / 2.0D);
         int l = healthHearts * 2;
@@ -116,10 +113,10 @@ public class AbsorptionBackgroundOverlay implements IGuiOverlay {
                 yPos += random.nextInt(2);
             }
 
-            if (hearts < healthHearts && hearts == p_168694_) {
+            if (hearts < healthHearts && hearts == shake) {
                 yPos -= 2;
             }
-            renderHeart(poseStack, Gui.HeartType.CONTAINER, xPos, yPos, vOffset, blink, false);
+            renderHeart(graphics, Gui.HeartType.CONTAINER, xPos, yPos, vOffset, blink, false);
             int j2 = hearts * 2;
             boolean flag = hearts >= healthHearts;
 
@@ -128,25 +125,25 @@ public class AbsorptionBackgroundOverlay implements IGuiOverlay {
 
                 if (k2 < absorption) {
                     boolean flag1 = k2 + 1 == absorption;
-                    renderHeart(poseStack, heartType == Gui.HeartType.WITHERED ? heartType : Gui.HeartType.ABSORBING, xPos, yPos, vOffset, false, flag1);
+                    renderHeart(graphics, heartType == Gui.HeartType.WITHERED ? heartType : Gui.HeartType.ABSORBING, xPos, yPos, vOffset, false, flag1);
                 }
             }
 
             if (blink && j2 < displayHealth) {
                 boolean jump = j2 + 1 == displayHealth;
-                renderHeart(poseStack, heartType, xPos, yPos, vOffset, true, jump);
+                renderHeart(graphics, heartType, xPos, yPos, vOffset, true, jump);
             }
 
             if (j2 < health) {
                 boolean jump = j2 + 1 == health;
-                renderHeart(poseStack, heartType, xPos, yPos, vOffset, false, jump);
+                renderHeart(graphics, heartType, xPos, yPos, vOffset, false, jump);
             }
         }
 
     }
 
-    private void renderHeart(PoseStack poseStack, Gui.HeartType heartType, int x, int y, int v, boolean blink, boolean jump) {
-        blit(poseStack, x, y, heartType.getX(jump, blink), v, 9, 9);
+    private void renderHeart( GuiGraphics graphics, Gui.HeartType heartType, int x, int y, int v, boolean blink, boolean jump ) {
+        graphics.blit( GUI_ICONS_LOCATION, x, y, heartType.getX(jump, blink), v, 9, 9 );
     }
 
     /**
@@ -156,36 +153,5 @@ public class AbsorptionBackgroundOverlay implements IGuiOverlay {
         return !(Minecraft.getInstance().getCameraEntity() instanceof Player)
                 ? null
                 : (Player) Minecraft.getInstance().getCameraEntity();
-    }
-
-
-    /**
-     * Renders a 2D texture in the GUI using the default depth (aka blitOffset) and texture resolution.
-     *
-     * @see net.minecraft.client.gui.GuiComponent#blit(PoseStack, int, int, int, int, int, int)
-     */
-    @SuppressWarnings( "SameParameterValue" )
-    private static void blit( PoseStack poseStack, int x, int y, int u, int v, int width, int height ) {
-        final float resolution = 256.0F;
-        
-        innerBlit( poseStack.last().pose(), x, x + width, y, y + height,
-                (float) u / resolution, (float) (u + width) / resolution,
-                (float) v / resolution, (float) (v + height) / resolution );
-    }
-    
-    /**
-     * Renders a 2D texture in the GUI using the default depth (aka blitOffset) and texture resolution.
-     */
-    private static void innerBlit( Matrix4f matrix4f, int x0, int x1, int y0, int y1, float u0, float u1, float v0, float v1 ) {
-        final float z = -90;
-        
-        RenderSystem.setShader( GameRenderer::getPositionTexShader );
-        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
-        bufferbuilder.begin( VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX );
-        bufferbuilder.vertex( matrix4f, (float) x0, (float) y1, z ).uv( u0, v1 ).endVertex();
-        bufferbuilder.vertex( matrix4f, (float) x1, (float) y1, z ).uv( u1, v1 ).endVertex();
-        bufferbuilder.vertex( matrix4f, (float) x1, (float) y0, z ).uv( u1, v0 ).endVertex();
-        bufferbuilder.vertex( matrix4f, (float) x0, (float) y0, z ).uv( u0, v0 ).endVertex();
-        BufferUploader.drawWithShader( bufferbuilder.end() );
     }
 }

@@ -32,7 +32,7 @@ public class HeartData implements IHeartData {
      */
     @Nonnull
     public static HeartData get( @Nonnull Player player ) {
-        if( player.level.isClientSide ) {
+        if( player.level().isClientSide ) {
             throw new IllegalArgumentException( "Heart data is only stored on the server side!" );
         }
         UUID uuid = player.getUUID();

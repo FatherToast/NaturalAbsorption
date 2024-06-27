@@ -34,7 +34,6 @@ public class AbsorptionAbsorbingBookItem extends Item {
     
     public AbsorptionAbsorbingBookItem() {
         super( new Item.Properties()
-                .tab( CreativeModeTab.TAB_COMBAT )
                 .stacksTo( 1 ) );
     }
     

@@ -7,7 +7,7 @@ import net.minecraftforge.common.data.GlobalLootModifierProvider;
 public class NALootModifierProvider extends GlobalLootModifierProvider {
 
     public NALootModifierProvider(DataGenerator gen) {
-        super(gen, NaturalAbsorption.MOD_ID);
+        super(gen.getPackOutput(), NaturalAbsorption.MOD_ID);
     }
 
     @Override

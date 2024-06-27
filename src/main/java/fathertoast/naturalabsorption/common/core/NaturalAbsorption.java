@@ -18,6 +18,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -76,7 +77,7 @@ public class NaturalAbsorption {
     
     public NaturalAbsorption() {
         Config.initialize();
-        
+
         packetHandler.registerMessages();
         CraftingUtil.registerConditions();
         
@@ -85,8 +86,10 @@ public class NaturalAbsorption {
         MinecraftForge.EVENT_BUS.addListener( CommandRegister::register );
         
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        
+
+        modBus.addListener( NAItems::onCreativeTabPopulate );
         modBus.addListener( this::onInterModProcess );
+        modBus.addListener( this::setup );
         modBus.addListener( HeartManager::onEntityAttributeCreation );
         
         NAItems.ITEMS.register( modBus );
@@ -97,6 +100,10 @@ public class NaturalAbsorption {
         if( ModList.get().isLoaded( "tconstruct" ) ) {
             NaturalAbsorptionTC.init( modBus );
         }
+    }
+
+    public void setup( final FMLCommonSetupEvent event ) {
+
     }
     
     /**

@@ -1,32 +1,32 @@
 package fathertoast.naturalabsorption.common.config;
 
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.AbstractConfigFile;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.field.*;
 import fathertoast.naturalabsorption.client.ClientUtil;
-import fathertoast.naturalabsorption.common.config.field.*;
-import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
 import fathertoast.naturalabsorption.common.recipe.condition.BookRecipeCondition;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 
-import java.io.File;
-
-public class AbsorptionConfig extends Config.AbstractConfig {
+public class AbsorptionConfig extends AbstractConfigFile {
     
     public final General GENERAL;
     public final Natural NATURAL;
     
     /** Builds the config spec that should be used for this config. */
-    AbsorptionConfig( File dir, String fileName ) {
-        super( dir, fileName,
+    AbsorptionConfig( ConfigManager manager, String fileName ) {
+        super( manager, fileName,
                 "This config contains most options for features that apply to absorption (yellow hearts).",
                 "Does NOT contain any armor or enchantment options - see the 'enchant_and_armor' config for those.",
                 "Also contains hunger options related specifically to absorption recovery."
         );
         
-        GENERAL = new General( SPEC );
-        NATURAL = new Natural( SPEC );
+        GENERAL = new General( this );
+        NATURAL = new Natural( this );
     }
     
-    public static class General extends Config.AbstractCategory {
+    public static class General extends AbstractConfigCategory<AbsorptionConfig> {
         
         public final DoubleField globalMax;
         
@@ -40,7 +40,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         
         public final InjectionWrapperField<BooleanField> renderCapacityBackground;
         
-        General( ToastConfigSpec parent ) {
+        General( AbsorptionConfig parent ) {
             super( parent, "absorption",
                     "Options that apply to absorption (yellow hearts) from any source.",
                     "", "Note: All absorption amounts are in half-hearts." );
@@ -83,7 +83,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         }
     }
     
-    public static class Natural extends Config.AbstractCategory {
+    public static class Natural extends AbstractConfigCategory<AbsorptionConfig> {
         
         public final DoubleField startingAmount;
         public final DoubleField maximumAmount;
@@ -106,7 +106,7 @@ public class AbsorptionConfig extends Config.AbstractConfig {
         
         // Insert here if a config for loot table injection for upgrade/sponge books is desired; see net.minecraftforge.event.LootTableLoadEvent
         
-        Natural( ToastConfigSpec parent ) {
+        Natural( AbsorptionConfig parent ) {
             super( parent, "natural_absorption",
                     "Options for natural absorption. Not to be confused with the Natural Absorption mod itself.",
                     "Natural absorption is one source of maximum absorption that is innate to the player - it does not",

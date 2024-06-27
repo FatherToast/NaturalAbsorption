@@ -1,28 +1,28 @@
 package fathertoast.naturalabsorption.common.config;
 
-import fathertoast.naturalabsorption.common.config.field.DoubleField;
-import fathertoast.naturalabsorption.common.config.file.ToastConfigSpec;
+import fathertoast.crust.api.config.common.AbstractConfigCategory;
+import fathertoast.crust.api.config.common.AbstractConfigFile;
+import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.field.DoubleField;
 
-import java.io.File;
-
-public class CompatConfig extends Config.AbstractConfig {
+public class CompatConfig extends AbstractConfigFile {
     
-    public final CompatConfig.TinkersConstruct TC;
+    public final TinkersConstruct TC;
     
     /** Builds the config spec that should be used for this config. */
-    CompatConfig( File dir, String fileName ) {
-        super( dir, fileName,
+    CompatConfig( ConfigManager manager, String fileName ) {
+        super( manager, fileName,
                 "This config contains config options for compatibility features for various supported mods."
         );
-        TC = new CompatConfig.TinkersConstruct( SPEC );
+        TC = new TinkersConstruct( this );
     }
 
-    public static class TinkersConstruct extends Config.AbstractCategory {
+    public static class TinkersConstruct extends AbstractConfigCategory<CompatConfig> {
         
         //public final BooleanField modifierEnabled;
         public final DoubleField potencyPerLevel;
         
-        TinkersConstruct( ToastConfigSpec parent ) {
+        TinkersConstruct( CompatConfig parent ) {
             super( parent, "tconstruct", "Compatibility options for Tinkers Construct" );
             
             //modifierEnabled = SPEC.define( new BooleanField( "modifier.enabled", true,
