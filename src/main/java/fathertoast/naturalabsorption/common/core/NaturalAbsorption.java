@@ -10,7 +10,7 @@ import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.core.register.NALootModifiers;
 import fathertoast.naturalabsorption.common.event.NAEventListener;
-import fathertoast.naturalabsorption.common.hearts.HeartManager;
+import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.network.PacketHandler;
 import fathertoast.naturalabsorption.common.recipe.CraftingUtil;
 import net.minecraft.resources.ResourceLocation;

@@ -1,4 +1,4 @@
-package fathertoast.naturalabsorption.common.hearts;
+package fathertoast.naturalabsorption.common.core.hearts;
 
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;

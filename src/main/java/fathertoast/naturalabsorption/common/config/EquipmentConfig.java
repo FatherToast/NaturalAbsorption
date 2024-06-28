@@ -3,13 +3,13 @@ package fathertoast.naturalabsorption.common.config;
 import fathertoast.crust.api.config.common.AbstractConfigCategory;
 import fathertoast.crust.api.config.common.AbstractConfigFile;
 import fathertoast.crust.api.config.common.ConfigManager;
+import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.crust.api.config.common.field.*;
 import fathertoast.crust.api.config.common.file.TomlHelper;
 import fathertoast.naturalabsorption.client.ClientUtil;
-import fathertoast.naturalabsorption.common.hearts.HeartManager;
+import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.EnchantArmorType;
 import fathertoast.naturalabsorption.common.util.EnchantmentRarity;
-import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.world.item.enchantment.ProtectionEnchantment;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -87,7 +87,7 @@ public class EquipmentConfig extends AbstractConfigFile {
             
             levelMax = SPEC.define( new IntField( "level_maximum", 4, IntField.Range.NON_NEGATIVE,
                     "Maximum level for the Absorption enchantment.",
-                    "Without messing with cost, it is recommended you only alter this to " + References.PLUS_OR_MINUS +
+                    "Without messing with cost, it is recommended you only alter this to " + ConfigUtil.PLUS_OR_MINUS +
                             " 1 default max level." ) );
             stacking = SPEC.define( new BooleanField( "stacking", true,
                     "If true, all equipped Absorption enchantments are added together (like vanilla Protection enchants).",
@@ -123,11 +123,7 @@ public class EquipmentConfig extends AbstractConfigFile {
         public final DoubleField armorRecovery;
         public final DoubleField armorToughnessMultiplier;
         public final DoubleField armorToughnessRecovery;
-        
-        public final BooleanField durabilityFriendly;
-        public final DoubleField durabilityMultiplier;
-        public final DoubleField durabilityThreshold;
-        public final EnumField<HeartManager.EnumDurabilityTrigger> durabilityTrigger;
+
         
         Armor( EquipmentConfig parent ) {
             super( parent, "armor",
@@ -163,20 +159,6 @@ public class EquipmentConfig extends AbstractConfigFile {
                     "For reference, the maximum attainable toughness in vanilla is 12 (full netherite armor)." ) );
             armorToughnessRecovery = SPEC.define( new DoubleField( "toughness_recovery", 0.05, DoubleField.Range.NON_NEGATIVE,
                     "The increase in absorption recovery rate for each point of armor toughness." ) );
-            
-            SPEC.newLine();
-            
-            durabilityFriendly = SPEC.define( new BooleanField( "durability.friendly", true,
-                    "If true, armor will only take durability damage based on damage dealt to absorption (yellow hearts)." ) );
-            durabilityMultiplier = SPEC.define( new DoubleField( "durability.damage_multiplier", 2.0, DoubleField.Range.NON_NEGATIVE,
-                    "The multiplier applied to armor durability damage." ) );
-            durabilityThreshold = SPEC.define( new DoubleField( "durability.threshold", 1.0, DoubleField.Range.NON_NEGATIVE,
-                    "Damage less than or equal to this threshold will not degrade armor durability." ) );
-            durabilityTrigger = SPEC.define( new EnumField<>( "durability.trigger", HeartManager.EnumDurabilityTrigger.ALL,
-                    "Decide which damage sources can inflict durability damage.",
-                    "  all  - all damage except thorns",
-                    "  hits - all damage except thorns and damage-over-time (poison, burning, cactus, etc.)",
-                    "  none - no damage hurts armor" ) );
         }
     }
 }

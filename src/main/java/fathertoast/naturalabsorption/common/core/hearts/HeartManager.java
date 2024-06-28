@@ -1,35 +1,34 @@
-package fathertoast.naturalabsorption.common.hearts;
+package fathertoast.naturalabsorption.common.core.hearts;
 
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -47,9 +46,6 @@ import java.util.Set;
 public class HeartManager {
     /** Map of all players that have had equipment changes since the last tick, linked to their previous max absorption. */
     private static final HashMap<Player, Double> PLAYER_EQUIPMENT_TRACKER = new HashMap<>();
-    
-    /** Set of all currently altered damage sources. */
-    private static final Set<DamageSource> MODDED_SOURCES = new HashSet<>();
     
     /** Map of all currently tracked players to their last known hunger state. */
     private static final HashMap<Player, HungerState> PLAYER_HUNGER_STATE_TRACKER = new HashMap<>();
@@ -80,34 +76,6 @@ public class HeartManager {
             AbsorptionHelper.updateEquipmentAbsorption( entry.getKey(), entry.getValue() );
         }
         PLAYER_EQUIPMENT_TRACKER.clear();
-    }
-    
-    /** Returns true if the given damage source is modified to ignore armor. */
-    private static boolean isSourceModified( DamageSource source ) { return MODDED_SOURCES.contains( source ); }
-
-    // TODO - modifying damage sources is no longer possible.
-    //        properties like "bypassesArmor" and "isMagic" are now damage type tags.
-    /** Modifies a source to ignore armor. */
-    private static void modifySource( DamageSource source ) {
-        //if( source.is( DamageTypeTags.BYPASSES_INVULNERABILITY) ) return;
-        //source.bypassArmor = true;
-    }
-    
-    /** Undoes any modification done to a damage source. */
-    private static void restoreSource( DamageSource source ) {
-        //source.bypassArmor = false;
-        //MODDED_SOURCES.remove( source );
-    }
-    
-    /** Undoes all modification done to all damage sources. */
-    public static void clearSources() {
-        /*
-        for( DamageSource source : MODDED_SOURCES ) {
-            source.bypassArmor = false;
-        }
-        MODDED_SOURCES.clear();
-
-         */
     }
     
     /** Creates or updates a player's tracked hunger state. */
@@ -168,7 +136,6 @@ public class HeartManager {
             if( ++cleanupCounter >= 6666 ) {
                 cleanupCounter = 0;
                 PLAYER_HUNGER_STATE_TRACKER.clear();
-                clearSources();
                 HeartData.clearCache();
             }
             
@@ -412,72 +379,25 @@ public class HeartManager {
             
             // Handle armor replacement, if enabled
             if( isArmorReplacementEnabled() ) {
+                float unmodifiedDamage = event.getAmount();
+
                 // Force damage to ignore armor
                 if( Config.EQUIPMENT.ARMOR.disableArmor.get() && !event.getSource().is( DamageTypeTags.BYPASSES_ARMOR ) ) {
-                    modifySource( event.getSource() );
-                }
-                // Degrade armor manually (armor ignoring damage otherwise won't)
-                if( event.getAmount() > Config.EQUIPMENT.ARMOR.durabilityThreshold.get() &&
-                        !event.getSource().is( DamageTypeTags.BYPASSES_INVULNERABILITY ) && !"thorns".equalsIgnoreCase( event.getSource().getMsgId() ) ) {
-                    
-                    switch( Config.EQUIPMENT.ARMOR.durabilityTrigger.get() ) {
-                        case NONE:
-                            break;
-                        case HITS:
-                            if( isSourceDamageOverTime( event.getSource(), event.getAmount() ) ) break;
-                        default:
-                            damageArmor( event );
-                    }
+                    event.setAmount( unmodifiedDamage + ( unmodifiedDamage - getDamageAfterArmorAbsorb( event.getEntity(), event.getSource(), unmodifiedDamage ) ) );
                 }
             }
         }
-        else if( isArmorReplacementEnabled() && isSourceModified( event.getSource() ) ) {
-            // Restore the source's normal settings against non-players
-            restoreSource( event.getSource() );
-        }
     }
-    
-    // Determines whether a damage source is damage-over-time.
-    private boolean isSourceDamageOverTime( DamageSource source, float amount ) {
-        // Potion degeneration
-        ResourceKey<DamageType> typeId = source.typeHolder().unwrapKey().orElse( null );
 
-        if ( typeId == null ) {
-            NaturalAbsorption.LOG.error("No ID (resource key) found for damage type '{}'", source.type());
-            return false;
+    /**
+     * @return Damage value after armor absorbs damage, without damaging the entity's armor.
+     */
+    public float getDamageAfterArmorAbsorb( LivingEntity entity, DamageSource source, float amount ) {
+        if ( !source.is(DamageTypeTags.BYPASSES_ARMOR )) {
+            amount = CombatRules.getDamageAfterAbsorb( amount, (float)entity.getArmorValue(), (float)entity.getAttributeValue(Attributes.ARMOR_TOUGHNESS) );
         }
-
-        return typeId == DamageTypes.MAGIC && amount <= 1.0F /* Hopefully poison damage */ || typeId == DamageTypes.WITHER ||
-                // Burning damage
-                typeId == DamageTypes.ON_FIRE || typeId == DamageTypes.IN_FIRE ||
-                typeId == DamageTypes.LAVA || typeId == DamageTypes.HOT_FLOOR ||
-                // Damaging plants
-                typeId == DamageTypes.CACTUS || typeId == DamageTypes.SWEET_BERRY_BUSH ||
-                // Unfortunate states
-                typeId == DamageTypes.IN_WALL || typeId == DamageTypes.CRAMMING ||
-                typeId == DamageTypes.DROWN || typeId == DamageTypes.STARVE || typeId == DamageTypes.DRY_OUT;
+        return amount;
     }
-    
-    // Used to degrade armor durability when armor damage reduction is disabled.
-    private void damageArmor( LivingHurtEvent event ) {
-        final Player player = (Player) event.getEntity();
-        
-        float durabilityDamage = event.getAmount();
-        
-        // Only degrade armor based on damage dealt to absorption health
-        if( Config.EQUIPMENT.ARMOR.durabilityFriendly.get() && durabilityDamage > player.getAbsorptionAmount() ) {
-            durabilityDamage = player.getAbsorptionAmount();
-        }
-        // Multiply degradation based on settings
-        durabilityDamage *= Config.EQUIPMENT.ARMOR.durabilityMultiplier.get();
-        
-        // Degrade armor durability
-        if( !event.getSource().is( DamageTypeTags.BYPASSES_INVULNERABILITY ) && durabilityDamage > 0.0F ) {
-            player.getInventory().hurtArmor( event.getSource(), durabilityDamage, Inventory.ALL_ARMOR_SLOTS );
-        }
-    }
-    
-    public enum EnumDurabilityTrigger { ALL, HITS, NONE }
     
     /** Used to track the current hunger and saturation level for a player of interest. */
     private static class HungerState {

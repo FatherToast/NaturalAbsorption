@@ -3,7 +3,7 @@ package fathertoast.naturalabsorption.api.impl;
 import fathertoast.naturalabsorption.api.IAbsorptionAccessor;
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.INaturalAbsorption;
-import fathertoast.naturalabsorption.common.hearts.HeartData;
+import fathertoast.naturalabsorption.common.core.hearts.HeartData;
 import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nonnull;

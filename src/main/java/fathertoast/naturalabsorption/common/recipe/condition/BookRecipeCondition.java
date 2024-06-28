@@ -3,7 +3,7 @@ package fathertoast.naturalabsorption.common.recipe.condition;
 import com.google.gson.JsonObject;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
-import fathertoast.naturalabsorption.common.hearts.HeartManager;
+import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;

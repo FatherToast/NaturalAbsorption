@@ -3,7 +3,7 @@ package fathertoast.naturalabsorption.common.event;
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
-import fathertoast.naturalabsorption.common.hearts.HeartManager;
+import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.recipe.condition.BookRecipeCondition;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.entity.player.AdvancementEvent;

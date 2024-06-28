@@ -2,8 +2,8 @@ package fathertoast.naturalabsorption.common.item;
 
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
-import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
-import fathertoast.naturalabsorption.common.hearts.HeartManager;
+import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
+import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;

@@ -1,4 +1,4 @@
-package fathertoast.naturalabsorption.common.hearts;
+package fathertoast.naturalabsorption.common.core.hearts;
 
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;

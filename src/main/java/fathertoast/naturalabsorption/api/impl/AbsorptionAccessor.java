@@ -1,7 +1,7 @@
 package fathertoast.naturalabsorption.api.impl;
 
 import fathertoast.naturalabsorption.api.IAbsorptionAccessor;
-import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
+import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
 import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.ParametersAreNonnullByDefault;

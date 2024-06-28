@@ -1,6 +1,6 @@
 package fathertoast.naturalabsorption.client;
 
-import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
+import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

@@ -3,7 +3,7 @@ package fathertoast.naturalabsorption.common.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import fathertoast.naturalabsorption.common.hearts.AbsorptionHelper;
+import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

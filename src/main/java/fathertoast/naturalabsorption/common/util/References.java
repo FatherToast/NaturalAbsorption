@@ -1,5 +1,7 @@
 package fathertoast.naturalabsorption.common.util;
 
+import fathertoast.crust.api.config.common.ConfigUtil;
+import fathertoast.crust.api.lib.CrustObjects;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import net.minecraft.network.chat.Component;
@@ -48,15 +50,6 @@ public class References {
     public static String prettyToString( float value ) {
         return Math.round( value ) == value ? Integer.toString( Math.round( value ) ) : Float.toString( Math.round( value * 100.0F ) / 100.0F );
     }
-    
-    //---------------- COOL SYMBOLS -------------------
-    
-    /** The plus or minus symbol (+/-). */
-    public static final String PLUS_OR_MINUS = "\u00b1";
-    /** The less than or equal to symbol (<=). */
-    public static final String LESS_OR_EQUAL = "\u2264";
-    /** The greater than or equal to symbol (>=). */
-    public static final String GREATER_OR_EQUAL = "\u2265";
     
     
     //------------ THE OBJECT SUPPLIER SUPPLIER SUPPLIER --------------
