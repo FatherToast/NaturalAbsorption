@@ -9,6 +9,10 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.ModList;
+import slimeknights.tconstruct.common.TinkerTags;
+import slimeknights.tconstruct.library.modifiers.ModifierId;
+import slimeknights.tconstruct.library.recipe.modifiers.adding.ModifierRecipeBuilder;
+import slimeknights.tconstruct.library.tools.SlotType;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -34,12 +38,10 @@ public class NARecipeProvider extends RecipeProvider {
     
     private void handleDependencyRecipes( Consumer<FinishedRecipe> consumer ) {
         if( ModList.get().isLoaded( "tconstruct" ) ) {
-            //this.tinkersRecipes( consumer );
+            this.tinkersRecipes( consumer );
         }
     }
 
-    // TODO - Wait for TC to update
-    /*
     private void tinkersRecipes( Consumer<FinishedRecipe> consumer ) {
         final String upgradeFolder = "tools/modifiers/upgrade/";
         final String abilityFolder = "tools/modifiers/ability/";
@@ -51,6 +53,7 @@ public class NARecipeProvider extends RecipeProvider {
         final String defenseSalvage = "tools/modifiers/salvage/defense/";
         final String compatFolder = "tools/modifiers/compat/";
         final String compatSalvage = "tools/modifiers/salvage/compat/";
+
         
         ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION_ID )
                 .addInput( NAItems.ABSORPTION_BOOK.get() )
@@ -65,6 +68,4 @@ public class NARecipeProvider extends RecipeProvider {
         ResourceLocation loc = Objects.requireNonNull( modifierId );
         return new ResourceLocation( modid, prefix + loc.getPath() );
     }
-
-     */
 }

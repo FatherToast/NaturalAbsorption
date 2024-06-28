@@ -43,6 +43,6 @@ side = "BOTH"
 [[dependencies.naturalabsorption]]
 modId = "tconstruct"
 mandatory = false
-versionRange = "[3.5.1.31,)"
+versionRange = "[3.8.3.39,)"
 ordering = "BEFORE"
 side = "BOTH"

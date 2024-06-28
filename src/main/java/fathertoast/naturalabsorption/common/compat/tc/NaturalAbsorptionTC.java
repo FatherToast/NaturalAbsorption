@@ -5,6 +5,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 public class NaturalAbsorptionTC {
 
     public static void init(IEventBus modBus) {
-        //modBus.addListener(NAModifiers::onModifierRegister);
+        modBus.addListener(NAModifiers::onModifierRegister);
     }
 }
