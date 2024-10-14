@@ -28,7 +28,7 @@ public class NABaseCommand {
 
         private static ArgumentBuilder<CommandSourceStack, ?> register() {
             return Commands.literal("absorption")
-                    .requires((source) -> source.hasPermission(3))
+                    .requires((source) -> source.hasPermission(2))
                     .then(Commands.literal("add")
                             .then(Commands.argument("targets", EntityArgument.players())
                                     .then(Commands.argument("absorption", IntegerArgumentType.integer(1))

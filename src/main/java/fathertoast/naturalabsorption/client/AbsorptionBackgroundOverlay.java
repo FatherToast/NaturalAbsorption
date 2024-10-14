@@ -45,7 +45,7 @@ public class AbsorptionBackgroundOverlay implements IIngameOverlay {
         
         final Player player = Minecraft.getInstance().player;
         
-        if( player == null || !ClientUtil.OVERLAY_ENABLED ) return;
+        if( player == null || !ClientUtil.OVERLAY_ENABLED || player.isCreative() || player.isSpectator() ) return;
         
         final float absorbMax = (float) AbsorptionHelper.getMaxAbsorption( player );
 
