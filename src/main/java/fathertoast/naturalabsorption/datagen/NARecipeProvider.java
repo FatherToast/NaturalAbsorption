@@ -1,14 +1,21 @@
 package fathertoast.naturalabsorption.datagen;
 
+import fathertoast.naturalabsorption.common.compat.tc.NAModifiers;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.ModList;
+import slimeknights.tconstruct.common.TinkerTags;
+import slimeknights.tconstruct.library.modifiers.ModifierId;
+import slimeknights.tconstruct.library.recipe.modifiers.adding.ModifierRecipeBuilder;
+import slimeknights.tconstruct.library.tools.SlotType;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class NARecipeProvider extends RecipeProvider {
@@ -26,17 +33,15 @@ public class NARecipeProvider extends RecipeProvider {
                 .unlockedBy( "has_sponge", has( Items.SPONGE ) )
                 .save( consumer );
         
-        this.handleDependencyRecipes( consumer );
+        handleDependencyRecipes( consumer );
     }
     
     private void handleDependencyRecipes( Consumer<FinishedRecipe> consumer ) {
         if( ModList.get().isLoaded( "tconstruct" ) ) {
-            //this.tinkersRecipes( consumer );
+            tinkersRecipes( consumer );
         }
     }
 
-    // TODO - Wait for TC to update
-    /*
     private void tinkersRecipes( Consumer<FinishedRecipe> consumer ) {
         final String upgradeFolder = "tools/modifiers/upgrade/";
         final String abilityFolder = "tools/modifiers/ability/";
@@ -51,7 +56,7 @@ public class NARecipeProvider extends RecipeProvider {
         
         ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION_ID )
                 .addInput( NAItems.ABSORPTION_BOOK.get() )
-                .setTools( TinkerTags.Items.ARMOR )
+                .setTools( TinkerTags.Items.WORN_ARMOR )
                 .setSlots( SlotType.DEFENSE, 1 )
                 .setMaxLevel( 3 )
                 .save( consumer, prefix( "tconstruct", NAModifiers.ARMOR_ABSORPTION_ID, upgradeFolder ) );
@@ -62,6 +67,4 @@ public class NARecipeProvider extends RecipeProvider {
         ResourceLocation loc = Objects.requireNonNull( modifierId );
         return new ResourceLocation( modid, prefix + loc.getPath() );
     }
-
-     */
 }

@@ -1,0 +1,14 @@
+{
+  "modifier_id": "naturalabsorption:armor_absorption",
+  "text": [
+    {
+      "text": "More health, kind of, but yellow!"
+    }
+  ],
+  "tool_filter": "tconstruct:modifiable/armor",
+  "effects": [
+    "Increases max absorption for the wearer",
+    "Multiple levels, each level further increases max absorption",
+    "Requires 1 upgrade slot per level"
+  ]
+}

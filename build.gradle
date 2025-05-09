@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)', changing: true
-        classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
+        //classpath group: "org.spongepowered", name: "mixingradle", version: "0.7-SNAPSHOT"
     }
 }
 plugins {
@@ -15,11 +15,13 @@ plugins {
     id 'idea'
 }
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: "org.spongepowered.mixin"
+//apply plugin: "org.spongepowered.mixin"
 
+/*
 mixin {
-    add sourceSets.main, "naturalabsorption.mixins.refmap.json"
+    add sourceSets.main, "naturalabsorption.refmap.json"
 }
+*/
 
 // The mod's version and id
 version = "${mc_version}-${mod_version}"
@@ -41,9 +43,9 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             property "mixin.debug.export", "true"
-            property 'mixin.env.disableRefMap', 'true'
+            //property 'mixin.env.disableRefMap', 'true'
 
-            arg "-mixin.config=naturalabsorption.mixins.json"
+            //arg "-mixin.config=naturalabsorption.mixins.json"
 
             mods {
                 naturalabsorption {
@@ -95,11 +97,10 @@ dependencies {
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
 
-    // Wait for TC to update
-    //implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
-    //implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
+    implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
+    implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")
 
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    //annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {
@@ -111,8 +112,8 @@ jar {
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : "${version}",
                 "Implementation-Vendor"   : "FatherToast",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs": "naturalabsorption.mixins.json"
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                //"MixinConfigs"            : "naturalabsorption.mixins.json"
         ])
     }
 }
