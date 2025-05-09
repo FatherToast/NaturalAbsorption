@@ -1,0 +1,23 @@
+{
+  "enchantment.naturalabsorption.absorption": "格挡",
+  "enchantment.naturalabsorption.absorption.desc": "提升你的格挡量",
+  "item.naturalabsorption.absorption_absorbing_book": "格挡吸收宝典",
+  "item.naturalabsorption.absorption_book": "格挡宝典",
+  "item.naturalabsorption.absorption_book.already_max": "无法再提高你的自然格挡量",
+  "item.naturalabsorption.absorption_book.not_enough_levels": "需要至少%s级来使用",
+  "item.naturalabsorption.absorption_book.tooltip.cost": "花费：%d级经验",
+  "item.naturalabsorption.absorption_book.tooltip.current": "你的格挡量",
+  "item.naturalabsorption.book.tooltip.can_use": "右键使用",
+  "item.naturalabsorption.book.tooltip.gain": "使用时：",
+  "item.naturalabsorption.book.tooltip.max": "%s最大格挡量",
+  "item.naturalabsorption.book.tooltip.no_use": "你不能使用此物品",
+  "item.naturalabsorption.food.tooltip.health": "%s生命值",
+  "item.naturalabsorption.food.tooltip.hunger": "%s饥饿值",
+  "item.naturalabsorption.food.tooltip.saturation": "%s饱和值",
+  "item.naturalabsorption.sponge_book.not_enough_absorption": "你没有自然格挡量作为交换",
+  "item.naturalabsorption.sponge_book.tooltip.refund": "返还：%d级经验",
+  "modifier.naturalabsorption.armor_absorption": "格挡",
+  "modifier.naturalabsorption.armor_absorption.description": "获得额外的格挡量",
+  "modifier.naturalabsorption.armor_absorption.flavor": "黄金之心",
+  "modifier.naturalabsorption.armor_absorption.tooltip": "+%s最大格挡量"
+}
