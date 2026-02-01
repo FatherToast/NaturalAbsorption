@@ -5,12 +5,12 @@ import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
 import fathertoast.naturalabsorption.common.command.CommandRegister;
 import fathertoast.naturalabsorption.common.compat.tc.NaturalAbsorptionTC;
 import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.core.register.NALootModifiers;
 import fathertoast.naturalabsorption.common.event.NAEventListener;
-import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.network.PacketHandler;
 import fathertoast.naturalabsorption.common.recipe.CraftingUtil;
 import net.minecraft.resources.ResourceLocation;
@@ -61,7 +61,6 @@ public class NaturalAbsorption {
      */
     
     /** Our mod ID. */
-    @SuppressWarnings( "SpellCheckingInspection" )
     public static final String MOD_ID = "naturalabsorption";
     
     /** Logger instance for the mod. */
@@ -75,9 +74,9 @@ public class NaturalAbsorption {
     private final INaturalAbsorption modApi = new NaturalAbsorptionAPI();
     
     
-    public NaturalAbsorption() {
+    public NaturalAbsorption( FMLJavaModLoadingContext context ) {
         Config.initialize();
-
+        
         packetHandler.registerMessages();
         CraftingUtil.registerConditions();
         
@@ -85,8 +84,8 @@ public class NaturalAbsorption {
         MinecraftForge.EVENT_BUS.register( new HeartManager() );
         MinecraftForge.EVENT_BUS.addListener( CommandRegister::register );
         
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+        IEventBus modBus = context.getModEventBus();
+        
         modBus.addListener( NAItems::onCreativeTabPopulate );
         modBus.addListener( this::onInterModProcess );
         modBus.addListener( this::setup );
@@ -101,36 +100,36 @@ public class NaturalAbsorption {
             NaturalAbsorptionTC.init( modBus );
         }
     }
-
+    
     public void setup( final FMLCommonSetupEvent event ) {
-
+    
     }
     
     /**
      * Hands the mod API to mods that ask for it.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     private void onInterModProcess( InterModProcessEvent event ) {
         event.getIMCStream().forEach( ( message ) -> {
             if( message.method().equals( "getNaturalAbsorptionAPI" ) ) {
                 Object o = message.messageSupplier().get();
-
+                
                 try {
                     ((Function<INaturalAbsorption, Void>) o).apply( modApi );
                 }
-                catch (Exception ignored) {
-                    LOG.warn("Mod with ID \"{}\" asked for our API instance, but something went wrong!", message.senderModId());
+                catch( Exception ignored ) {
+                    LOG.warn( "Mod with ID \"{}\" asked for our API instance, but something went wrong!", message.senderModId() );
                 }
             }
         } );
     }
     
     /** @return A ResourceLocation with the mod's namespace. */
-    public static ResourceLocation resourceLoc(String path ) { return new ResourceLocation( MOD_ID, path ); }
+    public static ResourceLocation resLoc( String path ) { return ResourceLocation.fromNamespaceAndPath( MOD_ID, path ); }
     
     /** @return Returns a Forge registry entry as a string, or "null" if it is null. */
     public static <T> String toString( @Nullable T object, IForgeRegistry<T> registry ) {
-        return object == null || !registry.containsValue(object) ? "null" : toString( registry.getKey(object) );
+        return object == null || !registry.containsValue( object ) ? "null" : toString( registry.getKey( object ) );
     }
     
     /** @return Returns the resource location as a string, or "null" if it is null. */

@@ -10,19 +10,7 @@ import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 
 public class BookRecipeCondition implements ICondition {
     
-    private static final ResourceLocation ID = NaturalAbsorption.resourceLoc( "recipe_style" );
-    
-    public enum Type {
-        NONE( "none" ),
-        SIMPLE( "simple" ),
-        SANDWICH( "sandwich" ),
-        CROSS( "cross" ),
-        SURROUND( "surround" );
-        
-        private final String NAME;
-        
-        Type( String name ) { NAME = name; }
-    }
+    private static final ResourceLocation ID = NaturalAbsorption.resLoc( "recipe_style" );
     
     private final String styleName;
     
@@ -34,11 +22,11 @@ public class BookRecipeCondition implements ICondition {
     public ResourceLocation getID() { return ID; }
     
     @Override
-    public boolean test(IContext context) {
+    public boolean test( IContext context ) {
         return HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.upgradeGain.get() > 0.0 &&
                 Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().equalsIgnoreCase( this.styleName );
     }
-
+    
     public static class Serializer implements IConditionSerializer<BookRecipeCondition> {
         
         public Serializer() { }
@@ -53,5 +41,17 @@ public class BookRecipeCondition implements ICondition {
         
         @Override
         public ResourceLocation getID() { return ID; }
+    }
+    
+    public enum Type {
+        NONE( "none" ),
+        SIMPLE( "simple" ),
+        SANDWICH( "sandwich" ),
+        CROSS( "cross" ),
+        SURROUND( "surround" );
+        
+        private final String NAME;
+        
+        Type( String name ) { NAME = name; }
     }
 }

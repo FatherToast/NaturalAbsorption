@@ -2,8 +2,8 @@ package fathertoast.naturalabsorption.common.event;
 
 import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
-import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
+import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.recipe.condition.BookRecipeCondition;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
@@ -13,7 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class NAEventListener {
     
-    private static final ResourceLocation ADV_BOOK_RECIPE = NaturalAbsorption.resourceLoc( "recipes/" + NAItems.ABSORPTION_BOOK.getId().getPath() );
+    private static final ResourceLocation ADV_BOOK_RECIPE = NaturalAbsorption.resLoc( "recipes/" + NAItems.ABSORPTION_BOOK.getId().getPath() );
     
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onAdvancement( AdvancementEvent.AdvancementEarnEvent event ) {

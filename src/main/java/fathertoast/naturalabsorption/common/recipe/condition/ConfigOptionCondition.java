@@ -12,75 +12,74 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 
 public record ConfigOptionCondition(Operation operation) implements ICondition {
-
-    private static final ResourceLocation ID = NaturalAbsorption.resourceLoc("config_option");
-
-    public enum Operation {
-
-        SPONGE_BOOK("sponge_book", Config.ABSORPTION.NATURAL.spongeBookEnabled::get);
-
-        Operation(String name, Supplier<Boolean> test) {
-            this.name = name;
-            this.test = test;
-        }
-
-        final String name;
-        final Supplier<Boolean> test;
-
-        public String getName() {
-            return name;
-        }
-
-        public boolean test() {
-            return test.get();
-        }
-
-        @Nullable
-        public static Operation getFromName(String operationName) {
-            for (Operation operation : values()) {
-                if (operation.getName().equals(operationName)) {
-                    return operation;
-                }
-            }
-            return null;
-        }
-    }
-
+    
+    private static final ResourceLocation ID = NaturalAbsorption.resLoc( "config_option" );
+    
     @Override
     public ResourceLocation getID() {
         return ID;
     }
-
+    
     @Override
-    public boolean test(IContext context) {
+    public boolean test( IContext context ) {
         return operation.test();
     }
-
+    
     public static class Serializer implements IConditionSerializer<ConfigOptionCondition> {
-
-        public Serializer() {
-        }
-
+        
+        public Serializer() { }
+        
         @Override
-        public void write(JsonObject json, ConfigOptionCondition value) {
-            json.addProperty("operation", value.operation.getName());
+        public void write( JsonObject json, ConfigOptionCondition value ) {
+            json.addProperty( "operation", value.operation.getName() );
         }
-
+        
         @Override
-        public ConfigOptionCondition read(JsonObject json) {
-            String operationName = json.getAsJsonPrimitive("operation").getAsString();
-            Operation operation = Operation.getFromName(operationName);
-
-            if (operation == null) {
-                throw new IllegalArgumentException("Attempted to read a config option crafting condition with invalid operation type. " +
-                        "Expected any of \"" + Arrays.toString(Operation.values()) + "\" but found \"" + operationName + "\"");
+        public ConfigOptionCondition read( JsonObject json ) {
+            String operationName = json.getAsJsonPrimitive( "operation" ).getAsString();
+            Operation operation = Operation.getFromName( operationName );
+            
+            if( operation == null ) {
+                throw new IllegalArgumentException( "Attempted to read a config option crafting condition with invalid operation type. " +
+                        "Expected any of \"" + Arrays.toString( Operation.values() ) + "\" but found \"" + operationName + "\"" );
             }
-            return new ConfigOptionCondition(operation);
+            return new ConfigOptionCondition( operation );
         }
-
+        
         @Override
         public ResourceLocation getID() {
             return ID;
+        }
+    }
+    
+    public enum Operation {
+        
+        SPONGE_BOOK( "sponge_book", Config.ABSORPTION.NATURAL.spongeBookEnabled::get );
+        
+        Operation( String name, Supplier<Boolean> test ) {
+            this.name = name;
+            this.test = test;
+        }
+        
+        final String name;
+        final Supplier<Boolean> test;
+        
+        public String getName() {
+            return name;
+        }
+        
+        public boolean test() {
+            return test.get();
+        }
+        
+        @Nullable
+        public static Operation getFromName( String operationName ) {
+            for( Operation operation : values() ) {
+                if( operation.getName().equals( operationName ) ) {
+                    return operation;
+                }
+            }
+            return null;
         }
     }
 }
