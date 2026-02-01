@@ -36,12 +36,15 @@ public class NARecipeProvider extends RecipeProvider {
         handleDependencyRecipes( consumer );
     }
     
+    // The recipes themselves aren't conditional, but we avoid
+    // trying to generate them if the mod they depend on isn't present,
+    // such as when we are updating to a new major MC version.
     private void handleDependencyRecipes( Consumer<FinishedRecipe> consumer ) {
         if( ModList.get().isLoaded( "tconstruct" ) ) {
             tinkersRecipes( consumer );
         }
     }
-
+    
     private void tinkersRecipes( Consumer<FinishedRecipe> consumer ) {
         final String upgradeFolder = "tools/modifiers/upgrade/";
         final String abilityFolder = "tools/modifiers/ability/";
@@ -63,8 +66,8 @@ public class NARecipeProvider extends RecipeProvider {
     }
     
     
-    public ResourceLocation prefix(String modid, ModifierId modifierId, String prefix ) {
+    public ResourceLocation prefix( String modid, ModifierId modifierId, String prefix ) {
         ResourceLocation loc = Objects.requireNonNull( modifierId );
-        return new ResourceLocation( modid, prefix + loc.getPath() );
+        return ResourceLocation.fromNamespaceAndPath( modid, prefix + loc.getPath() );
     }
 }
