@@ -11,14 +11,14 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.function.Supplier;
 
 public class NALootModifiers {
-
-    public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> LOOT_MODIFIER_SERIALIZERS = DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, NaturalAbsorption.MOD_ID);
-
-
-    public static final RegistryObject<Codec<AddItemChanceLootModifier>> ADD_ITEM_CHANCE = register("add_with_chance", AddItemChanceLootModifier.CODEC);
-
-
-    private static <T extends Codec<? extends IGlobalLootModifier>> RegistryObject<T> register(String name, Supplier<T> supplier) {
-        return LOOT_MODIFIER_SERIALIZERS.register(name, supplier);
+    
+    public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> LOOT_MODIFIER_SERIALIZERS = DeferredRegister.create( ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, NaturalAbsorption.MOD_ID );
+    
+    
+    public static final RegistryObject<Codec<AddItemChanceLootModifier>> ADD_ITEM_CHANCE = register( "add_with_chance", AddItemChanceLootModifier.CODEC );
+    
+    
+    private static <T extends Codec<? extends IGlobalLootModifier>> RegistryObject<T> register( String name, Supplier<T> supplier ) {
+        return LOOT_MODIFIER_SERIALIZERS.register( name, supplier );
     }
 }

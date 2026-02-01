@@ -10,11 +10,11 @@ public class ClientUtil {
     
     private static boolean armorFeaturesEnabled;
     private static boolean hideArmorBar;
-
+    
     public static boolean OVERLAY_ENABLED = true;
     public static boolean RENDER_ARMOR = true;
-
-
+    
+    
     /** Sets whether the user wants armor features enabled, and toggles rendering if needed. */
     public static DistExecutor.SafeRunnable setArmorFeaturesEnabled( boolean value ) {
         // Non-lambda function is required to pass Forge's validation

@@ -21,7 +21,7 @@ public class NAEventListener {
             if( event.getAdvancement().getId().equals( ADV_BOOK_RECIPE ) ) {
                 
                 // The advancement for unlocking the book of absorption recipe
-                ResourceLocation recipe = new ResourceLocation(
+                ResourceLocation recipe = ResourceLocation.tryParse(
                         NaturalAbsorption.toString( NAItems.ABSORPTION_BOOK.get(), ForgeRegistries.ITEMS ) + "_" +
                                 Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().toLowerCase()
                 );

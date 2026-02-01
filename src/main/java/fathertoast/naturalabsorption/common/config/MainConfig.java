@@ -8,8 +8,6 @@ import fathertoast.crust.api.config.common.field.InjectionWrapperField;
 import fathertoast.crust.api.config.common.field.IntField;
 import net.minecraft.world.level.GameRules;
 
-import java.io.File;
-
 public class MainConfig extends AbstractConfigFile {
     
     public final General GENERAL;

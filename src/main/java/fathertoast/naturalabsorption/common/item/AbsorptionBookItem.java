@@ -15,7 +15,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -39,7 +42,7 @@ public class AbsorptionBookItem extends Item {
                 (int) (Config.ABSORPTION.NATURAL.upgradeLevelCostBase.get() + Config.ABSORPTION.NATURAL.upgradeLevelCostPerPoint.get() * capacity),
                 0, Config.ABSORPTION.NATURAL.upgradeLevelCostMax.get() );
     }
-
+    
     @Override
     public InteractionResultHolder<ItemStack> use( Level level, Player player, InteractionHand hand ) {
         // Check if natural absorption can be upgraded
@@ -80,7 +83,7 @@ public class AbsorptionBookItem extends Item {
     
     @Override
     @OnlyIn( value = Dist.CLIENT )
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag ) {
+    public void appendHoverText( ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag ) {
         final Player player = Minecraft.getInstance().player;
         
         if( player == null )
@@ -128,5 +131,5 @@ public class AbsorptionBookItem extends Item {
     }
     
     @Override
-    public Rarity getRarity(ItemStack stack ) { return Rarity.RARE; }
+    public Rarity getRarity( ItemStack stack ) { return Rarity.RARE; }
 }

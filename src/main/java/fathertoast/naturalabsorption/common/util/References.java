@@ -1,7 +1,5 @@
 package fathertoast.naturalabsorption.common.util;
 
-import fathertoast.crust.api.config.common.ConfigUtil;
-import fathertoast.crust.api.lib.CrustObjects;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import net.minecraft.network.chat.Component;
@@ -29,7 +27,7 @@ public class References {
     public static final String ABSORPTION_BOOK_CURRENT = ITEM_ROOT + "absorption_book.tooltip.current";
     public static final String ABSORPTION_BOOK_COST = ITEM_ROOT + "absorption_book.tooltip.cost";
     public static final String SPONGE_BOOK_REFUND = ITEM_ROOT + "sponge_book.tooltip.refund";
-
+    
     public static final String CMD_CHANGE_ABSORPTION_SINGLE = "commands.naturalabsorption.change_absorption.single.success";
     public static final String CMD_CHANGE_ABSORPTION_MULTIPLE = "commands.naturalabsorption.change_absorption.multiple.success";
     
@@ -45,7 +43,7 @@ public class References {
     
     //---------------- FORMAT METHODS -------------------
     
-    public static Component translate(String key, Object... args ) { return Component.translatable( key, args ); }
+    public static Component translate( String key, Object... args ) { return Component.translatable( key, args ); }
     
     public static String prettyToString( float value ) {
         return Math.round( value ) == value ? Integer.toString( Math.round( value ) ) : Float.toString( Math.round( value * 100.0F ) / 100.0F );

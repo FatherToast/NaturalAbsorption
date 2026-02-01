@@ -6,29 +6,23 @@ import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.*;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -39,9 +33,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class HeartManager {
     /** Map of all players that have had equipment changes since the last tick, linked to their previous max absorption. */
@@ -380,21 +372,21 @@ public class HeartManager {
             // Handle armor replacement, if enabled
             if( isArmorReplacementEnabled() ) {
                 float unmodifiedDamage = event.getAmount();
-
+                
                 // Force damage to ignore armor
                 if( Config.EQUIPMENT.ARMOR.disableArmor.get() && !event.getSource().is( DamageTypeTags.BYPASSES_ARMOR ) ) {
-                    event.setAmount( unmodifiedDamage + ( unmodifiedDamage - getDamageAfterArmorAbsorb( event.getEntity(), event.getSource(), unmodifiedDamage ) ) );
+                    event.setAmount( unmodifiedDamage + (unmodifiedDamage - getDamageAfterArmorAbsorb( event.getEntity(), event.getSource(), unmodifiedDamage )) );
                 }
             }
         }
     }
-
+    
     /**
      * @return Damage value after armor absorbs damage, without damaging the entity's armor.
      */
     public float getDamageAfterArmorAbsorb( LivingEntity entity, DamageSource source, float amount ) {
-        if ( !source.is(DamageTypeTags.BYPASSES_ARMOR )) {
-            amount = CombatRules.getDamageAfterAbsorb( amount, (float)entity.getArmorValue(), (float)entity.getAttributeValue(Attributes.ARMOR_TOUGHNESS) );
+        if( !source.is( DamageTypeTags.BYPASSES_ARMOR ) ) {
+            amount = CombatRules.getDamageAfterAbsorb( amount, (float) entity.getArmorValue(), (float) entity.getAttributeValue( Attributes.ARMOR_TOUGHNESS ) );
         }
         return amount;
     }

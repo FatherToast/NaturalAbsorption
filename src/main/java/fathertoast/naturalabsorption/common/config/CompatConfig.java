@@ -16,14 +16,14 @@ public class CompatConfig extends AbstractConfigFile {
         );
         TC = new TinkersConstruct( this );
     }
-
+    
     public static class TinkersConstruct extends AbstractConfigCategory<CompatConfig> {
         
         //public final BooleanField modifierEnabled;
         public final DoubleField potencyPerLevel;
         
         TinkersConstruct( CompatConfig parent ) {
-            super( parent, "tinkers_construct", "Compatibility options for Tinkers Construct (currently not used)" );
+            super( parent, "tinkers_construct", "Compatibility options for Tinkers Construct" );
             
             //modifierEnabled = SPEC.define( new BooleanField( "modifier.enabled", true,
             //        "Set this to false to disable the absorption modifier for armor that Natural Absorption adds to TC." ) );

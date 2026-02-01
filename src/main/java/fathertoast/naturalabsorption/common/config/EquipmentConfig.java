@@ -7,7 +7,6 @@ import fathertoast.crust.api.config.common.ConfigUtil;
 import fathertoast.crust.api.config.common.field.*;
 import fathertoast.crust.api.config.common.file.TomlHelper;
 import fathertoast.naturalabsorption.client.ClientUtil;
-import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.EnchantArmorType;
 import fathertoast.naturalabsorption.common.util.EnchantmentRarity;
 import net.minecraft.world.item.enchantment.ProtectionEnchantment;
@@ -123,7 +122,7 @@ public class EquipmentConfig extends AbstractConfigFile {
         public final DoubleField armorRecovery;
         public final DoubleField armorToughnessMultiplier;
         public final DoubleField armorToughnessRecovery;
-
+        
         
         Armor( EquipmentConfig parent ) {
             super( parent, "armor",
