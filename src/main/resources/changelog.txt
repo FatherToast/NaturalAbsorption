@@ -19,7 +19,6 @@
 --------------------------------------------------------------------------------------------------
 
 1.19.2-1.0.4
-    - Updated minimum required Forge version.
     - Added command "/naturalabsorption capacity" and sub commands to modify max absorption capacity.
     - Reworked command "/naturalabsorption absorption" and sub commands to now modify current absorption amount.
 1.19.2-1.0.3
