@@ -113,17 +113,26 @@ public class NALanguageProvider extends LanguageProvider {
                     "No tienes absorción natural para convertir", "Você não tem absorção natural para converter",
                     "Tu n'as pas d'absorption naturelle à convertir", "Non hai assorbimento naturale da convertire",
                     "Sie haben keine natürliche absorption zu konvertieren", "Ye don't be havin any magic hearts to be doin that" ),
-
+            
             // Commands
-            translations( References.CMD_CHANGE_ABSORPTION_SINGLE, "Changed max absorption for %s",
+            translations( References.CMD_CHANGE_CAPACITY_SINGLE, "Changed max absorption for %s",
                     "Absorción máx modificada para %s", "Absorção máxima alterada para %s",
                     "Absorption max modifiée pour %s", "Assorbimento massimo modificato per %s",
                     "Max absorption für %s geändert", "Changed max magic hearts for %s" ),
-            translations( References.CMD_CHANGE_ABSORPTION_MULTIPLE, "Changed max absorption for %s players",
+            translations( References.CMD_CHANGE_CAPACITY_MULTIPLE, "Changed max absorption capacity for %s players",
                     "Absorción máx modificada para %s jugadores", "Absorção máxima alterada para %s jogadores",
                     "Absorption max modifiée pour %s joueurs", "Assorbimento massimo modificato per %s giocatori",
                     "Max absorption für %s Spieler geändert", "Changed max magic hearts for %s sailors" ),
-
+            
+            translations( References.CMD_CHANGE_ABSORPTION_SINGLE, "Changed absorption for %s",
+                    "Absorción modificada para %s", "Absorção alterada para %s",
+                    "Absorption modifiée pour %s", "Assorbimento modificato per %s",
+                    "Absorption für %s geändert", "Changed magic hearts for %s" ),
+            translations( References.CMD_CHANGE_ABSORPTION_MULTIPLE, "Changed absorption for %s players",
+                    "Absorción modificada para %s jugadores", "Absorção alterada para %s jogadores",
+                    "Absorption modifiée pour %s joueurs", "Assorbimento modificato per %s giocatori",
+                    "Absorption für %s Spieler geändert", "Changed magic hearts for %s sailors" ),
+            
             // Compat Features
             translations( References.ED_ABSORPTION_INFO, "Increases your maximum absorption.",
                     "Aumenta su máxima absorción.", "Aumenta sua absorção máxima.",
