@@ -28,14 +28,14 @@ public class References {
     public static final String ABSORPTION_BOOK_COST = ITEM_ROOT + "absorption_book.tooltip.cost";
     public static final String SPONGE_BOOK_REFUND = ITEM_ROOT + "sponge_book.tooltip.refund";
     
+    public static final String CMD_CHANGE_CAPACITY_SINGLE = "commands.naturalabsorption.change_capacity.single.success";
+    public static final String CMD_CHANGE_CAPACITY_MULTIPLE = "commands.naturalabsorption.change_capacity.multiple.success";
     public static final String CMD_CHANGE_ABSORPTION_SINGLE = "commands.naturalabsorption.change_absorption.single.success";
     public static final String CMD_CHANGE_ABSORPTION_MULTIPLE = "commands.naturalabsorption.change_absorption.multiple.success";
     
     // Compat
     private static final String ED_SUFFIX = ".desc";
     public static final String ED_ABSORPTION_INFO = NAEnchantments.ABSORPTION_ENCHANTMENT.get().getDescriptionId() + ED_SUFFIX;
-    // Lang key is derived below; commented out to avoid NoClassDefFoundError
-    // public static final String TC_ARMOR_ABSORPTION = NAModifiers.ARMOR_ABSORPTION.get().getTranslationKey();
     public static final String TC_ARMOR_ABSORPTION = "modifier.naturalabsorption.armor_absorption";
     public static final String TC_ARMOR_ABSORPTION_TOOLTIP = TC_ARMOR_ABSORPTION + ".tooltip";
     public static final String TC_ARMOR_ABSORPTION_FLAVOR = TC_ARMOR_ABSORPTION + ".flavor";
