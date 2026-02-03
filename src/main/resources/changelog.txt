@@ -1,22 +1,70 @@
+1.20.1-1.0.6
+    - Updated minimum required Forge version.
+    - Added command "/naturalabsorption capacity" and sub commands to modify max absorption capacity.
+    - Reworked command "/naturalabsorption absorption" and sub commands to now modify current absorption amount.
+1.20.1-1.0.5
+    - Re-added compat for Tinker's Construct (a bit more thorough than last time).
+1.20.1-1.0.3
+    - Fixed absorption capacity overlay renderer showing up in spectator mode.
+    - Fixed absorption capacity overlay renderer not showing potion absorption.
+1.20.1-1.0.2
+    - Fixed naturalabsorption command demanding permission level higher than 2, making it impossible to use in command blocks.
+1.20.1-1.0.1
+    - Updated to Crust 2.3.4.
+    - Fixed dependency load order (fixed potential config crash).
+1.20.1-1.0.0
+    - Ported to 1.20.1.
+    - Internal rework of armor tweaks (some config settings have been removed).
+
+--------------------------------------------------------------------------------------------------
+
+1.19.2-1.0.3
+    - Fixed naturalabsorption command demanding permission level higher than 2, making it impossible to use in command blocks.
+    - Fixed absorption capacity overlay renderer showing up in spectator mode.
+    - Fixed absorption capacity overlay renderer not showing potion absorption.
+1.19.2-1.0.2
+    - Added back Tinkers Construct absorption modifier.
+1.19.2-1.0.1
+    - Fixed absorption command not calculating the correct amount of absorption to add/remove.
+1.19.2-1.0.0
+    - Ported to 1.19.2.
+    - Reworked absorption capacity render code.
+
+--------------------------------------------------------------------------------------------------
+
+1.18.2-1.0.1
+    - Fixed naturalabsorption command demanding permission level higher than 2, making it impossible to use in command blocks.
+    - Fixed absorption capacity overlay renderer showing up in spectator mode.
+1.18.2-1.0.0
+    - Ported to 1.18.2.
+    - Added command for adding/removing natural absorption for a player.
+
+--------------------------------------------------------------------------------------------------
+
+1.16.5-2.2.1
+    - Added command for adding/removing natural absorption from a player.
 1.16.5-2.2.0
     - Absorption Absorbing Book!
-    - New & updated textures by Tutta
-    - Now provides info about hunger, saturation, and health restored to food tooltips
-    - Max absorption is now based on attributes, for easier mod interaction
-    - Rewrote localization into new data gen system
+    - New & updated textures by Tutta.
+    - Now provides info about hunger, saturation, and health restored to food tooltips.
+    - Max absorption is now based on attributes, for easier mod interaction.
+    - Rewrote localization into new data gen system.
 1.16.5-2.1.1
-    - Fixed absorption data not being saved to player persistent data before clearing HeartData cache
-    - Removed unneeded absorption update packet
+    - Fixed absorption data not being saved to player persistent data before clearing HeartData cache.
+    - Removed unneeded absorption update packet.
 1.16.5-1.0.0
-    - Rewritten for 1.16.5, primarily done by Sarinsa
-    - Terminology rebased, now absorption is no longer referred to as health and health/absorption together are called hearts
-    - The health regen disabling option now sets the game rule's default value rather than constantly setting it
+    - Rewritten for 1.16.5, primarily done by Sarinsa.
+    - Terminology rebased, now absorption is no longer referred to as health and health/absorption together are called hearts.
+    - The health regen disabling option now sets the game rule's default value rather than constantly setting it.
     - Food healing rebalanced
-        - Only counts actual hunger and saturation restored, rather than counting total value of food eaten
-        - Now counts saturation (on its own drumstick:health ratio)
+        - Only counts actual hunger and saturation restored, rather than counting total value of food eaten.
+        - Now counts saturation (on its own drumstick:health ratio).
     - Armor replacement rebalanced
-        - Most settings can now be enabled/disabled independently (still need to be enabled by master toggle)
-        - Now armor and armor toughness can each provide absorption hearts and/or absorption recovery rate
-1.0.0
+        - Most settings can now be enabled/disabled independently (still need to be enabled by master toggle).
+        - Now armor and armor toughness can each provide absorption hearts and/or absorption recovery rate.
+
+--------------------------------------------------------------------------------------------------
+
+1.12.2-1.0.0
     - Rewritten for 1.12.2.
     - Merged unreleased mod "Regen Cap" - similar controls for normal health.
