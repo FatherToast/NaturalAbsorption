@@ -43,7 +43,7 @@ side = "BOTH"
 [[dependencies.naturalabsorption]]
 modId = "crust"
 mandatory = true
-versionRange = "[2.5.10,)"
+versionRange = "[4.17,)"
 ordering = "BEFORE"
 side = "BOTH"
 
