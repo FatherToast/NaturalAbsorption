@@ -6,7 +6,7 @@ import slimeknights.tconstruct.library.modifiers.ModifierManager;
 
 public class NAModifiers {
     
-    public static final ModifierId ARMOR_ABSORPTION_ID = new ModifierId( NaturalAbsorption.resLoc( "armor_absorption" ) );
+    public static final ModifierId ARMOR_ABSORPTION_ID = new ModifierId( NaturalAbsorption.rl( "armor_absorption" ) );
     public static final ArmorAbsorptionModifier ARMOR_ABSORPTION = new ArmorAbsorptionModifier();
     
     

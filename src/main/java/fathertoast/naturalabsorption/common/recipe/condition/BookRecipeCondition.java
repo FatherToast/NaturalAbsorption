@@ -1,16 +1,17 @@
 package fathertoast.naturalabsorption.common.recipe.condition;
 
 import com.google.gson.JsonObject;
-import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 
 public class BookRecipeCondition implements ICondition {
     
-    private static final ResourceLocation ID = NaturalAbsorption.resLoc( "recipe_style" );
+    private static final ResourceLocation ID = NaturalAbsorption.rl( "recipe_style" );
     
     private final String styleName;
     
@@ -24,7 +25,7 @@ public class BookRecipeCondition implements ICondition {
     @Override
     public boolean test( IContext context ) {
         return HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.upgradeGain.get() > 0.0 &&
-                Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().equalsIgnoreCase( this.styleName );
+                Config.ABSORPTION.NATURAL.upgradeBookRecipe.get().name().equalsIgnoreCase( styleName );
     }
     
     public static class Serializer implements IConditionSerializer<BookRecipeCondition> {
@@ -43,15 +44,20 @@ public class BookRecipeCondition implements ICondition {
         public ResourceLocation getID() { return ID; }
     }
     
-    public enum Type {
+    public enum Type implements StringRepresentable {
         NONE( "none" ),
         SIMPLE( "simple" ),
         SANDWICH( "sandwich" ),
         CROSS( "cross" ),
         SURROUND( "surround" );
         
-        private final String NAME;
+        private final String name;
         
-        Type( String name ) { NAME = name; }
+        Type( String name ) { this.name = name; }
+        
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
     }
 }

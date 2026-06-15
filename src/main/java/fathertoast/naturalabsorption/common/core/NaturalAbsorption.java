@@ -4,7 +4,7 @@ import fathertoast.naturalabsorption.api.INaturalAbsorption;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
 import fathertoast.naturalabsorption.common.command.CommandRegister;
 import fathertoast.naturalabsorption.common.compat.tc.NaturalAbsorptionTC;
-import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingStage;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
@@ -75,21 +76,21 @@ public class NaturalAbsorption {
     
     
     public NaturalAbsorption( FMLJavaModLoadingContext context ) {
-        Config.initialize();
+        // Enqueue config initialization
+        ModLoadingStage.CONSTRUCT.getDeferredWorkQueue().enqueueWork( context.getContainer(), Config::initialize );
         
         packetHandler.registerMessages();
-        CraftingUtil.registerConditions();
+        
+        final IEventBus modBus = context.getModEventBus();
+        
+        modBus.addListener( NAItems::onCreativeTabPopulate );
+        modBus.addListener( HeartManager::onEntityAttributeCreation );
+        modBus.addListener( this::onInterModProcess );
+        modBus.addListener( this::onCommonSetup );
         
         MinecraftForge.EVENT_BUS.register( new NAEventListener() );
         MinecraftForge.EVENT_BUS.register( new HeartManager() );
         MinecraftForge.EVENT_BUS.addListener( CommandRegister::register );
-        
-        IEventBus modBus = context.getModEventBus();
-        
-        modBus.addListener( NAItems::onCreativeTabPopulate );
-        modBus.addListener( this::onInterModProcess );
-        modBus.addListener( this::setup );
-        modBus.addListener( HeartManager::onEntityAttributeCreation );
         
         NAItems.ITEMS.register( modBus );
         NAAttributes.ATTRIBUTES.register( modBus );
@@ -101,8 +102,8 @@ public class NaturalAbsorption {
         }
     }
     
-    public void setup( final FMLCommonSetupEvent event ) {
-    
+    private void onCommonSetup( FMLCommonSetupEvent event ) {
+        event.enqueueWork( CraftingUtil::registerConditions );
     }
     
     /**
@@ -125,7 +126,7 @@ public class NaturalAbsorption {
     }
     
     /** @return A ResourceLocation with the mod's namespace. */
-    public static ResourceLocation resLoc( String path ) { return ResourceLocation.fromNamespaceAndPath( MOD_ID, path ); }
+    public static ResourceLocation rl( String path ) { return ResourceLocation.fromNamespaceAndPath( MOD_ID, path ); }
     
     /** @return Returns a Forge registry entry as a string, or "null" if it is null. */
     public static <T> String toString( @Nullable T object, IForgeRegistry<T> registry ) {

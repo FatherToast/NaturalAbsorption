@@ -1,6 +1,6 @@
 package fathertoast.naturalabsorption.common.item;
 
-import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
@@ -110,7 +110,7 @@ public class AbsorptionBookItem extends Item {
                 tooltip.add( Component.translatable( ChatFormatting.GRAY + References.translate( References.BOOK_GAIN ).getString() ) );
                 tooltip.add( Component.translatable( ChatFormatting.BLUE + References.translate( References.BOOK_MAX, "+" + References.prettyToString( (float) gainOnUse ) ).getString() ) );
                 
-                tooltip.add( Component.translatable( "" ) );
+                tooltip.add( Component.literal( "" ) );
                 
                 // Provide feedback on cost and usability
                 final int levelCost = getLevelCost( naturalAbsorption );

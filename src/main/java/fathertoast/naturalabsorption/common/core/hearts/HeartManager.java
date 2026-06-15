@@ -1,7 +1,7 @@
 package fathertoast.naturalabsorption.common.core.hearts;
 
-import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
@@ -150,6 +150,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseStart( LivingEntityUseItemEvent.Start event ) {
+        // noinspection resource
         if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             // Start watching hunger
             trackPlayerHungerState( player );
@@ -163,6 +164,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseTick( LivingEntityUseItemEvent.Tick event ) {
+        // noinspection resource
         if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             // Update watched hunger, just in case anything changes mid-use
             trackPlayerHungerState( player );
@@ -176,6 +178,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseStop( LivingEntityUseItemEvent.Stop event ) {
+        // noinspection resource
         if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             // Stop watching hunger; item was not food or eating was canceled
             clearPlayerHungerState( player );
@@ -191,6 +194,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemUseFinish( LivingEntityUseItemEvent.Finish event ) {
+        // noinspection resource
         if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingMax.get() != 0.0 ) {
                 // Apply healing from food
@@ -302,6 +306,7 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onPlayerRespawn( PlayerEvent.PlayerRespawnEvent event ) {
         final Player player = event.getEntity();
+        // noinspection resource
         if( !player.level().isClientSide && !event.isEndConquered() ) {
             // Apply death penalty
             AbsorptionHelper.applyDeathPenalty( player );
@@ -363,6 +368,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public void onLivingHurt( LivingHurtEvent event ) {
+        // noinspection resource
         if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
             HeartData data = HeartData.get( player );
             

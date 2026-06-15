@@ -1,7 +1,7 @@
 package fathertoast.naturalabsorption.common.core.hearts;
 
-import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
 import net.minecraft.util.Mth;
@@ -138,6 +138,7 @@ public class AbsorptionHelper {
             "Equipment absorption from armor replacement", 0.0, AttributeModifier.Operation.ADDITION );
     
     /** Helper method for checking existence of absorption attribute modifiers. */
+    @SuppressWarnings( "SameParameterValue" )
     private static boolean hasAbsorptionModifier( Player player, boolean natural, AttributeModifier staticModifier ) {
         final Attribute attribute = natural ? NAAttributes.NATURAL_ABSORPTION.get() : NAAttributes.EQUIPMENT_ABSORPTION.get();
         final AttributeInstance instance = player.getAttribute( attribute );

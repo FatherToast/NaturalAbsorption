@@ -11,6 +11,5 @@ public class NALootModifierProvider extends GlobalLootModifierProvider {
     }
     
     @Override
-    protected void start() {
-    }
+    protected void start() { }
 }

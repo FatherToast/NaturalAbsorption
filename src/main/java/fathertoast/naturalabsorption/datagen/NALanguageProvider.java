@@ -28,6 +28,7 @@ public class NALanguageProvider extends LanguageProvider {
         
         // Fix the encoding to allow us to use accented characters in the translation string literals
         // Note: If a translation uses any non-ASCII characters, make sure they are all in this matrix! (case-sensitive)
+        // noinspection UnnecessaryUnicodeEscape
         final String[][] utf8ToUnicode = {
                 { "à", "\u00E0" }, { "á", "\u00E1" }, { "ã", "\u00E3" }, { "ä", "\u00E4" },
                 { "ç", "\u00E7" },

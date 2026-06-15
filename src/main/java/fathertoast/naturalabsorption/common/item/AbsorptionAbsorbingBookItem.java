@@ -1,6 +1,6 @@
 package fathertoast.naturalabsorption.common.item;
 
-import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.core.register.NAItems;

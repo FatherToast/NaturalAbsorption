@@ -47,15 +47,6 @@ public class NARecipeProvider extends RecipeProvider {
     
     private void tinkersRecipes( Consumer<FinishedRecipe> consumer ) {
         final String upgradeFolder = "tools/modifiers/upgrade/";
-        final String abilityFolder = "tools/modifiers/ability/";
-        final String slotlessFolder = "tools/modifiers/slotless/";
-        final String upgradeSalvage = "tools/modifiers/salvage/upgrade/";
-        final String abilitySalvage = "tools/modifiers/salvage/ability/";
-        final String slotlessSalvage = "tools/modifiers/salvage/slotless/";
-        final String defenseFolder = "tools/modifiers/defense/";
-        final String defenseSalvage = "tools/modifiers/salvage/defense/";
-        final String compatFolder = "tools/modifiers/compat/";
-        final String compatSalvage = "tools/modifiers/salvage/compat/";
         
         ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION_ID )
                 .addInput( NAItems.ABSORPTION_BOOK.get() )

@@ -1,6 +1,6 @@
 package fathertoast.naturalabsorption.common.enchantment;
 
-import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +29,7 @@ class AbsorptionEnchantment extends Enchantment {
             enchantLevel = 0;
             
             for( ItemStack itemStack : equipment ) {
-                enchantLevel += EnchantmentHelper.getItemEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), itemStack );
+                enchantLevel += itemStack.getEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get() );
             }
         }
         else {

@@ -1,8 +1,8 @@
 package fathertoast.naturalabsorption.common.recipe.condition;
 
 import com.google.gson.JsonObject;
-import fathertoast.naturalabsorption.common.config.Config;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 public record ConfigOptionCondition(Operation operation) implements ICondition {
     
-    private static final ResourceLocation ID = NaturalAbsorption.resLoc( "config_option" );
+    private static final ResourceLocation ID = NaturalAbsorption.rl( "config_option" );
     
     @Override
     public ResourceLocation getID() {

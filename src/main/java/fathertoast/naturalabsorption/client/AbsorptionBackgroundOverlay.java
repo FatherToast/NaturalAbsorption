@@ -98,6 +98,7 @@ public class AbsorptionBackgroundOverlay implements IGuiOverlay {
     
     protected void renderHearts( GuiGraphics graphics, Player player, int x, int y, int rowHeight, int shake, float maxHealth, int health, int displayHealth, int absorption, int maxAbsorption, boolean blink ) {
         Gui.HeartType heartType = Gui.HeartType.forPlayer( player );
+        // noinspection resource
         int vOffset = 9 * (player.level().getLevelData().isHardcore() ? 5 : 0);
         int healthHearts = Mth.ceil( (double) maxHealth / 2.0D );
         int absorptionHearts = Mth.ceil( (double) maxAbsorption / 2.0D );

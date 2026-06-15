@@ -2,7 +2,7 @@ package fathertoast.naturalabsorption.common.core.hearts;
 
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
-import fathertoast.naturalabsorption.common.config.Config;
+import fathertoast.naturalabsorption.common.core.config.Config;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@SuppressWarnings( "WeakerAccess" )
 public class HeartData implements IHeartData {
     
     private static final int NBT_TYPE_NUMERICAL = 99;
@@ -29,9 +28,11 @@ public class HeartData implements IHeartData {
     /**
      * @param player Player to get or load heart data for.
      * @return The player's heart data.
+     * @throws IllegalArgumentException if called not called server-side.
      */
     @Nonnull
     public static HeartData get( @Nonnull Player player ) {
+        // noinspection resource
         if( player.level().isClientSide ) {
             throw new IllegalArgumentException( "Heart data is only stored on the server side!" );
         }
@@ -147,14 +148,14 @@ public class HeartData implements IHeartData {
                     final double armor = owner.getAttributeValue( Attributes.ARMOR );
                     
                     if( armor > 0.0F ) {
-                        recovered *= 1.0 + armor * Config.EQUIPMENT.ARMOR.armorRecovery.get();
+                        recovered *= (float) (1.0 + armor * Config.EQUIPMENT.ARMOR.armorRecovery.get());
                     }
                 }
                 if( Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get() > 0.0 ) {
                     final double toughness = owner.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
                     
                     if( toughness > 0.0F ) {
-                        recovered *= 1.0 + toughness * Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get();
+                        recovered *= (float) (1.0 + toughness * Config.EQUIPMENT.ARMOR.armorToughnessRecovery.get());
                     }
                 }
             }

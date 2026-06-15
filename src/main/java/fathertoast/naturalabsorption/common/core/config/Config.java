@@ -1,4 +1,4 @@
-package fathertoast.naturalabsorption.common.config;
+package fathertoast.naturalabsorption.common.core.config;
 
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
