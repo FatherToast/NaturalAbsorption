@@ -1,3 +1,5 @@
+1.20.1-1.0.7
+    - Updated minimum required Crust version to 4.17+.
 1.20.1-1.0.6
     - Updated minimum required Forge version.
     - Added command "/naturalabsorption capacity" and sub commands to modify max absorption capacity.
