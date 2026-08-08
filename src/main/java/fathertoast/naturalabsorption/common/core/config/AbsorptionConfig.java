@@ -16,12 +16,11 @@ public class AbsorptionConfig extends AbstractConfigFile {
     
     /** Builds the config spec that should be used for this config. */
     AbsorptionConfig( ConfigManager manager, String fileName ) {
-        super( manager, fileName,
+        super( manager, fileName, false,
                 "This config contains most options for features that apply to absorption (yellow hearts).",
                 "Does NOT contain any armor or enchantment options - see the 'enchant_and_armor' config for those.",
                 "Also contains hunger options related specifically to absorption recovery."
         );
-        
         GENERAL = new General( this );
         NATURAL = new Natural( this );
     }
@@ -38,7 +37,7 @@ public class AbsorptionConfig extends AbstractConfigFile {
         public final IntField recoveryHungerRequired;
         public final DoubleField recoveryHungerCost;
         
-        public final InjectionWrapperField<BooleanField> renderCapacityBackground;
+        public final BooleanField renderCapacityBackground;
         
         General( AbsorptionConfig parent ) {
             super( parent, "absorption",
@@ -79,7 +78,7 @@ public class AbsorptionConfig extends AbstractConfigFile {
                             "but can regenerate back. This may not work right if another mod changes heart bar rendering, or may override",
                             "other mods' heart rendering (for example, Mantle's heart stacker option)." ),
                     ( wrapped ) -> DistExecutor.safeRunWhenOn( Dist.CLIENT, () ->
-                            ClientUtil.toggleAbsorptionBackgroundRender( wrapped.get() ) ) ) );
+                            ClientUtil.toggleAbsorptionBackgroundRender( wrapped.get() ) ) ) ).field();
         }
     }
     

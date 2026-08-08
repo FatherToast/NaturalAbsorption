@@ -202,7 +202,7 @@ public class HeartManager {
                 if( !stack.isEmpty() && stack.getItem().getFoodProperties( stack, player ) != null ) {
                     // Ignore the max if setting is negative
                     final float maxHealing = Config.HEALTH.GENERAL.foodHealingMax.get() < 0.0 ? Float.POSITIVE_INFINITY :
-                            (float) Config.HEALTH.GENERAL.foodHealingMax.get();
+                            Config.HEALTH.GENERAL.foodHealingMax.getFloat();
                     
                     // Calculate the food's hunger and saturation
                     final int hunger;
@@ -272,7 +272,7 @@ public class HeartManager {
             if( isHealthEnabled() && Config.HEALTH.GENERAL.foodHealingExtraTooltipInfo.get() ) {
                 // Calculate as if the food's entire nutritional value is used
                 final float maxHealing = Config.HEALTH.GENERAL.foodHealingMax.get() < 0.0 ? Float.POSITIVE_INFINITY :
-                        (float) Config.HEALTH.GENERAL.foodHealingMax.get();
+                        Config.HEALTH.GENERAL.foodHealingMax.getFloat();
                 final float healing = Math.min( getFoodHealing( hunger, saturation ), maxHealing );
                 if( healing > 0.0F ) {
                     event.getToolTip().add( Component.translatable( ChatFormatting.BLUE + References.translate( References.FOOD_HEALTH, "+" + References.prettyToString( healing ) ).getString() ) );
@@ -288,10 +288,10 @@ public class HeartManager {
     private static float getFoodHealing( int hunger, float saturation ) {
         float healing = 0.0F;
         if( hunger > 0 ) {
-            healing += hunger * (float) Config.HEALTH.GENERAL.foodHealingPerHunger.get();
+            healing += hunger * Config.HEALTH.GENERAL.foodHealingPerHunger.getFloat();
         }
         if( saturation > 0.0F ) {
-            healing += saturation * (float) Config.HEALTH.GENERAL.foodHealingPerSaturation.get();
+            healing += saturation * Config.HEALTH.GENERAL.foodHealingPerSaturation.getFloat();
         }
         return healing;
     }
@@ -315,10 +315,10 @@ public class HeartManager {
             final HeartData data = HeartData.get( player );
             data.startRecoveryDelay();
             if( isHealthEnabled() && Config.HEALTH.GENERAL.respawnAmount.get() > 0.0F ) {
-                data.owner.setHealth( (float) Config.HEALTH.GENERAL.respawnAmount.get() );
+                data.owner.setHealth( Config.HEALTH.GENERAL.respawnAmount.getFloat() );
             }
             if( isAbsorptionEnabled() ) {
-                data.setAbsorption( (float) Config.ABSORPTION.GENERAL.respawnAmount.get() );
+                data.setAbsorption( Config.ABSORPTION.GENERAL.respawnAmount.getFloat() );
             }
         }
     }

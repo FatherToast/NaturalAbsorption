@@ -52,7 +52,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
             final double naturalAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( player );
             
             if( naturalAbsorption > 0.0F ) {
-                final float gainOnUse = (float) Config.ABSORPTION.NATURAL.upgradeGain.get();
+                final float gainOnUse = Config.ABSORPTION.NATURAL.upgradeGain.getFloat();
                 final double newAbsorption = Math.max( 0.0F, naturalAbsorption - gainOnUse );
                 
                 // Consume costs
@@ -63,7 +63,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
                 }
                 
                 // Apply downgrade effects and notify client
-                final float levelRefundMulti = (float) Config.ABSORPTION.NATURAL.spongeBookLevelRefundMulti.get();
+                final float levelRefundMulti = Config.ABSORPTION.NATURAL.spongeBookLevelRefundMulti.getFloat();
                 if( levelRefundMulti > 0.0F ) {
                     final int levelsReturned = (int) (levelRefundMulti * getLevelCost( newAbsorption ));
                     if( levelsReturned > 0 ) player.giveExperienceLevels( levelsReturned );
@@ -96,8 +96,8 @@ public class AbsorptionAbsorbingBookItem extends Item {
             return;
         
         final double naturalAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( player );
-        final float gainOnUse = (float) Config.ABSORPTION.NATURAL.upgradeGain.get();
-        final float levelRefundMulti = (float) Config.ABSORPTION.NATURAL.spongeBookLevelRefundMulti.get();
+        final float gainOnUse = Config.ABSORPTION.NATURAL.upgradeGain.getFloat();
+        final float levelRefundMulti = Config.ABSORPTION.NATURAL.spongeBookLevelRefundMulti.getFloat();
         final int levelsReturned = (int) (levelRefundMulti * getLevelCost( naturalAbsorption - gainOnUse ));
         
         tooltip.add( Component.literal( "" ) );

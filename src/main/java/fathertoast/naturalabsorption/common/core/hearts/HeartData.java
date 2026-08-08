@@ -167,7 +167,7 @@ public class HeartData implements IHeartData {
             // Apply hunger cost
             if( newAbsorption - oldAbsorption > 0 && Config.ABSORPTION.GENERAL.recoveryHungerCost.get() > 0.0 ) {
                 owner.getFoodData().addExhaustion( (float) (newAbsorption - oldAbsorption) *
-                        (float) Config.ABSORPTION.GENERAL.recoveryHungerCost.get() );
+                        Config.ABSORPTION.GENERAL.recoveryHungerCost.getFloat() );
             }
         }
     }
@@ -196,7 +196,7 @@ public class HeartData implements IHeartData {
         if( owner.getFoodData().getFoodLevel() < Config.HEALTH.GENERAL.recoveryHungerRequired.get() ) return;
         
         // Recover health, if needed
-        final float maxHealth = Math.min( (float) Config.HEALTH.GENERAL.recoveryMax.get(), owner.getMaxHealth() );
+        final float maxHealth = Math.min( Config.HEALTH.GENERAL.recoveryMax.getFloat(), owner.getMaxHealth() );
         final float oldHealth = owner.getHealth();
         
         if( recovered > 0.0F && oldHealth < maxHealth ) {
@@ -207,7 +207,7 @@ public class HeartData implements IHeartData {
             // Apply hunger cost
             if( newHealth - oldHealth > 0 && Config.HEALTH.GENERAL.recoveryHungerCost.get() > 0.0 ) {
                 owner.getFoodData().addExhaustion( (newHealth - oldHealth) *
-                        (float) Config.HEALTH.GENERAL.recoveryHungerCost.get() );
+                        Config.HEALTH.GENERAL.recoveryHungerCost.getFloat() );
             }
         }
     }

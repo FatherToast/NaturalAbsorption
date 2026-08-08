@@ -14,7 +14,7 @@ public class MainConfig extends AbstractConfigFile {
     
     /** Builds the config spec that should be used for this config. */
     MainConfig( ConfigManager manager, String fileName ) {
-        super( manager, fileName,
+        super( manager, fileName, false,
                 "This config contains options that apply to the mod as a whole, including some master disable",
                 "toggles for convenience."
         );
@@ -26,7 +26,7 @@ public class MainConfig extends AbstractConfigFile {
         
         public final IntField updateTime;
         
-        public final InjectionWrapperField<BooleanField> defaultGameRuleNoRegen;
+        public final BooleanField defaultGameRuleNoRegen;
         
         public final BooleanField foodExtraTooltipInfo;
         
@@ -53,7 +53,7 @@ public class MainConfig extends AbstractConfigFile {
                         // Note, we are assuming the default is always true without this mod (ie, no other mod changes the default)
                         GameRules.GAME_RULE_TYPES.put( GameRules.RULE_NATURAL_REGENERATION,
                                 GameRules.BooleanValue.create( !wrapped.get() ) );
-                    } ) );
+                    } ) ).field();
             
             SPEC.newLine();
             

@@ -14,7 +14,7 @@ public class HealthConfig extends AbstractConfigFile {
     
     /** Builds the config spec that should be used for this config. */
     HealthConfig( ConfigManager manager, String fileName ) {
-        super( manager, fileName,
+        super( manager, fileName, false,
                 "This config contains most options for features that apply to health (red hearts).",
                 "Does NOT contain any armor or enchantment options - see the 'armor_and_enchant' config for those.",
                 "Also contains hunger options related specifically to health recovery and healing from food."

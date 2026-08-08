@@ -20,7 +20,7 @@ public class EquipmentConfig extends AbstractConfigFile {
     
     /** Builds the config spec that should be used for this config. */
     EquipmentConfig( ConfigManager manager, String fileName ) {
-        super( manager, fileName,
+        super( manager, fileName, false,
                 "This config contains options for features that apply to the Absorption enchantment and armor."
         );
         
@@ -116,7 +116,7 @@ public class EquipmentConfig extends AbstractConfigFile {
         public final BooleanField enabled;
         
         public final BooleanField disableArmor;
-        public final InjectionWrapperField<BooleanField> hideArmorBar;
+        public final BooleanField hideArmorBar;
         
         public final DoubleField armorMultiplier;
         public final DoubleField armorRecovery;
@@ -145,7 +145,7 @@ public class EquipmentConfig extends AbstractConfigFile {
                     new BooleanField( "hide_armor_bar", true,
                             "If true, the (perhaps now much less useful) armor bar will not be rendered." ),
                     ( wrapped ) -> DistExecutor.safeRunWhenOn( Dist.CLIENT, () ->
-                            ClientUtil.setHideArmorBar( wrapped.get() ) ) ) );
+                            ClientUtil.setHideArmorBar( wrapped.get() ) ) ) ).field();
             
             SPEC.newLine();
             

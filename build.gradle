@@ -86,14 +86,21 @@ repositories {
             includeGroup 'curse.maven'
         }
     }
+    // Just in case!
+    flatDir {
+        dir 'flat_deps'
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
     // Crust; only implement the api, but include the entire mod at runtime
-    implementation "curse.maven:crust-873570:${crust_api_version}"
-    runtimeOnly "curse.maven:crust-873570:${crust_src_version}"
+    // TODO Switch back when the new Crust update is out!
+    // implementation "curse.maven:crust-873570:${crust_api_version}"
+    // runtimeOnly "curse.maven:crust-873570:${crust_src_version}"
+    implementation "blank:crust:1.20.1-5.0.0:api"
+    runtimeOnly "blank:crust:1.20.1-5.0.0:src"
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
 

@@ -11,7 +11,7 @@ public class CompatConfig extends AbstractConfigFile {
     
     /** Builds the config spec that should be used for this config. */
     CompatConfig( ConfigManager manager, String fileName ) {
-        super( manager, fileName,
+        super( manager, fileName, false,
                 "This config contains config options for compatibility features for various supported mods."
         );
         TC = new TinkersConstruct( this );
