@@ -4,9 +4,7 @@ import fathertoast.naturalabsorption.api.IAbsorptionAccessor;
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.INaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.hearts.HeartData;
-import net.minecraft.world.entity.player.Player;
-
-import javax.annotation.Nonnull;
+import net.minecraft.world.entity.LivingEntity;
 
 /**
  * This is the API implementation. Woah!
@@ -18,13 +16,12 @@ public class NaturalAbsorptionAPI implements INaturalAbsorption {
     /**
      * Gets or loads heart data for a player.
      *
-     * @param player The player to retrieve heart data from.
+     * @param entity The player to retrieve heart data from.
      * @return The given player's heart data.
      * @throws IllegalArgumentException if called on client.
      */
-    @Nonnull
     @Override
-    public IHeartData getHeartData( @Nonnull Player player ) { return HeartData.get( player ); }
+    public IHeartData getHeartData( LivingEntity entity ) { return HeartData.get( entity ); }
     
     /**
      * @return The API IAbsorptionAccessor instance.

@@ -8,7 +8,6 @@ public class CommandRegister {
     
     public static void register( RegisterCommandsEvent event ) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-        
         NABaseCommand.register( dispatcher );
     }
 }

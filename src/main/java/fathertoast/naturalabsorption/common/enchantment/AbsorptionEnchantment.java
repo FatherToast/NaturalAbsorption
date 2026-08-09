@@ -3,7 +3,7 @@ package fathertoast.naturalabsorption.common.enchantment;
 import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -20,12 +20,12 @@ class AbsorptionEnchantment extends Enchantment {
     }
     
     /** @return The maximum absorption granted by enchantments. */
-    public static float getMaxAbsorptionBonus( Player player ) {
+    public static float getMaxAbsorptionBonus( LivingEntity entity ) {
         // Calculate enchantment level
         int enchantLevel;
         
         if( Config.EQUIPMENT.ENCHANTMENT.stacking.get() ) {
-            Iterable<ItemStack> equipment = player.getArmorSlots();
+            Iterable<ItemStack> equipment = entity.getArmorSlots();
             enchantLevel = 0;
             
             for( ItemStack itemStack : equipment ) {
@@ -33,9 +33,8 @@ class AbsorptionEnchantment extends Enchantment {
             }
         }
         else {
-            enchantLevel = EnchantmentHelper.getEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), player );
+            enchantLevel = EnchantmentHelper.getEnchantmentLevel( NAEnchantments.ABSORPTION_ENCHANTMENT.get(), entity );
         }
-        
         // Calculate capacity to grant for level
         if( enchantLevel > 0 ) {
             return Math.max( 0.0F, (float) Math.min(

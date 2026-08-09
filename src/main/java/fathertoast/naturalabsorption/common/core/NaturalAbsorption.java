@@ -10,7 +10,7 @@ import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.core.register.NALootModifiers;
-import fathertoast.naturalabsorption.common.event.NAEventListener;
+import fathertoast.naturalabsorption.common.event.GameEventListener;
 import fathertoast.naturalabsorption.common.network.PacketHandler;
 import fathertoast.naturalabsorption.common.recipe.CraftingUtil;
 import net.minecraft.resources.ResourceLocation;
@@ -84,18 +84,18 @@ public class NaturalAbsorption {
         final IEventBus modBus = context.getModEventBus();
         
         modBus.addListener( NAItems::onCreativeTabPopulate );
-        modBus.addListener( HeartManager::onEntityAttributeCreation );
+        modBus.addListener( HeartManager::onModifyEntityAttributes );
         modBus.addListener( this::onInterModProcess );
         modBus.addListener( this::onCommonSetup );
         
-        MinecraftForge.EVENT_BUS.register( new NAEventListener() );
+        MinecraftForge.EVENT_BUS.register( new GameEventListener() );
         MinecraftForge.EVENT_BUS.register( new HeartManager() );
         MinecraftForge.EVENT_BUS.addListener( CommandRegister::register );
         
-        NAItems.ITEMS.register( modBus );
-        NAAttributes.ATTRIBUTES.register( modBus );
-        NAEnchantments.ENCHANTMENTS.register( modBus );
-        NALootModifiers.LOOT_MODIFIER_SERIALIZERS.register( modBus );
+        NAItems.REGISTRY.register( modBus );
+        NAAttributes.REGISTRY.register( modBus );
+        NAEnchantments.REGISTRY.register( modBus );
+        NALootModifiers.REGISTRY.register( modBus );
         
         if( ModList.get().isLoaded( "tconstruct" ) ) {
             NaturalAbsorptionTC.init( modBus );

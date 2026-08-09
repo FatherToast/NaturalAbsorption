@@ -21,9 +21,7 @@ public class NABaseCommand {
                 .then( AbsorptionBaseCommand.register() ) );
     }
     
-    /**
-     * Base command for absorption capacity modification.
-     */
+    /** Base command for absorption capacity modification. */
     private static class CapacityBaseCommand {
         
         private static ArgumentBuilder<CommandSourceStack, ?> register() {
@@ -58,9 +56,7 @@ public class NABaseCommand {
                     );
         }
         
-        /**
-         * Adds the specified amount of capacity to the target player(s) max absorption.
-         */
+        /** Adds the specified amount of capacity to the target player(s) max absorption. */
         private static int addCapacity( CommandSourceStack source, Collection<ServerPlayer> players, int absorption ) {
             for( ServerPlayer player : players ) {
                 double currentMaxAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( player );
@@ -78,9 +74,7 @@ public class NABaseCommand {
             return players.size();
         }
         
-        /**
-         * Subtracts the specified amount of capacity from the target player(s) max absorption.
-         */
+        /** Subtracts the specified amount of capacity from the target player(s) max absorption. */
         private static int removeCapacity( CommandSourceStack source, Collection<ServerPlayer> players, int absorption ) {
             for( ServerPlayer player : players ) {
                 double currentMaxAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( player );
@@ -98,9 +92,7 @@ public class NABaseCommand {
             return players.size();
         }
         
-        /**
-         * Sets the specified amount of max absorption capacity for the target player(s).
-         */
+        /** Sets the specified amount of max absorption capacity for the target player(s). */
         private static int setCapacity( CommandSourceStack source, Collection<ServerPlayer> players, int absorption ) {
             for( ServerPlayer player : players ) {
                 AbsorptionHelper.setBaseNaturalAbsorption( player, true, absorption );
@@ -118,9 +110,7 @@ public class NABaseCommand {
         }
     }
     
-    /**
-     * Base command for modifying a player's current absorption amount.
-     */
+    /** Base command for modifying a player's current absorption amount. */
     private static class AbsorptionBaseCommand {
         
         private static ArgumentBuilder<CommandSourceStack, ?> register() {
@@ -155,9 +145,7 @@ public class NABaseCommand {
                     );
         }
         
-        /**
-         * Adds the specified amount of absorption to the target player(s).
-         */
+        /** Adds the specified amount of absorption to the target player(s). */
         private static int addAbsorption( CommandSourceStack source, Collection<ServerPlayer> players, int absorption ) {
             for( ServerPlayer player : players ) {
                 float currentAbsorption = player.getAbsorptionAmount();
@@ -175,9 +163,7 @@ public class NABaseCommand {
             return players.size();
         }
         
-        /**
-         * Subtracts the specified amount of absorption from the target player(s).
-         */
+        /** Subtracts the specified amount of absorption from the target player(s). */
         private static int removeAbsorption( CommandSourceStack source, Collection<ServerPlayer> players, int absorption ) {
             for( ServerPlayer player : players ) {
                 float currentAbsorption = player.getAbsorptionAmount();
@@ -195,9 +181,7 @@ public class NABaseCommand {
             return players.size();
         }
         
-        /**
-         * Sets the specified amount of absorption for the target player(s).
-         */
+        /** Sets the specified amount of absorption for the target player(s). */
         private static int setAbsorption( CommandSourceStack source, Collection<ServerPlayer> players, int absorption ) {
             for( ServerPlayer player : players ) {
                 player.setAbsorptionAmount( Math.min( (float) absorption, Float.MAX_VALUE ) );

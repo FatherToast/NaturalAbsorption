@@ -9,8 +9,8 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class NAEnchantments {
     
-    public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create( ForgeRegistries.ENCHANTMENTS, NaturalAbsorption.MOD_ID );
+    public static final DeferredRegister<Enchantment> REGISTRY = DeferredRegister.create( ForgeRegistries.ENCHANTMENTS, NaturalAbsorption.MOD_ID );
     
     
-    public static final RegistryObject<AbsorptionEnchantment> ABSORPTION_ENCHANTMENT = ENCHANTMENTS.register( "absorption", AbsorptionEnchantment::new );
+    public static final RegistryObject<AbsorptionEnchantment> ABSORPTION_ENCHANTMENT = REGISTRY.register( "absorption", AbsorptionEnchantment::new );
 }

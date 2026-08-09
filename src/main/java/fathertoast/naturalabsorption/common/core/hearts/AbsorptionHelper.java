@@ -5,6 +5,7 @@ import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -15,54 +16,55 @@ import java.util.UUID;
 
 public class AbsorptionHelper {
     
-    /** @return The player's max absorption, from all sources combined. In other words, the actual limit on absorption recovery. */
-    public static double getMaxAbsorption( Player player ) {
-        return getSteadyStateMaxAbsorption( player ) + HeartManager.getPotionAbsorption( player );
+    /** @return The entity's max absorption, from all sources combined. In other words, the actual limit on absorption recovery. */
+    public static double getMaxAbsorption( LivingEntity entity ) {
+        return getSteadyStateMaxAbsorption( entity ) + HeartManager.getPotionAbsorption( entity );
     }
     
     /** @return The player's max absorption not counting buffs, limited by the global max absorption config. */
-    public static double getSteadyStateMaxAbsorption( Player player ) {
-        final double calculatedMax = getNaturalAbsorption( player ) + getEquipmentAbsorption( player );
+    public static double getSteadyStateMaxAbsorption( LivingEntity entity ) {
+        final double naturalAbsorption = entity instanceof Player player ? getNaturalAbsorption( player ) : 0.0;
+        final double calculatedMax = naturalAbsorption + getEquipmentAbsorption( entity );
         return Config.ABSORPTION.GENERAL.globalMax.get() < 0.0 ? calculatedMax :
                 Math.min( calculatedMax, Config.ABSORPTION.GENERAL.globalMax.get() );
     }
     
-    /** @return The player's max absorption granted by natural absorption. */
-    public static double getNaturalAbsorption( Player player ) {
-        return player.getAttributeValue( NAAttributes.NATURAL_ABSORPTION.get() );
+    /** @return The entity's max absorption granted by natural absorption. */
+    public static double getNaturalAbsorption( LivingEntity entity ) {
+        return entity.getAttributeValue( NAAttributes.NATURAL_ABSORPTION.get() );
     }
     
-    /** @return True if the player's base natural absorption has been initialized. */
-    public static boolean isBaseNaturalAbsorptionInitialized( Player player ) {
-        return hasAbsorptionModifier( player, true, NATURAL_MODIFIER_BASE );
+    /** @return True if the entity's base natural absorption has been initialized. */
+    public static boolean isBaseNaturalAbsorptionInitialized( LivingEntity entity ) {
+        return hasAbsorptionModifier( entity, true, NATURAL_MODIFIER_BASE );
     }
     
-    /** @return The player's natural absorption, ignoring all attribute modifiers. */
-    public static double getBaseNaturalAbsorption( Player player ) {
-        return getAbsorptionModifier( player, true, NATURAL_MODIFIER_BASE );
+    /** @return The entity's natural absorption, ignoring all attribute modifiers. */
+    public static double getBaseNaturalAbsorption( LivingEntity entity ) {
+        return getAbsorptionModifier( entity, true, NATURAL_MODIFIER_BASE );
     }
     
     /** Sets base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed. */
-    public static void setBaseNaturalAbsorption( Player player, boolean updateActualAbsorption, double value ) {
+    public static void setBaseNaturalAbsorption( LivingEntity entity, boolean updateActualAbsorption, double value ) {
         if( HeartManager.isAbsorptionEnabled() ) {
-            final double initialValue = updateActualAbsorption ? getNaturalAbsorption( player ) : 0.0;
+            final double initialValue = updateActualAbsorption ? getNaturalAbsorption( entity ) : 0.0;
             
-            setAbsorptionModifier( player, true, NATURAL_MODIFIER_BASE,
+            setAbsorptionModifier( entity, true, NATURAL_MODIFIER_BASE,
                     Mth.clamp( value, 0.0, Config.ABSORPTION.NATURAL.maximumAmount.get() ) );
             
             if( updateActualAbsorption ) {
-                final double finalValue = getNaturalAbsorption( player );
+                final double finalValue = getNaturalAbsorption( entity );
                 if( initialValue > finalValue ) {
                     final double netChange = finalValue - initialValue;
-                    player.setAbsorptionAmount( player.getAbsorptionAmount() + (float) netChange );
+                    entity.setAbsorptionAmount( entity.getAbsorptionAmount() + (float) netChange );
                 }
             }
         }
     }
     
     /** Adds (or removes) base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed. */
-    public static void addBaseNaturalAbsorption( Player player, boolean updateActualAbsorption, double value ) {
-        setBaseNaturalAbsorption( player, updateActualAbsorption, getBaseNaturalAbsorption( player ) + value );
+    public static void addBaseNaturalAbsorption( LivingEntity entity, boolean updateActualAbsorption, double value ) {
+        setBaseNaturalAbsorption( entity, updateActualAbsorption, getBaseNaturalAbsorption( entity ) + value );
     }
     
     /** Removes base natural absorption equal to the death penalty, down to a limit, reducing actual absorption to match. */
@@ -76,48 +78,48 @@ public class AbsorptionHelper {
         }
     }
     
-    /** @return The player's max absorption granted by equipment. That is, how much they would lose by unequipping everything. */
-    public static double getEquipmentAbsorption( Player player ) {
-        return player.getAttributeValue( NAAttributes.EQUIPMENT_ABSORPTION.get() );
+    /** @return The entity's max absorption granted by equipment. That is, how much the entity would lose by unequipping everything. */
+    public static double getEquipmentAbsorption( LivingEntity entity ) {
+        return entity.getAttributeValue( NAAttributes.EQUIPMENT_ABSORPTION.get() );
     }
     
-    /** @return The player's equipment absorption from enchantments, ignoring all attribute modifiers. */
-    public static double getEnchantmentAbsorption( Player player ) {
-        return getAbsorptionModifier( player, false, EQUIP_MODIFIER_ENCHANT );
+    /** @return The entity's equipment absorption from enchantments, ignoring all attribute modifiers. */
+    public static double getEnchantmentAbsorption( LivingEntity entity ) {
+        return getAbsorptionModifier( entity, false, EQUIP_MODIFIER_ENCHANT );
     }
     
-    /** @return The player's equipment absorption from armor replacement, ignoring all attribute modifiers. */
-    public static double getArmorReplacementAbsorption( Player player ) {
-        return getAbsorptionModifier( player, false, EQUIP_MODIFIER_ARMOR_REPLACE );
+    /** @return The entity's equipment absorption from armor replacement, ignoring all attribute modifiers. */
+    public static double getArmorReplacementAbsorption( LivingEntity entity ) {
+        return getAbsorptionModifier( entity, false, EQUIP_MODIFIER_ARMOR_REPLACE );
     }
     
     /** Recalculates and reapplies all equipment absorption modifiers. */
-    public static void updateEquipmentAbsorption( Player player, double previousMaxAbsorb ) {
+    public static void updateEquipmentAbsorption( LivingEntity entity, double previousMaxAbsorb ) {
         if( HeartManager.isAbsorptionEnabled() ) {
-            setAbsorptionModifier( player, false, EQUIP_MODIFIER_ENCHANT, Config.EQUIPMENT.ENCHANTMENT.enabled.get() ?
-                    AbsorptionEnchantment.getMaxAbsorptionBonus( player ) : 0.0 );
-            setAbsorptionModifier( player, false, EQUIP_MODIFIER_ARMOR_REPLACE, HeartManager.isArmorReplacementEnabled() ?
-                    getArmorReplacementBonus( player ) : 0.0 );
+            setAbsorptionModifier( entity, false, EQUIP_MODIFIER_ENCHANT, Config.EQUIPMENT.ENCHANTMENT.enabled.get() ?
+                    AbsorptionEnchantment.getMaxAbsorptionBonus( entity ) : 0.0 );
+            setAbsorptionModifier( entity, false, EQUIP_MODIFIER_ARMOR_REPLACE, HeartManager.isArmorReplacementEnabled() ?
+                    getArmorReplacementBonus( entity ) : 0.0 );
             
-            final double finalMaxAbsorb = getMaxAbsorption( player );
+            final double finalMaxAbsorb = getMaxAbsorption( entity );
             if( previousMaxAbsorb > finalMaxAbsorb ) {
                 final double netChange = finalMaxAbsorb - previousMaxAbsorb;
-                player.setAbsorptionAmount( player.getAbsorptionAmount() + (float) netChange );
+                entity.setAbsorptionAmount( entity.getAbsorptionAmount() + (float) netChange );
             }
         }
     }
     
     /** @return The maximum absorption granted by armor replacement. */
-    private static double getArmorReplacementBonus( Player player ) {
+    private static double getArmorReplacementBonus( LivingEntity entity ) {
         double bonus = 0.0;
         if( Config.EQUIPMENT.ARMOR.armorMultiplier.get() > 0.0 ) {
-            final double armor = player.getAttributeValue( Attributes.ARMOR );
+            final double armor = entity.getAttributeValue( Attributes.ARMOR );
             if( armor > 0.0F ) {
                 bonus += Config.EQUIPMENT.ARMOR.armorMultiplier.get() * armor;
             }
         }
         if( Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() > 0.0 ) {
-            final double toughness = player.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
+            final double toughness = entity.getAttributeValue( Attributes.ARMOR_TOUGHNESS );
             if( toughness > 0.0F ) {
                 bonus += Config.EQUIPMENT.ARMOR.armorToughnessMultiplier.get() * toughness;
             }
@@ -139,16 +141,16 @@ public class AbsorptionHelper {
     
     /** Helper method for checking existence of absorption attribute modifiers. */
     @SuppressWarnings( "SameParameterValue" )
-    private static boolean hasAbsorptionModifier( Player player, boolean natural, AttributeModifier staticModifier ) {
+    private static boolean hasAbsorptionModifier( LivingEntity entity, boolean natural, AttributeModifier staticModifier ) {
         final Attribute attribute = natural ? NAAttributes.NATURAL_ABSORPTION.get() : NAAttributes.EQUIPMENT_ABSORPTION.get();
-        final AttributeInstance instance = player.getAttribute( attribute );
+        final AttributeInstance instance = entity.getAttribute( attribute );
         return instance != null && instance.getModifier( staticModifier.getId() ) != null;
     }
     
     /** Helper method for reading absorption attribute modifier values. */
-    private static double getAbsorptionModifier( Player player, boolean natural, AttributeModifier staticModifier ) {
+    private static double getAbsorptionModifier( LivingEntity entity, boolean natural, AttributeModifier staticModifier ) {
         final Attribute attribute = natural ? NAAttributes.NATURAL_ABSORPTION.get() : NAAttributes.EQUIPMENT_ABSORPTION.get();
-        final AttributeInstance instance = player.getAttribute( attribute );
+        final AttributeInstance instance = entity.getAttribute( attribute );
         if( instance != null ) {
             final AttributeModifier modifier = instance.getModifier( staticModifier.getId() );
             if( modifier != null ) return modifier.getAmount();
@@ -157,12 +159,12 @@ public class AbsorptionHelper {
     }
     
     /** Helper method for writing absorption attribute modifier values. */
-    private static void setAbsorptionModifier( Player player, boolean natural, AttributeModifier staticModifier, double value ) {
+    private static void setAbsorptionModifier( LivingEntity entity, boolean natural, AttributeModifier staticModifier, double value ) {
         final Attribute attribute = natural ? NAAttributes.NATURAL_ABSORPTION.get() : NAAttributes.EQUIPMENT_ABSORPTION.get();
-        final AttributeInstance instance = player.getAttribute( attribute );
+        final AttributeInstance instance = entity.getAttribute( attribute );
         if( instance == null ) {
-            NaturalAbsorption.LOG.error( "Player '{}' does not have '{}' registered!",
-                    player.getScoreboardName(), attribute.getDescriptionId() );
+            NaturalAbsorption.LOG.error( "Entity '{}' does not have '{}' registered!",
+                    entity.getScoreboardName(), attribute.getDescriptionId() );
             return;
         }
         

@@ -4,10 +4,15 @@ import fathertoast.crust.api.config.common.AbstractConfigCategory;
 import fathertoast.crust.api.config.common.AbstractConfigFile;
 import fathertoast.crust.api.config.common.ConfigManager;
 import fathertoast.crust.api.config.common.field.*;
+import fathertoast.crust.api.config.common.field.collection.RegistryMapField;
+import fathertoast.crust.api.config.common.value.collection.RegistryMap;
+import fathertoast.crust.api.config.common.value.collection.value.DoubleValueCodec;
 import fathertoast.naturalabsorption.client.ClientUtil;
 import fathertoast.naturalabsorption.common.recipe.condition.BookRecipeCondition;
+import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class AbsorptionConfig extends AbstractConfigFile {
     
@@ -84,7 +89,8 @@ public class AbsorptionConfig extends AbstractConfigFile {
     
     public static class Natural extends AbstractConfigCategory<AbsorptionConfig> {
         
-        public final DoubleField startingAmount;
+        public final RegistryMapField<EntityType<?>, Double> entities;
+        
         public final DoubleField maximumAmount;
         
         public final DoubleField deathPenalty;
@@ -114,8 +120,14 @@ public class AbsorptionConfig extends AbstractConfigFile {
                     "Books of Absorption, and loses some upon death.",
                     "", "Note: All absorption amounts are in half-hearts." );
             
-            startingAmount = SPEC.define( new DoubleField( "starting_absorption", 4.0, DoubleField.Range.NON_NEGATIVE,
-                    "The amount of natural absorption a new player starts with." ) );
+            entities = SPEC.define( new RegistryMapField<>( "entities.list", new RegistryMap.Builder<>( ForgeRegistries.ENTITY_TYPES, DoubleValueCodec.NON_NEGATIVE )
+                    .put( EntityType.PLAYER, 4.0 )
+                    .build(),
+                    "A list of entity types that can have natural absorption.",
+                    "The value after the entity type is the base amount of natural absorption the entity will spawn with." ) );
+            
+            SPEC.newLine();
+            
             maximumAmount = SPEC.define( new DoubleField( "max_absorption", 20.0, DoubleField.Range.NON_NEGATIVE,
                     "The maximum natural absorption a player may obtain from upgrades.",
                     "Does not include any other sources of max absorption (such as from potions or equipment)." ) );

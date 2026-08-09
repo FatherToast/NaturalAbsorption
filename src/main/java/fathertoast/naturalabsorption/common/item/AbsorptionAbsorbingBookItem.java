@@ -6,7 +6,6 @@ import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -21,17 +20,12 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 import static fathertoast.naturalabsorption.common.item.AbsorptionBookItem.getLevelCost;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class AbsorptionAbsorbingBookItem extends Item {
     
     public AbsorptionAbsorbingBookItem() {
@@ -85,7 +79,6 @@ public class AbsorptionAbsorbingBookItem extends Item {
     }
     
     @Override
-    @OnlyIn( value = Dist.CLIENT )
     public void appendHoverText( ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag ) {
         if( !Config.ABSORPTION.NATURAL.spongeBookEnabled.get() )
             return;

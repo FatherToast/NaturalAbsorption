@@ -1,8 +1,6 @@
 package fathertoast.naturalabsorption.api;
 
-import net.minecraft.world.entity.player.Player;
-
-import javax.annotation.Nonnull;
+import net.minecraft.world.entity.LivingEntity;
 
 @SuppressWarnings( "unused" )
 public interface INaturalAbsorption {
@@ -13,34 +11,31 @@ public interface INaturalAbsorption {
      * Do not modify this NBT directly if IHeartData is available (the NBT will simply be overwritten).
      */
     /**
-     * The name of the base NBT compound for all player save data used by the Natural Absorption mod.
-     * The NBT compound is located in the player's persisted NBT (see example below).
+     * The name of the base NBT compound for all entity save data used by the Natural Absorption mod.
+     * The base NBT compound that is written/read to depends on whether the entity is a player or not.
+     * <br><br>
+     * For players the base tag is the persist-on-death tag:
      * <p>
-     * player.getPersistentData().getCompound(PlayerEntity.PERSISTED_NBT_TAG).getCompound(INaturalAbsorption.TAG_BASE)
+     * <code>entity.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG).getCompound(INaturalAbsorption.TAG_BASE)</code>
+     * <p>
+     * For other living entities the base tag is the Forge persistant data tag:
+     * <code>entity.getPersistentData().getCompound(INaturalAbsorption.TAG_BASE)</code>
      */
     String TAG_BASE = "naturalabsorption";
-    /**
-     * The name of the NBT integer that represents ticks until absorption regeneration can begin. Located in the base tag.
-     */
+    /** The name of the NBT integer that represents ticks until absorption regeneration can begin. Located in the base tag. */
     String TAG_DELAY_ABSORPTION = "AbsorbDelay";
-    /**
-     * The name of the NBT integer that represents ticks until health regeneration can begin. Located in the base tag.
-     */
+    /** The name of the NBT integer that represents ticks until health regeneration can begin. Located in the base tag. */
     String TAG_DELAY_HEALTH = "HealthDelay";
     
     /**
-     * Gets or loads heart data for a player.<br>
-     * <br>
+     * Gets or loads heart data for the specified entity.
      *
-     * @param player The player to retrieve heart data from.
-     * @return The given player's heart data.
+     * @param entity The entity to retrieve heart data from.
+     * @return The given entity's heart data.
      * @throws IllegalArgumentException if called on client.
      */
-    @Nonnull
-    IHeartData getHeartData( @Nonnull Player player );
+    IHeartData getHeartData( LivingEntity entity );
     
-    /**
-     * @return The API IAbsorptionAccessor instance.
-     */
+    /** @return The absorption accessor instance provided by Natural Absorption. */
     IAbsorptionAccessor getAbsorptionAccessor();
 }

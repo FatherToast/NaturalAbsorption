@@ -21,7 +21,7 @@ import java.util.Random;
  * to drawing the player's health also draws empty heart containers before absorption
  * to display the player's absorption capacity.
  */
-public class AbsorptionBackgroundOverlay implements IGuiOverlay {
+public class NAHealthOverlay implements IGuiOverlay {
     
     /** A resource location pointing to vanilla's GUI icons texture. */
     private static final ResourceLocation GUI_ICONS_LOCATION = ResourceLocation.withDefaultNamespace( "textures/gui/icons.png" );

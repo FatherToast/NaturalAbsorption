@@ -54,7 +54,7 @@ public record ConfigOptionCondition(Operation operation) implements ICondition {
     
     public enum Operation {
         
-        SPONGE_BOOK( "sponge_book", Config.ABSORPTION.NATURAL.spongeBookEnabled::get );
+        SPONGE_BOOK( "sponge_book", Config.ABSORPTION.NATURAL.spongeBookEnabled );
         
         Operation( String name, Supplier<Boolean> test ) {
             this.name = name;

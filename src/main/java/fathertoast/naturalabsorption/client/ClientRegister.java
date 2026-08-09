@@ -13,7 +13,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber( value = Dist.CLIENT, modid = NaturalAbsorption.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD )
 public class ClientRegister {
     
-    public static final IGuiOverlay ABSORPTION_BACKGROUND = new AbsorptionBackgroundOverlay();
+    /** Natural Absorption's custom health GUI overlay. */
+    public static final IGuiOverlay HEALTH_OVERLAY = new NAHealthOverlay();
     
     @SubscribeEvent
     public static void onClientSetup( FMLClientSetupEvent event ) {
@@ -22,6 +23,6 @@ public class ClientRegister {
     
     @SubscribeEvent
     public static void onGuiOverlayRegister( RegisterGuiOverlaysEvent event ) {
-        event.registerAbove( VanillaGuiOverlay.PLAYER_HEALTH.id(), "absorption_background_capacity", ABSORPTION_BACKGROUND );
+        event.registerAbove( VanillaGuiOverlay.PLAYER_HEALTH.id(), "health_overlay", HEALTH_OVERLAY );
     }
 }

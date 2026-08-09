@@ -7,22 +7,21 @@ import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -31,13 +30,14 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class HeartManager {
-    /** Map of all players that have had equipment changes since the last tick, linked to their previous max absorption. */
-    private static final HashMap<Player, Double> PLAYER_EQUIPMENT_TRACKER = new HashMap<>();
+    /** Map of all living entities that have had equipment changes since the last tick, linked to their previous max absorption. */
+    private static final HashMap<LivingEntity, Double> ENTITY_EQUIPMENT_TRACKER = new HashMap<>();
     
     /** Map of all currently tracked players to their last known hunger state. */
     private static final HashMap<Player, HungerState> PLAYER_HUNGER_STATE_TRACKER = new HashMap<>();
@@ -51,23 +51,23 @@ public class HeartManager {
     /** @return True if armor replacement features in this mod are enabled. */
     public static boolean isArmorReplacementEnabled() { return Config.EQUIPMENT.ARMOR.enabled.get(); }
     
-    /** Marks a player as having equipment changes and records their current max absorption. */
-    private static void trackPlayerEquipmentChange( Player player ) {
+    /** Marks a living entity as having equipment changes and records their current max absorption. */
+    private static void trackEntityEquipmentChange( LivingEntity entity ) {
         // This will not be called multiple times per tick for the same player under normal circumstances; however, in
         // case it does happen, we can safely ignore repeat calls since we only care about the initial & final states
-        if( !PLAYER_EQUIPMENT_TRACKER.containsKey( player ) ) {
-            PLAYER_EQUIPMENT_TRACKER.put( player, AbsorptionHelper.getMaxAbsorption( player ) );
+        if( !ENTITY_EQUIPMENT_TRACKER.containsKey( entity ) ) {
+            ENTITY_EQUIPMENT_TRACKER.put( entity, AbsorptionHelper.getMaxAbsorption( entity ) );
         }
     }
     
-    /** Updates all players' pending equipment absorption changes and updates their actual absorption as needed. */
-    private static void applyPlayerEquipmentChanges() {
-        if( PLAYER_EQUIPMENT_TRACKER.isEmpty() ) return;
+    /** Updates all entities' pending equipment absorption changes and updates their actual absorption as needed. */
+    private static void applyEntityEquipmentChanges() {
+        if( ENTITY_EQUIPMENT_TRACKER.isEmpty() ) return;
         
-        for( Map.Entry<Player, Double> entry : PLAYER_EQUIPMENT_TRACKER.entrySet() ) {
+        for( Map.Entry<LivingEntity, Double> entry : ENTITY_EQUIPMENT_TRACKER.entrySet() ) {
             AbsorptionHelper.updateEquipmentAbsorption( entry.getKey(), entry.getValue() );
         }
-        PLAYER_EQUIPMENT_TRACKER.clear();
+        ENTITY_EQUIPMENT_TRACKER.clear();
     }
     
     /** Creates or updates a player's tracked hunger state. */
@@ -85,9 +85,9 @@ public class HeartManager {
     private static void clearPlayerHungerState( Player player ) { PLAYER_HUNGER_STATE_TRACKER.remove( player ); }
     
     /** @return The max absorption granted by potion effects. */
-    public static float getPotionAbsorption( Player player ) {
-        if( player.hasEffect( MobEffects.ABSORPTION ) ) {
-            final MobEffectInstance absorptionPotion = player.getEffect( MobEffects.ABSORPTION );
+    public static float getPotionAbsorption( LivingEntity entity ) {
+        if( entity.hasEffect( MobEffects.ABSORPTION ) ) {
+            final MobEffectInstance absorptionPotion = entity.getEffect( MobEffects.ABSORPTION );
             if( absorptionPotion != null )
                 return 4.0F * (absorptionPotion.getAmplifier() + 1);
         }
@@ -122,7 +122,7 @@ public class HeartManager {
         if( event.phase == TickEvent.Phase.END ) {
             
             // Apply queued events
-            applyPlayerEquipmentChanges();
+            applyEntityEquipmentChanges();
             
             // Counter for cache cleanup; very lazily do this every ~5.5 minutes
             if( ++cleanupCounter >= 6666 ) {
@@ -131,13 +131,17 @@ public class HeartManager {
                 HeartData.clearCache();
             }
             
-            // Counter for player heart update
+            // Counter for entity heart update
             if( ++updateCounter >= Config.MAIN.GENERAL.updateTime.get() ) {
                 updateCounter = 0;
                 
-                for( ServerPlayer player : server.getPlayerList().getPlayers() ) {
-                    // Update each player's heart data
-                    if( player != null && player.isAlive() ) HeartData.get( player ).update();
+                // Update heart data for all living entities in all levels, including players
+                for( ServerLevel level : server.getAllLevels() ) {
+                    for( Entity entity : level.getAllEntities() ) {
+                        if( entity.isAlive() && entity instanceof LivingEntity livingEntity ) {
+                            HeartData.get( livingEntity ).update();
+                        }
+                    }
                 }
             }
         }
@@ -249,7 +253,6 @@ public class HeartManager {
      *
      * @param event The event data.
      */
-    @OnlyIn( Dist.CLIENT )
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onItemTooltip( ItemTooltipEvent event ) {
         final FoodProperties food = event.getItemStack().getItem().getFoodProperties( event.getItemStack(), event.getEntity() );
@@ -337,26 +340,7 @@ public class HeartManager {
      */
     @SubscribeEvent( priority = EventPriority.HIGHEST )
     public void onPlayerEquipmentChange( LivingEquipmentChangeEvent event ) {
-        if( event.getEntity() instanceof Player player ) {
-            trackPlayerEquipmentChange( player );
-        }
-    }
-    
-    /**
-     * Adds our absorption attributes to the player entity type. Individually registered to the mod event bus.
-     */
-    public static void onEntityAttributeCreation( @SuppressWarnings( "unused" ) EntityAttributeCreationEvent event ) {
-        AttributeSupplier attributeSupplier = DefaultAttributes.getSupplier( EntityType.PLAYER );
-        AttributeSupplier.Builder builder = AttributeSupplier.builder();
-        
-        builder.add( NAAttributes.NATURAL_ABSORPTION.get(), 0.0 );
-        builder.add( NAAttributes.EQUIPMENT_ABSORPTION.get(), 0.0 );
-        AttributeSupplier newAttributeSupplier = builder.build();
-        Map<Attribute, AttributeInstance> map = new HashMap<>();
-        
-        map.putAll( attributeSupplier.instances );
-        map.putAll( newAttributeSupplier.instances );
-        attributeSupplier.instances = map;
+        trackEntityEquipmentChange( event.getEntity() );
     }
     
     /**
@@ -384,6 +368,21 @@ public class HeartManager {
                     event.setAmount( unmodifiedDamage + (unmodifiedDamage - getDamageAfterArmorAbsorb( event.getEntity(), event.getSource(), unmodifiedDamage )) );
                 }
             }
+        }
+    }
+    
+    /**
+     * Adds our absorption attributes to the entity types that are configured to have them.
+     * Registered as a listener in {@link NaturalAbsorption#NaturalAbsorption(FMLJavaModLoadingContext)}.
+     */
+    public static void onModifyEntityAttributes( EntityAttributeModificationEvent event ) {
+        for( EntityType<? extends LivingEntity> type : event.getTypes() ) {
+            if( Config.ABSORPTION.NATURAL.entities.contains( type ) ) {
+                // noinspection ConstantConditions
+                event.add( type, NAAttributes.NATURAL_ABSORPTION.get(), Config.ABSORPTION.NATURAL.entities.get( type ) );
+            }
+            // All living entities can make use of equipment absorption
+            event.add( type, NAAttributes.EQUIPMENT_ABSORPTION.get() );
         }
     }
     

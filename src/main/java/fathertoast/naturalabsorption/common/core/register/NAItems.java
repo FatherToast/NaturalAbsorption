@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 
 public class NAItems {
     
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create( ForgeRegistries.ITEMS, NaturalAbsorption.MOD_ID );
+    public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create( ForgeRegistries.ITEMS, NaturalAbsorption.MOD_ID );
     public static final Map<ResourceKey<CreativeModeTab>, List<RegistryObject<? extends Item>>> TAB_ITEMS = new HashMap<>();
     
     
@@ -30,7 +30,7 @@ public class NAItems {
     
     @SafeVarargs
     protected static <T extends Item> RegistryObject<T> register( String name, Supplier<T> itemSupplier, ResourceKey<CreativeModeTab>... creativeTabs ) {
-        RegistryObject<T> regObj = ITEMS.register( name, itemSupplier );
+        RegistryObject<T> regObj = REGISTRY.register( name, itemSupplier );
         queueForCreativeTabs( regObj, creativeTabs );
         return regObj;
     }

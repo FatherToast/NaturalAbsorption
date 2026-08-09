@@ -42,9 +42,6 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
 
-            property "mixin.debug.export", "true"
-            //property 'mixin.env.disableRefMap', 'true'
-
             //arg "-mixin.config=naturalabsorption.mixins.json"
 
             mods {
@@ -55,11 +52,11 @@ minecraft {
         }
 
         client {
-
+            property 'mixin.env.disableRefMap', 'true'
         }
 
         server {
-
+            property 'mixin.env.disableRefMap', 'true'
         }
 
         gameTestServer {
@@ -103,6 +100,8 @@ dependencies {
     runtimeOnly "blank:crust:1.20.1-5.0.0:src"
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
+
+    runtimeOnly fg.deobf("curse.maven:jade-324717:${jade_version}")
 
     implementation fg.deobf("curse.maven:tc-74072:${tc_version}")
     implementation fg.deobf("curse.maven:mantle-74924:${mantle_version}")

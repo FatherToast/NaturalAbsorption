@@ -1,21 +1,20 @@
 package fathertoast.naturalabsorption.common.core.hearts;
 
+import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
 import fathertoast.naturalabsorption.common.core.config.Config;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class HeartData implements IHeartData {
-    
-    private static final int NBT_TYPE_NUMERICAL = 99;
     
     private static final Map<UUID, HeartData> PLAYER_CACHE = new HashMap<>();
     
@@ -26,31 +25,61 @@ public class HeartData implements IHeartData {
     public static void clearCache() { PLAYER_CACHE.clear(); }
     
     /**
-     * @param player Player to get or load heart data for.
-     * @return The player's heart data.
-     * @throws IllegalArgumentException if called not called server-side.
+     * @param entity Entity to get or load heart data for.
+     * @return The entity's heart data.
+     * @throws IllegalArgumentException if not called server-side.
      */
-    @Nonnull
-    public static HeartData get( @Nonnull Player player ) {
+    public static HeartData get( LivingEntity entity ) {
         // noinspection resource
-        if( player.level().isClientSide ) {
+        if( entity.level().isClientSide ) {
             throw new IllegalArgumentException( "Heart data is only stored on the server side!" );
         }
-        UUID uuid = player.getUUID();
+        UUID uuid = entity.getUUID();
         HeartData data = PLAYER_CACHE.get( uuid );
         
-        if( data == null || player != data.owner ) {
-            data = new HeartData( player );
+        if( data == null || entity != data.owner ) {
+            data = new HeartData( entity );
             PLAYER_CACHE.put( uuid, data );
         }
         return data;
     }
     
-    public final Player owner;
+    public final LivingEntity owner;
+    private final boolean isPlayer;
     private final CompoundTag saveTag;
     
     private int absorptionRecoveryDelay;
     private int healthRecoveryDelay;
+    
+    /** For internal use, call {@link #get(LivingEntity)} outside this class. */
+    private HeartData( LivingEntity entity ) {
+        owner = entity;
+        isPlayer = owner instanceof Player;
+        saveTag = getModNBTTag( entity );
+        
+        // First-time initialization
+        if( !AbsorptionHelper.isBaseNaturalAbsorptionInitialized( owner ) && Config.ABSORPTION.NATURAL.entities.contains( owner.getType() ) ) {
+            // noinspection ConstantConditions
+            double startingAmount = Config.ABSORPTION.NATURAL.entities.get( owner.getType() );
+            AbsorptionHelper.setBaseNaturalAbsorption( owner, true, startingAmount );
+        }
+        
+        // Absorption delay
+        if( NBTHelper.containsNumber( saveTag, NaturalAbsorptionAPI.TAG_DELAY_ABSORPTION ) ) {
+            absorptionRecoveryDelay = saveTag.getInt( NaturalAbsorptionAPI.TAG_DELAY_ABSORPTION );
+        }
+        else {
+            setAbsorptionDelay( 0 );
+        }
+        
+        // Health delay
+        if( NBTHelper.containsNumber( saveTag, NaturalAbsorptionAPI.TAG_DELAY_HEALTH ) ) {
+            healthRecoveryDelay = saveTag.getInt( NaturalAbsorptionAPI.TAG_DELAY_HEALTH );
+        }
+        else {
+            setHealthDelay( 0 );
+        }
+    }
     
     
     // Absorption recovery delay methods
@@ -109,6 +138,7 @@ public class HeartData implements IHeartData {
         }
     }
     
+    /** Updated absorption data. */
     private void updateAbsorption() {
         // TEMP Try with this disabled; allow mods to add raw vanilla absorption if they want past the cap
         //        if( owner.getAbsorptionAmount() > AbsorptionHelper.getMaxAbsorption( owner ) ) {
@@ -134,8 +164,9 @@ public class HeartData implements IHeartData {
             recovered = (float) (Config.ABSORPTION.GENERAL.recoveryRate.get() * updateTime);
         }
         
-        // Handle hunger cost restrictions
-        if( owner.getFoodData().getFoodLevel() < Config.ABSORPTION.GENERAL.recoveryHungerRequired.get() ) return;
+        // Handle hunger cost restrictions for players
+        if( isPlayer && ((Player) owner).getFoodData().getFoodLevel() < Config.ABSORPTION.GENERAL.recoveryHungerRequired.get() )
+            return;
         
         // Recover absorption, if needed
         final double maxAbsorption = AbsorptionHelper.getMaxAbsorption( owner );
@@ -165,13 +196,14 @@ public class HeartData implements IHeartData {
             owner.setAbsorptionAmount( (float) newAbsorption );
             
             // Apply hunger cost
-            if( newAbsorption - oldAbsorption > 0 && Config.ABSORPTION.GENERAL.recoveryHungerCost.get() > 0.0 ) {
-                owner.getFoodData().addExhaustion( (float) (newAbsorption - oldAbsorption) *
+            if( isPlayer && newAbsorption - oldAbsorption > 0 && Config.ABSORPTION.GENERAL.recoveryHungerCost.get() > 0.0 ) {
+                ((Player) owner).getFoodData().addExhaustion( (float) (newAbsorption - oldAbsorption) *
                         Config.ABSORPTION.GENERAL.recoveryHungerCost.getFloat() );
             }
         }
     }
     
+    /** Updates health data. */
     private void updateHealth() {
         // Update delay and determine amount to recover accordingly
         final int updateTime = Config.MAIN.GENERAL.updateTime.get();
@@ -193,7 +225,8 @@ public class HeartData implements IHeartData {
         }
         
         // Handle hunger cost restrictions
-        if( owner.getFoodData().getFoodLevel() < Config.HEALTH.GENERAL.recoveryHungerRequired.get() ) return;
+        if( isPlayer && ((Player) owner).getFoodData().getFoodLevel() < Config.HEALTH.GENERAL.recoveryHungerRequired.get() )
+            return;
         
         // Recover health, if needed
         final float maxHealth = Math.min( Config.HEALTH.GENERAL.recoveryMax.getFloat(), owner.getMaxHealth() );
@@ -205,48 +238,21 @@ public class HeartData implements IHeartData {
             owner.setHealth( newHealth );
             
             // Apply hunger cost
-            if( newHealth - oldHealth > 0 && Config.HEALTH.GENERAL.recoveryHungerCost.get() > 0.0 ) {
-                owner.getFoodData().addExhaustion( (newHealth - oldHealth) *
+            if( isPlayer && newHealth - oldHealth > 0 && Config.HEALTH.GENERAL.recoveryHungerCost.get() > 0.0 ) {
+                ((Player) owner).getFoodData().addExhaustion( (newHealth - oldHealth) *
                         Config.HEALTH.GENERAL.recoveryHungerCost.getFloat() );
             }
         }
     }
     
-    private HeartData( Player player ) {
-        owner = player;
-        saveTag = getModNBTTag( player );
+    /** @return The compound tag that holds Natural Absorption's data. */
+    private static CompoundTag getModNBTTag( LivingEntity entity ) {
+        // Start with the base entity Forge data.
+        // If the entity is a player, we get the persist-on-death data.
+        CompoundTag tag = entity instanceof Player player
+                ? NBTHelper.getPlayerData( player )
+                : NBTHelper.getForgeData( entity );
         
-        // First-time initialization
-        if( !AbsorptionHelper.isBaseNaturalAbsorptionInitialized( owner ) ) {
-            AbsorptionHelper.setBaseNaturalAbsorption( owner, true, Config.ABSORPTION.NATURAL.startingAmount.get() );
-        }
-        
-        // Absorption delay
-        if( saveTag.contains( NaturalAbsorptionAPI.TAG_DELAY_ABSORPTION, NBT_TYPE_NUMERICAL ) ) {
-            absorptionRecoveryDelay = saveTag.getInt( NaturalAbsorptionAPI.TAG_DELAY_ABSORPTION );
-        }
-        else {
-            setAbsorptionDelay( 0 );
-        }
-        
-        // Health delay
-        if( saveTag.contains( NaturalAbsorptionAPI.TAG_DELAY_HEALTH, NBT_TYPE_NUMERICAL ) ) {
-            healthRecoveryDelay = saveTag.getInt( NaturalAbsorptionAPI.TAG_DELAY_HEALTH );
-        }
-        else {
-            setHealthDelay( 0 );
-        }
-    }
-    
-    /** @return The nbt tag compound that holds all of this mod's data. */
-    private static CompoundTag getModNBTTag( Player player ) {
-        // Start with the base entity forge data
-        CompoundTag tag = player.getPersistentData().getCompound( Player.PERSISTED_NBT_TAG );
-        
-        // Get/make a tag unique to this mod
-        if( !tag.contains( NaturalAbsorptionAPI.TAG_BASE, tag.getId() ) ) {
-            tag.put( NaturalAbsorptionAPI.TAG_BASE, new CompoundTag() );
-        }
-        return tag.getCompound( NaturalAbsorptionAPI.TAG_BASE );
+        return NBTHelper.getOrCreateCompound( tag, NaturalAbsorptionAPI.TAG_BASE );
     }
 }

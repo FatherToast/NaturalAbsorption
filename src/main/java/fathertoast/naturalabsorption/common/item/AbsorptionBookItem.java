@@ -5,7 +5,6 @@ import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -24,11 +23,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class AbsorptionBookItem extends Item {
     
     public AbsorptionBookItem() {

@@ -13,10 +13,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 
-public class NAEventListener {
+public final class GameEventListener {
     
     private static final ResourceLocation ADV_BOOK_RECIPE = NaturalAbsorption.rl( "recipes/" + Objects.requireNonNull( NAItems.ABSORPTION_BOOK.getId() ).getPath() );
     
+    
+    /** Called when a player earns an advancement, unlocking it. */
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onAdvancement( AdvancementEvent.AdvancementEarnEvent event ) {
         if( HeartManager.isAbsorptionEnabled() && Config.ABSORPTION.NATURAL.upgradeBookRecipe.get() != BookRecipeCondition.Type.NONE ) {

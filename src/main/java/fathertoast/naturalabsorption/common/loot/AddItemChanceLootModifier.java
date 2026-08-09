@@ -14,7 +14,6 @@ import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -62,7 +61,6 @@ public class AddItemChanceLootModifier extends LootModifier {
         this.lootTables = lootTables;
     }
     
-    @Nonnull
     @Override
     protected ObjectArrayList<ItemStack> doApply( ObjectArrayList<ItemStack> generatedLoot, LootContext context ) {
         if( lootTables.contains( context.getQueriedLootTableId() ) ) {
