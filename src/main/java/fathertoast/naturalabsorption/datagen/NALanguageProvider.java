@@ -1,8 +1,7 @@
 package fathertoast.naturalabsorption.datagen;
 
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
-import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
-import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.LanguageProvider;
@@ -58,14 +57,22 @@ public class NALanguageProvider extends LanguageProvider {
     private static final String[][] TRANSLATIONS = {
             
             // Items/equipment names
-            translations( NAItems.ABSORPTION_BOOK.get().getDescriptionId(), "Book of Absorption",
+            translations( NaturalAbsorptionObjects.Items.ABSORPTION_BOOK.get().getDescriptionId(), "Book of Absorption",
                     "Libro de absorción", "Livro de absorção", "Livre d'absorption",
                     "Libro di assorbimento", "Buch der Absorption", "Book of Magic Hearts" ),
-            translations( NAItems.ABSORPTION_ABSORBING_BOOK.get().getDescriptionId(), "Absorption Absorbing Book",
+            translations( NaturalAbsorptionObjects.Items.ABSORPTION_ABSORBING_BOOK.get().getDescriptionId(), "Absorption Absorbing Book",
                     "Absorción libro absorbente", "Livro absorção absorção", "Absorption livre absorbant",
                     "Assorbimento libro assorbente", "Absorption Absorptionsbuch", "Magic Heart Plundering Book" ),
-            translations( NAEnchantments.ABSORPTION_ENCHANTMENT.get().getDescriptionId(), "Absorption",
+            translations( NaturalAbsorptionObjects.Enchantments.ABSORPTION.get().getDescriptionId(), "Absorption",
                     "Absorción", "Absorção", "Absorption", "Assorbimento", "Absorption", "Heart o' Magic" ),
+            // TODO translation for non-english langs
+            translations( NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get().getDescriptionId(), "Natural Absorption",
+                    "Natural Absorption", "Natural Absorption", "Natural Absorption",
+                    "Natural Absorption", "Natural Absorption", "Natural Absorption" ),
+            // TODO translation for non-english langs
+            translations( NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get().getDescriptionId(), "Equipment Absorption",
+                    "Equipment Absorption", "Equipment Absorption", "Equipment Absorption",
+                    "Equipment Absorption", "Equipment Absorption", "Equipment Absorption" ),
             
             // Food extra tooltip info
             translations( References.FOOD_HUNGER, "%s Hunger",
@@ -120,19 +127,19 @@ public class NALanguageProvider extends LanguageProvider {
                     "Absorción máx modificada para %s", "Absorção máxima alterada para %s",
                     "Absorption max modifiée pour %s", "Assorbimento massimo modificato per %s",
                     "Max absorption für %s geändert", "Changed max magic hearts for %s" ),
-            translations( References.CMD_CHANGE_CAPACITY_MULTIPLE, "Changed max absorption capacity for %s players",
-                    "Absorción máx modificada para %s jugadores", "Absorção máxima alterada para %s jogadores",
-                    "Absorption max modifiée pour %s joueurs", "Assorbimento massimo modificato per %s giocatori",
-                    "Max absorption für %s Spieler geändert", "Changed max magic hearts for %s sailors" ),
+            translations( References.CMD_CHANGE_CAPACITY_MULTIPLE, "Changed max absorption capacity for %s entities",
+                    "Absorción máx modificada para %s entidades", "Absorção máxima alterada para %s entidades",
+                    "Absorption max modifiée pour %s entités", "Assorbimento massimo modificato per %s entità",
+                    "Max absorption für %s Entitäten geändert", "Changed max magic hearts for %s mateys" ),
             
             translations( References.CMD_CHANGE_ABSORPTION_SINGLE, "Changed absorption for %s",
                     "Absorción modificada para %s", "Absorção alterada para %s",
                     "Absorption modifiée pour %s", "Assorbimento modificato per %s",
                     "Absorption für %s geändert", "Changed magic hearts for %s" ),
-            translations( References.CMD_CHANGE_ABSORPTION_MULTIPLE, "Changed absorption for %s players",
-                    "Absorción modificada para %s jugadores", "Absorção alterada para %s jogadores",
-                    "Absorption modifiée pour %s joueurs", "Assorbimento modificato per %s giocatori",
-                    "Absorption für %s Spieler geändert", "Changed magic hearts for %s sailors" ),
+            translations( References.CMD_CHANGE_ABSORPTION_MULTIPLE, "Changed absorption for %s entities",
+                    "Absorción modificada para %s entidades", "Absorção alterada para %s entidades",
+                    "Absorption modifiée pour %s entités", "Assorbimento modificato per %s entità",
+                    "Absorption für %s Entitäten geändert", "Changed magic hearts for %s mateys" ),
             
             // Compat Features
             translations( References.ED_ABSORPTION_INFO, "Increases your maximum absorption.",
