@@ -1,6 +1,6 @@
 package fathertoast.naturalabsorption.common.core;
 
-import fathertoast.naturalabsorption.api.INaturalAbsorption;
+import fathertoast.naturalabsorption.api.INaturalAbsorptionApi;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
 import fathertoast.naturalabsorption.common.command.CommandRegister;
 import fathertoast.naturalabsorption.common.compat.tc.NaturalAbsorptionTC;
@@ -72,7 +72,7 @@ public class NaturalAbsorption {
     private final PacketHandler packetHandler = new PacketHandler();
     
     /** Mod API instance **/
-    private final INaturalAbsorption modApi = new NaturalAbsorptionAPI();
+    private final INaturalAbsorptionApi modApi = new NaturalAbsorptionAPI();
     
     
     public NaturalAbsorption( FMLJavaModLoadingContext context ) {
@@ -116,7 +116,7 @@ public class NaturalAbsorption {
                 Object o = message.messageSupplier().get();
                 
                 try {
-                    ((Function<INaturalAbsorption, Void>) o).apply( modApi );
+                    ((Function<INaturalAbsorptionApi, Void>) o).apply( modApi );
                 }
                 catch( Exception ignored ) {
                     LOG.warn( "Mod with ID \"{}\" asked for our API instance, but something went wrong!", message.senderModId() );

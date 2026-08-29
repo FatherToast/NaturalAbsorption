@@ -2,10 +2,10 @@ package fathertoast.naturalabsorption.api;
 
 import net.minecraft.world.entity.LivingEntity;
 
-@SuppressWarnings( "unused" )
-public interface INaturalAbsorption {
+/** This is the API interface for accessing Natural Absorption's API. */
+public interface INaturalAbsorptionApi {
     /*
-     * These are all the tag keys the mod uses for storing the player's absorption data.
+     * These are all the tag keys the mod uses for storing an entity's absorption data.
      * This data can easily be read and manipulated through the IHeartData interface.
      *
      * Do not modify this NBT directly if IHeartData is available (the NBT will simply be overwritten).
@@ -14,12 +14,12 @@ public interface INaturalAbsorption {
      * The name of the base NBT compound for all entity save data used by the Natural Absorption mod.
      * The base NBT compound that is written/read to depends on whether the entity is a player or not.
      * <br><br>
-     * For players the base tag is the persist-on-death tag:
+     * For players the base tag exists in the persist-on-death tag:
      * <p>
-     * <code>entity.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG).getCompound(INaturalAbsorption.TAG_BASE)</code>
+     * <code>entity.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG).getCompound(INaturalAbsorptionApi.TAG_BASE)</code>
      * <p>
-     * For other living entities the base tag is the Forge persistant data tag:
-     * <code>entity.getPersistentData().getCompound(INaturalAbsorption.TAG_BASE)</code>
+     * For other living entities the base tag exists in the Forge persistent data tag:
+     * <code>entity.getPersistentData().getCompound(INaturalAbsorptionApi.TAG_BASE)</code>
      */
     String TAG_BASE = "naturalabsorption";
     /** The name of the NBT integer that represents ticks until absorption regeneration can begin. Located in the base tag. */
