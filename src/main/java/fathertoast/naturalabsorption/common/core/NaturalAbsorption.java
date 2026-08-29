@@ -2,7 +2,6 @@ package fathertoast.naturalabsorption.common.core;
 
 import fathertoast.naturalabsorption.api.INaturalAbsorptionApi;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
-import fathertoast.naturalabsorption.common.command.CommandRegister;
 import fathertoast.naturalabsorption.common.compat.tc.NaturalAbsorptionTC;
 import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
@@ -10,7 +9,6 @@ import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.core.register.NALootModifiers;
-import fathertoast.naturalabsorption.common.event.GameEventListener;
 import fathertoast.naturalabsorption.common.network.PacketHandler;
 import fathertoast.naturalabsorption.common.recipe.CraftingUtil;
 import net.minecraft.resources.ResourceLocation;
@@ -62,7 +60,7 @@ public class NaturalAbsorption {
      */
     
     /** Our mod ID. */
-    public static final String MOD_ID = "naturalabsorption";
+    public static final String MOD_ID = INaturalAbsorptionApi.MOD_ID;
     
     /** Logger instance for the mod. */
     public static final Logger LOG = LogManager.getLogger( MOD_ID );
@@ -88,16 +86,14 @@ public class NaturalAbsorption {
         modBus.addListener( this::onInterModProcess );
         modBus.addListener( this::onCommonSetup );
         
-        MinecraftForge.EVENT_BUS.register( new GameEventListener() );
         MinecraftForge.EVENT_BUS.register( new HeartManager() );
-        MinecraftForge.EVENT_BUS.addListener( CommandRegister::register );
         
-        NAItems.REGISTRY.register( modBus );
-        NAAttributes.REGISTRY.register( modBus );
-        NAEnchantments.REGISTRY.register( modBus );
-        NALootModifiers.REGISTRY.register( modBus );
+        NAItems.register( modBus );
+        NAAttributes.register( modBus );
+        NAEnchantments.register( modBus );
+        NALootModifiers.register( modBus );
         
-        if( ModList.get().isLoaded( "tconstruct" ) ) {
+        if( ModList.get().isLoaded( NaturalAbsorptionTC.MOD_ID ) ) {
             NaturalAbsorptionTC.init( modBus );
         }
     }

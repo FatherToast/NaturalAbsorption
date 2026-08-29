@@ -1,8 +1,8 @@
 package fathertoast.naturalabsorption.common.core.hearts;
 
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.config.Config;
-import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.enchantment.AbsorptionEnchantment;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,7 +31,7 @@ public class AbsorptionHelper {
     
     /** @return The entity's max absorption granted by natural absorption. */
     public static double getNaturalAbsorption( LivingEntity entity ) {
-        return entity.getAttributeValue( NAAttributes.NATURAL_ABSORPTION.get() );
+        return entity.getAttributeValue( NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get() );
     }
     
     /** @return True if the entity's base natural absorption has been initialized. */
@@ -47,15 +47,15 @@ public class AbsorptionHelper {
     /** Sets base natural absorption, clamped in a valid range, optionally reducing actual absorption as needed. */
     public static void setBaseNaturalAbsorption( LivingEntity entity, boolean updateActualAbsorption, double value ) {
         if( HeartManager.isAbsorptionEnabled() ) {
-            final double initialValue = updateActualAbsorption ? getNaturalAbsorption( entity ) : 0.0;
+            final double currentAbsorption = updateActualAbsorption ? entity.getAbsorptionAmount() : 0.0;
             
             setAbsorptionModifier( entity, true, NATURAL_MODIFIER_BASE,
                     Mth.clamp( value, 0.0, Config.ABSORPTION.NATURAL.maximumAmount.get() ) );
             
             if( updateActualAbsorption ) {
                 final double finalValue = getNaturalAbsorption( entity );
-                if( initialValue > finalValue ) {
-                    final double netChange = finalValue - initialValue;
+                if( currentAbsorption > finalValue ) {
+                    final double netChange = finalValue - currentAbsorption;
                     entity.setAbsorptionAmount( entity.getAbsorptionAmount() + (float) netChange );
                 }
             }
@@ -80,7 +80,7 @@ public class AbsorptionHelper {
     
     /** @return The entity's max absorption granted by equipment. That is, how much the entity would lose by unequipping everything. */
     public static double getEquipmentAbsorption( LivingEntity entity ) {
-        return entity.getAttributeValue( NAAttributes.EQUIPMENT_ABSORPTION.get() );
+        return entity.getAttributeValue( NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get() );
     }
     
     /** @return The entity's equipment absorption from enchantments, ignoring all attribute modifiers. */
@@ -142,14 +142,18 @@ public class AbsorptionHelper {
     /** Helper method for checking existence of absorption attribute modifiers. */
     @SuppressWarnings( "SameParameterValue" )
     private static boolean hasAbsorptionModifier( LivingEntity entity, boolean natural, AttributeModifier staticModifier ) {
-        final Attribute attribute = natural ? NAAttributes.NATURAL_ABSORPTION.get() : NAAttributes.EQUIPMENT_ABSORPTION.get();
+        final Attribute attribute = natural
+                ? NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get()
+                : NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get();
         final AttributeInstance instance = entity.getAttribute( attribute );
         return instance != null && instance.getModifier( staticModifier.getId() ) != null;
     }
     
     /** Helper method for reading absorption attribute modifier values. */
     private static double getAbsorptionModifier( LivingEntity entity, boolean natural, AttributeModifier staticModifier ) {
-        final Attribute attribute = natural ? NAAttributes.NATURAL_ABSORPTION.get() : NAAttributes.EQUIPMENT_ABSORPTION.get();
+        final Attribute attribute = natural
+                ? NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get()
+                : NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get();
         final AttributeInstance instance = entity.getAttribute( attribute );
         if( instance != null ) {
             final AttributeModifier modifier = instance.getModifier( staticModifier.getId() );
@@ -160,7 +164,9 @@ public class AbsorptionHelper {
     
     /** Helper method for writing absorption attribute modifier values. */
     private static void setAbsorptionModifier( LivingEntity entity, boolean natural, AttributeModifier staticModifier, double value ) {
-        final Attribute attribute = natural ? NAAttributes.NATURAL_ABSORPTION.get() : NAAttributes.EQUIPMENT_ABSORPTION.get();
+        final Attribute attribute = natural
+                ? NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get()
+                : NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get();
         final AttributeInstance instance = entity.getAttribute( attribute );
         if( instance == null ) {
             NaturalAbsorption.LOG.error( "Entity '{}' does not have '{}' registered!",

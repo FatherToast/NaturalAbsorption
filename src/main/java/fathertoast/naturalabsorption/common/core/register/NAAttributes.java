@@ -1,32 +1,38 @@
 package fathertoast.naturalabsorption.common.core.register;
 
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.Locale;
+import java.util.Objects;
 
-public class NAAttributes {
+public final class NAAttributes {
     
-    public static final DeferredRegister<Attribute> REGISTRY = DeferredRegister.create( ForgeRegistries.ATTRIBUTES, NaturalAbsorption.MOD_ID );
+    private static final DeferredRegister<Attribute> REGISTRY = DeferredRegister.create( ForgeRegistries.ATTRIBUTES, NaturalAbsorption.MOD_ID );
+    
+    static {
+        registerRanged( NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION, 0.0D, 0.0D, Double.MAX_VALUE, true );
+        registerRanged( NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION, 0.0D, 0.0D, Double.MAX_VALUE, true );
+    }
     
     
-    public static final RegistryObject<Attribute> NATURAL_ABSORPTION = registerRanged( "natural_absorption", Type.PLAYER, 0.0D, 0.0D, Double.MAX_VALUE, true );
-    public static final RegistryObject<Attribute> EQUIPMENT_ABSORPTION = registerRanged( "equipment_absorption", Type.PLAYER, 0.0D, 0.0D, Double.MAX_VALUE, true );
+    /** Called to register this class. */
+    public static void register( IEventBus bus ) { REGISTRY.register( bus ); }
     
-    
+    /** Registers a ranged attribute to the deferred register. */
     @SuppressWarnings( "SameParameterValue" )
-    private static RegistryObject<Attribute> registerRanged( String name, Type type, double defaultValue, double min, double max, boolean sync ) {
-        final String regName = type.name().toLowerCase( Locale.ROOT ) + "." + name;
-        final String attribName = "attribute.name." + regName;
-        return REGISTRY.register( regName, () -> new RangedAttribute( attribName, defaultValue, min, max ).setSyncable( sync ) );
+    private static void registerRanged( RegistryObject<Attribute> regObj, double defaultValue, double min, double max, boolean sync ) {
+        final String name = Objects.requireNonNull( regObj.getId() ).getPath();
+        final String attribName = "attribute.name." + name;
+        REGISTRY.register( name, () -> new RangedAttribute( attribName, defaultValue, min, max ).setSyncable( sync ) );
     }
     
-    enum Type {
-        PLAYER,
-        GENERIC;
-    }
+    
+    // Utility class
+    private NAAttributes() { }
 }

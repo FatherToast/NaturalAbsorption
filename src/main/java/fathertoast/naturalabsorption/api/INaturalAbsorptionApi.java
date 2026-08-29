@@ -4,6 +4,10 @@ import net.minecraft.world.entity.LivingEntity;
 
 /** This is the API interface for accessing Natural Absorption's API. */
 public interface INaturalAbsorptionApi {
+    
+    /** Natural Absorption's mod ID. */
+    String MOD_ID = "naturalabsorption";
+    
     /*
      * These are all the tag keys the mod uses for storing an entity's absorption data.
      * This data can easily be read and manipulated through the IHeartData interface.

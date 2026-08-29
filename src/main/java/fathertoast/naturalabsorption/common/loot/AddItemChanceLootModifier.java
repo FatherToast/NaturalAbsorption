@@ -3,7 +3,7 @@ package fathertoast.naturalabsorption.common.loot;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.ListCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fathertoast.naturalabsorption.common.core.register.NALootModifiers;
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -76,6 +76,6 @@ public class AddItemChanceLootModifier extends LootModifier {
     
     @Override
     public Codec<? extends IGlobalLootModifier> codec() {
-        return NALootModifiers.ADD_ITEM_CHANCE.get();
+        return NaturalAbsorptionObjects.GLMSerializers.ADD_WITH_CHANCE.get();
     }
 }

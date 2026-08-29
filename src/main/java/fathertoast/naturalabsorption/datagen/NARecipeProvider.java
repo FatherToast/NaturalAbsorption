@@ -1,7 +1,7 @@
 package fathertoast.naturalabsorption.datagen;
 
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.compat.tc.NAModifiers;
-import fathertoast.naturalabsorption.common.core.register.NAItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -26,7 +26,7 @@ public class NARecipeProvider extends RecipeProvider {
     
     @Override
     protected void buildRecipes( Consumer<FinishedRecipe> consumer ) {
-        ShapelessRecipeBuilder.shapeless( RecipeCategory.MISC, NAItems.ABSORPTION_ABSORBING_BOOK.get() )
+        ShapelessRecipeBuilder.shapeless( RecipeCategory.MISC, NaturalAbsorptionObjects.Items.ABSORPTION_ABSORBING_BOOK.get() )
                 .requires( Items.BOOK )
                 .requires( Items.SPONGE )
                 .unlockedBy( "has_book", has( Items.BOOK ) )
@@ -49,7 +49,7 @@ public class NARecipeProvider extends RecipeProvider {
         final String upgradeFolder = "tools/modifiers/upgrade/";
         
         ModifierRecipeBuilder.modifier( NAModifiers.ARMOR_ABSORPTION_ID )
-                .addInput( NAItems.ABSORPTION_BOOK.get() )
+                .addInput( NaturalAbsorptionObjects.Items.ABSORPTION_BOOK.get() )
                 .setTools( TinkerTags.Items.WORN_ARMOR )
                 .setSlots( SlotType.DEFENSE, 1 )
                 .setMaxLevel( 3 )
@@ -57,8 +57,8 @@ public class NARecipeProvider extends RecipeProvider {
     }
     
     
-    public ResourceLocation prefix( String modid, ModifierId modifierId, String prefix ) {
+    public ResourceLocation prefix( String modId, ModifierId modifierId, String prefix ) {
         ResourceLocation loc = Objects.requireNonNull( modifierId );
-        return ResourceLocation.fromNamespaceAndPath( modid, prefix + loc.getPath() );
+        return ResourceLocation.fromNamespaceAndPath( modId, prefix + loc.getPath() );
     }
 }

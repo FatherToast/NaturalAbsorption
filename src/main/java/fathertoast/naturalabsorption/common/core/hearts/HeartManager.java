@@ -1,8 +1,8 @@
 package fathertoast.naturalabsorption.common.core.hearts;
 
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.config.Config;
-import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -120,7 +120,6 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.NORMAL )
     public void onServerTick( TickEvent.ServerTickEvent event ) {
         if( event.phase == TickEvent.Phase.END ) {
-            
             // Apply queued events
             applyEntityEquipmentChanges();
             
@@ -379,10 +378,10 @@ public class HeartManager {
         for( EntityType<? extends LivingEntity> type : event.getTypes() ) {
             if( Config.ABSORPTION.NATURAL.entities.contains( type ) ) {
                 // noinspection ConstantConditions
-                event.add( type, NAAttributes.NATURAL_ABSORPTION.get(), Config.ABSORPTION.NATURAL.entities.get( type ) );
+                event.add( type, NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get() );
             }
             // All living entities can make use of equipment absorption
-            event.add( type, NAAttributes.EQUIPMENT_ABSORPTION.get() );
+            event.add( type, NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get() );
         }
     }
     

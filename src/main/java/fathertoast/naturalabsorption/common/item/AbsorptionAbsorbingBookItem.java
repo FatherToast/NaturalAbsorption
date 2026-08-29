@@ -1,9 +1,9 @@
 package fathertoast.naturalabsorption.common.item;
 
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.config.Config;
 import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
-import fathertoast.naturalabsorption.common.core.register.NAItems;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -53,7 +53,7 @@ public class AbsorptionAbsorbingBookItem extends Item {
                 if( !isCreative ) {
                     spongeBook.shrink( 1 );
                     if( Config.ABSORPTION.NATURAL.spongeBookBookRefund.get() )
-                        Block.popResource( level, player.blockPosition(), new ItemStack( NAItems.ABSORPTION_BOOK.get() ) );
+                        Block.popResource( level, player.blockPosition(), new ItemStack( NaturalAbsorptionObjects.Items.ABSORPTION_BOOK.get() ) );
                 }
                 
                 // Apply downgrade effects and notify client

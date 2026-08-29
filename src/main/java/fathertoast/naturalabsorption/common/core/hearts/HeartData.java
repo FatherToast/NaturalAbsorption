@@ -3,6 +3,7 @@ package fathertoast.naturalabsorption.common.core.hearts;
 import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.config.Config;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -16,13 +17,13 @@ import java.util.UUID;
 
 public class HeartData implements IHeartData {
     
-    private static final Map<UUID, HeartData> PLAYER_CACHE = new HashMap<>();
+    private static final Map<UUID, HeartData> ENTITY_CACHE = new HashMap<>();
     
     /**
-     * Clears the cache of all stored player health data.
+     * Clears the cache of all stored entity health data.
      * Done periodically just in case anything weird goes on.
      */
-    public static void clearCache() { PLAYER_CACHE.clear(); }
+    public static void clearCache() { ENTITY_CACHE.clear(); }
     
     /**
      * @param entity Entity to get or load heart data for.
@@ -35,11 +36,11 @@ public class HeartData implements IHeartData {
             throw new IllegalArgumentException( "Heart data is only stored on the server side!" );
         }
         UUID uuid = entity.getUUID();
-        HeartData data = PLAYER_CACHE.get( uuid );
+        HeartData data = ENTITY_CACHE.get( uuid );
         
         if( data == null || entity != data.owner ) {
             data = new HeartData( entity );
-            PLAYER_CACHE.put( uuid, data );
+            ENTITY_CACHE.put( uuid, data );
         }
         return data;
     }
@@ -59,9 +60,11 @@ public class HeartData implements IHeartData {
         
         // First-time initialization
         if( !AbsorptionHelper.isBaseNaturalAbsorptionInitialized( owner ) && Config.ABSORPTION.NATURAL.entities.contains( owner.getType() ) ) {
-            // noinspection ConstantConditions
-            double startingAmount = Config.ABSORPTION.NATURAL.entities.get( owner.getType() );
-            AbsorptionHelper.setBaseNaturalAbsorption( owner, true, startingAmount );
+            if( owner.getAttributes().hasAttribute( NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get() ) ) {
+                // noinspection ConstantConditions
+                double startingAmount = Config.ABSORPTION.NATURAL.entities.get( owner.getType() );
+                AbsorptionHelper.setBaseNaturalAbsorption( owner, true, startingAmount );
+            }
         }
         
         // Absorption delay

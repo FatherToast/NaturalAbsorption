@@ -1,7 +1,7 @@
 package fathertoast.naturalabsorption.common.compat.tc;
 
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.config.Config;
-import fathertoast.naturalabsorption.common.core.register.NAAttributes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,10 +21,8 @@ import slimeknights.tconstruct.library.tools.nbt.IToolContext;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
 import slimeknights.tconstruct.library.tools.nbt.ToolDataNBT;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
 
-@ParametersAreNonnullByDefault
 public class ArmorAbsorptionModifier extends Modifier implements EquipmentChangeModifierHook, VolatileDataModifierHook {
     
     private static final UUID[] modifierSlotUuids = new UUID[] {
@@ -56,7 +54,7 @@ public class ArmorAbsorptionModifier extends Modifier implements EquipmentChange
     public void onUnequip( IToolStackView tool, ModifierEntry entry, EquipmentChangeContext context ) {
         if( context.getEntity() instanceof ServerPlayer player && context.getChangedSlot().getType() == EquipmentSlot.Type.ARMOR ) {
             final UUID uuid = modifierSlotUuids[context.getChangedSlot().getIndex()];
-            final AttributeInstance instance = player.getAttribute( NAAttributes.EQUIPMENT_ABSORPTION.get() );
+            final AttributeInstance instance = player.getAttribute( NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get() );
             
             if( instance != null ) {
                 instance.removeModifier( uuid );
@@ -67,7 +65,7 @@ public class ArmorAbsorptionModifier extends Modifier implements EquipmentChange
     @Override
     public void onEquip( IToolStackView tool, ModifierEntry entry, EquipmentChangeContext context ) {
         if( context.getEntity() instanceof ServerPlayer player && context.getChangedSlot().getType() == EquipmentSlot.Type.ARMOR ) {
-            final AttributeInstance instance = player.getAttribute( NAAttributes.EQUIPMENT_ABSORPTION.get() );
+            final AttributeInstance instance = player.getAttribute( NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get() );
             
             if( instance != null ) {
                 final double absorptionBonus = entry.getLevel() * Config.COMPAT.TC.potencyPerLevel.get();

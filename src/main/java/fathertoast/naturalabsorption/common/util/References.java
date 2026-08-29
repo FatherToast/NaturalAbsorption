@@ -1,7 +1,7 @@
 package fathertoast.naturalabsorption.common.util;
 
+import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
-import fathertoast.naturalabsorption.common.core.register.NAEnchantments;
 import net.minecraft.network.chat.Component;
 
 import java.util.function.Supplier;
@@ -35,7 +35,7 @@ public class References {
     
     // Compat
     private static final String ED_SUFFIX = ".desc";
-    public static final String ED_ABSORPTION_INFO = NAEnchantments.ABSORPTION_ENCHANTMENT.get().getDescriptionId() + ED_SUFFIX;
+    public static final String ED_ABSORPTION_INFO = NaturalAbsorptionObjects.Enchantments.ABSORPTION.get().getDescriptionId() + ED_SUFFIX;
     public static final String TC_ARMOR_ABSORPTION = "modifier.naturalabsorption.armor_absorption";
     public static final String TC_ARMOR_ABSORPTION_TOOLTIP = TC_ARMOR_ABSORPTION + ".tooltip";
     public static final String TC_ARMOR_ABSORPTION_FLAVOR = TC_ARMOR_ABSORPTION + ".flavor";
