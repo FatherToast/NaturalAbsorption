@@ -124,7 +124,7 @@ public class AbsorptionConfig extends AbstractConfigFile {
                     .put( EntityType.PLAYER, 4.0 )
                     .build(),
                     "A list of entity types that can have natural absorption.",
-                    "The value after the entity type is the base amount of natural absorption the entity will spawn with." ) );
+                    "The value after the entity type is the base amount of natural absorption the entity will spawn with." ), RestartNote.GAME );
             
             SPEC.newLine();
             
