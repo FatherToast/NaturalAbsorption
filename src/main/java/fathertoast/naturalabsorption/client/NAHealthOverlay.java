@@ -81,16 +81,16 @@ public class NAHealthOverlay implements IGuiOverlay {
         final int maxAbsorption = Mth.ceil( absorbMax );
         final int healthRows = Mth.ceil( (maxHealth + (float) maxAbsorption) / 2.0F / 10.0F );
         final int rowHeight = Math.max( 10 - (healthRows - 2), 3 );
-        int shake = -1;
+        int jump = -1;
         
         if( player.hasEffect( MobEffects.REGENERATION ) ) {
-            shake = gui.getGuiTicks() % Mth.ceil( maxHealth + 5.0F );
+            jump = gui.getGuiTicks() % Mth.ceil( maxHealth + 5.0F );
         }
         // Assume the vanilla health renderer is inactive while we render,
         // so we must add the offset ourselves.
         gui.leftHeight += (healthRows * rowHeight) + 1;
         
-        renderHearts( graphics, player, x, y, rowHeight, shake, maxHealth, health, displayHealth, absorption, maxAbsorption, blink );
+        renderHearts( graphics, player, x, y, rowHeight, jump, maxHealth, health, displayHealth, absorption, maxAbsorption, blink );
     }
     
     /**
@@ -99,44 +99,43 @@ public class NAHealthOverlay implements IGuiOverlay {
      * @see ForgeGui#renderHearts(GuiGraphics, Player, int, int, int, int, float, int, int, int, boolean)
      */
     @SuppressWarnings( "JavadocReference" )
-    protected void renderHearts( GuiGraphics graphics, Player player, int x, int y, int rowHeight, int shake, float maxHealth, int health, int displayHealth, int absorption, int maxAbsorption, boolean blink ) {
-        // TODO Clean up variable names, cause this sucks to read
-        Gui.HeartType heartType = Gui.HeartType.forPlayer( player );
+    protected void renderHearts( GuiGraphics graphics, Player player, int x, int y, int rowHeight, int jump, float maxHealth, int health, int displayHealth, int absorption, int maxAbsorption, boolean blink ) {
+        final Gui.HeartType heartType = Gui.HeartType.forPlayer( player );
         // noinspection resource
-        int vOffset = 9 * (player.level().getLevelData().isHardcore() ? 5 : 0);
-        int healthHearts = Mth.ceil( (double) maxHealth / 2.0D );
-        int absorptionHearts = Mth.ceil( (double) maxAbsorption / 2.0D );
+        final int vOffset = 9 * (player.level().getLevelData().isHardcore() ? 5 : 0);
+        final int healthHearts = Mth.ceil( (double) maxHealth / 2.0D );
+        final int totalHearts = healthHearts + Mth.ceil( (Math.max( absorption, maxAbsorption )) / 2.0D );
         
-        for( int hearts = healthHearts + absorptionHearts - 1; hearts >= 0; --hearts ) {
-            int xPos = x + (hearts % 10) * 8;
-            int yPos = y - (hearts / 10) * rowHeight;
+        for( int i = totalHearts - 1; i >= 0; --i ) {
+            int xPos = x + (i % 10) * 8;
+            int yPos = y - (i / 10) * rowHeight;
             
+            // Make hearts "shiver" when health is low
             if( health + absorption <= 4 ) {
                 yPos += random.nextInt( 2 );
             }
-            if( hearts < healthHearts && hearts == shake ) {
+            // Do a tiny tick-based jump
+            // Usually only happens if the player has the regeneration effect
+            if( i < healthHearts && i == jump ) {
                 yPos -= 2;
             }
-            // Draw an empty heart container
+            // Draw a heart container before drawing a heart
             renderHeart( graphics, Gui.HeartType.CONTAINER, xPos, yPos, vOffset, blink, false );
-            int j2 = hearts * 2;
-            boolean flag = hearts >= healthHearts;
+            int halves = i * 2;
             
-            if( flag ) {
-                int k2 = j2 - (healthHearts * 2);
+            // Draw an absorption heart, if absorption is not 0
+            if( i >= healthHearts ) {
+                int absorptionHalves = halves - (healthHearts * 2);
                 
-                if( k2 < absorption ) {
-                    boolean half = k2 + 1 == absorption;
-                    renderHeart( graphics, heartType == Gui.HeartType.WITHERED ? heartType : Gui.HeartType.ABSORBING, xPos, yPos, vOffset, false, half );
+                if( absorptionHalves < absorption ) {
+                    renderHeart( graphics, heartType == Gui.HeartType.WITHERED ? heartType : Gui.HeartType.ABSORBING, xPos, yPos, vOffset, false, absorptionHalves + 1 == absorption );
                 }
             }
-            if( blink && j2 < displayHealth ) {
-                boolean half = j2 + 1 == displayHealth;
-                renderHeart( graphics, heartType, xPos, yPos, vOffset, true, half );
+            if( blink && halves < displayHealth ) {
+                renderHeart( graphics, heartType, xPos, yPos, vOffset, true, halves + 1 == displayHealth );
             }
-            if( j2 < health ) {
-                boolean half = j2 + 1 == health;
-                renderHeart( graphics, heartType, xPos, yPos, vOffset, false, half );
+            if( halves < health ) {
+                renderHeart( graphics, heartType, xPos, yPos, vOffset, false, halves + 1 == health );
             }
         }
     }
