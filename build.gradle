@@ -92,12 +92,12 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
+    // TODO Uncomment when Crust update is released
     // Crust; only implement the api, but include the entire mod at runtime
-    // TODO Switch back when the new Crust update is out!
     // implementation "curse.maven:crust-873570:${crust_api_version}"
     // runtimeOnly "curse.maven:crust-873570:${crust_src_version}"
-    implementation "blank:crust:1.20.1-5.0.0:api"
-    runtimeOnly "blank:crust:1.20.1-5.0.0:src"
+    implementation "blank:crust-1.20.1-5.1.1:api"
+    runtimeOnly "blank:crust-1.20.1-5.1.1:src"
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_version}")
 
