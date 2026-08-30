@@ -3,7 +3,6 @@ package fathertoast.naturalabsorption.common.core.hearts;
 import fathertoast.crust.api.lib.NBTHelper;
 import fathertoast.naturalabsorption.api.IHeartData;
 import fathertoast.naturalabsorption.api.impl.NaturalAbsorptionAPI;
-import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.config.Config;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -60,7 +59,7 @@ public class HeartData implements IHeartData {
         
         // First-time initialization
         if( !AbsorptionHelper.isBaseNaturalAbsorptionInitialized( owner ) && Config.ABSORPTION.NATURAL.entities.contains( owner.getType() ) ) {
-            if( owner.getAttributes().hasAttribute( NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get() ) ) {
+            if( AbsorptionHelper.hasNaturalAbsorptionAttribute( owner ) ) {
                 // noinspection ConstantConditions
                 double startingAmount = Config.ABSORPTION.NATURAL.entities.get( owner.getType() );
                 AbsorptionHelper.setBaseNaturalAbsorption( owner, true, startingAmount );
@@ -113,7 +112,7 @@ public class HeartData implements IHeartData {
         setHealthDelay( healthRecoveryDelay - value );
     }
     
-    /** Starts the player's recovery delay timers. */
+    /** Starts the entity's recovery delay timers. */
     @Override
     public void startRecoveryDelay() {
         if( HeartManager.isHealthEnabled() && Config.HEALTH.GENERAL.recoveryDelay.get() > 0 ) {
@@ -124,12 +123,12 @@ public class HeartData implements IHeartData {
         }
     }
     
-    /** Helper method to set the player's current absorption; clamps the value between 0 and the player's personal maximum. */
+    /** Helper method to set the entity's current absorption; clamps the value between 0 and the entity's personal maximum. */
     public void setAbsorption( float value ) {
         owner.setAbsorptionAmount( Mth.clamp( value, 0.0F, (float) AbsorptionHelper.getMaxAbsorption( owner ) ) );
     }
     
-    /** Updates the player's absorption and health values by the number of ticks since this was last updated. */
+    /** Updates the entity's absorption and health values by the number of ticks since this was last updated. */
     void update() {
         if( HeartManager.isHealthEnabled() && Config.HEALTH.GENERAL.recoveryDelay.get() >= 0 ) {
             updateHealth();

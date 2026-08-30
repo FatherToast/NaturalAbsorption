@@ -51,12 +51,6 @@ public class HeartManager {
     /** @return True if armor replacement features in this mod are enabled. */
     public static boolean isArmorReplacementEnabled() { return Config.EQUIPMENT.ARMOR.enabled.get(); }
     
-    /** @return True if the given entity has the attribute for natural absorption. */
-    @SuppressWarnings( "BooleanMethodIsAlwaysInverted" )
-    public static boolean hasNaturalAbsorption( LivingEntity entity ) {
-        return entity.getAttributes().hasAttribute( NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get() );
-    }
-    
     /** Marks a living entity as having equipment changes and records their current max absorption. */
     private static void trackEntityEquipmentChange( LivingEntity entity ) {
         // This will not be called multiple times per tick for the same player under normal circumstances; however, in
@@ -358,8 +352,8 @@ public class HeartManager {
     @SubscribeEvent( priority = EventPriority.LOWEST )
     public void onLivingHurt( LivingHurtEvent event ) {
         // noinspection resource
-        if( event.getEntity() instanceof Player player && !event.getEntity().level().isClientSide ) {
-            HeartData data = HeartData.get( player );
+        if( !event.getEntity().level().isClientSide ) {
+            HeartData data = HeartData.get( event.getEntity() );
             
             // Interrupt recovery
             data.startRecoveryDelay();

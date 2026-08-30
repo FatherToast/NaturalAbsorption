@@ -16,14 +16,27 @@ import java.util.UUID;
 
 public class AbsorptionHelper {
     
+    /** @return True if the given entity has the attribute for natural absorption. */
+    @SuppressWarnings( "BooleanMethodIsAlwaysInverted" )
+    public static boolean hasNaturalAbsorptionAttribute( LivingEntity entity ) {
+        return entity.getAttributes().hasAttribute( NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get() );
+    }
+    
+    /** @return True if the given entity has the attribute for equipment absorption. */
+    @SuppressWarnings( "BooleanMethodIsAlwaysInverted" )
+    public static boolean hasEquipmentAbsorptionAttribute( LivingEntity entity ) {
+        return entity.getAttributes().hasAttribute( NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get() );
+    }
+    
     /** @return The entity's max absorption, from all sources combined. In other words, the actual limit on absorption recovery. */
     public static double getMaxAbsorption( LivingEntity entity ) {
         return getSteadyStateMaxAbsorption( entity ) + HeartManager.getPotionAbsorption( entity );
     }
     
-    /** @return The player's max absorption not counting buffs, limited by the global max absorption config. */
+    /** @return The entity's max absorption not counting buffs, limited by the global max absorption config. */
     public static double getSteadyStateMaxAbsorption( LivingEntity entity ) {
-        final double naturalAbsorption = entity instanceof Player player ? getNaturalAbsorption( player ) : 0.0;
+        if( !hasNaturalAbsorptionAttribute( entity ) ) return 0.0;
+        final double naturalAbsorption = getNaturalAbsorption( entity );
         final double calculatedMax = naturalAbsorption + getEquipmentAbsorption( entity );
         return Config.ABSORPTION.GENERAL.globalMax.get() < 0.0 ? calculatedMax :
                 Math.min( calculatedMax, Config.ABSORPTION.GENERAL.globalMax.get() );
@@ -31,6 +44,7 @@ public class AbsorptionHelper {
     
     /** @return The entity's max absorption granted by natural absorption. */
     public static double getNaturalAbsorption( LivingEntity entity ) {
+        if( !hasNaturalAbsorptionAttribute( entity ) ) return 0.0;
         return entity.getAttributeValue( NaturalAbsorptionObjects.Attributes.NATURAL_ABSORPTION.get() );
     }
     
@@ -80,6 +94,7 @@ public class AbsorptionHelper {
     
     /** @return The entity's max absorption granted by equipment. That is, how much the entity would lose by unequipping everything. */
     public static double getEquipmentAbsorption( LivingEntity entity ) {
+        if( !hasEquipmentAbsorptionAttribute( entity ) ) return 0.0;
         return entity.getAttributeValue( NaturalAbsorptionObjects.Attributes.EQUIPMENT_ABSORPTION.get() );
     }
     
