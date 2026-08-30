@@ -6,7 +6,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import fathertoast.crust.api.lib.CrustCmdHelper;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
 import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
-import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -58,7 +57,7 @@ public final class NABaseCommand {
         private static int addCapacity( CommandSourceStack src, Collection<? extends Entity> entities, int absorption ) {
             return livingTargetCmd( src, entities, References.CMD_CHANGE_CAPACITY_SINGLE, References.CMD_CHANGE_CAPACITY_MULTIPLE,
                     entity -> {
-                        if( !HeartManager.hasNaturalAbsorption( entity ) ) return false;
+                        if( !AbsorptionHelper.hasNaturalAbsorptionAttribute( entity ) ) return false;
                         
                         double currentMaxAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( entity );
                         AbsorptionHelper.setBaseNaturalAbsorption( entity, false, currentMaxAbsorption + absorption );
@@ -70,7 +69,7 @@ public final class NABaseCommand {
         private static int removeCapacity( CommandSourceStack src, Collection<? extends Entity> entities, int absorption ) {
             return livingTargetCmd( src, entities, References.CMD_CHANGE_CAPACITY_SINGLE, References.CMD_CHANGE_CAPACITY_MULTIPLE,
                     entity -> {
-                        if( !HeartManager.hasNaturalAbsorption( entity ) ) return false;
+                        if( !AbsorptionHelper.hasNaturalAbsorptionAttribute( entity ) ) return false;
                         
                         double currentMaxAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( entity );
                         AbsorptionHelper.setBaseNaturalAbsorption( entity, true, currentMaxAbsorption - absorption );
@@ -82,7 +81,7 @@ public final class NABaseCommand {
         private static int setCapacity( CommandSourceStack src, Collection<? extends Entity> entities, int absorption ) {
             return livingTargetCmd( src, entities, References.CMD_CHANGE_CAPACITY_SINGLE, References.CMD_CHANGE_CAPACITY_MULTIPLE,
                     entity -> {
-                        if( !HeartManager.hasNaturalAbsorption( entity ) ) return false;
+                        if( !AbsorptionHelper.hasNaturalAbsorptionAttribute( entity ) ) return false;
                         AbsorptionHelper.setBaseNaturalAbsorption( entity, true, absorption );
                         return true;
                     } );
