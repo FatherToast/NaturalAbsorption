@@ -6,7 +6,6 @@ import fathertoast.naturalabsorption.common.core.hearts.AbsorptionHelper;
 import fathertoast.naturalabsorption.common.core.hearts.HeartManager;
 import fathertoast.naturalabsorption.common.util.References;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -80,13 +79,9 @@ public class AbsorptionAbsorbingBookItem extends Item {
     
     @Override
     public void appendHoverText( ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag ) {
-        if( !Config.ABSORPTION.NATURAL.spongeBookEnabled.get() )
-            return;
-        
-        final Player player = Minecraft.getInstance().player;
-        
-        if( player == null )
-            return;
+        if( !Config.ABSORPTION.NATURAL.spongeBookEnabled.get() ) return;
+        final Player player = References.getClientPlayer();
+        if( player == null ) return;
         
         final double naturalAbsorption = AbsorptionHelper.getBaseNaturalAbsorption( player );
         final float gainOnUse = Config.ABSORPTION.NATURAL.upgradeGain.getFloat();

@@ -2,8 +2,12 @@ package fathertoast.naturalabsorption.common.util;
 
 import fathertoast.naturalabsorption.api.lib.NaturalAbsorptionObjects;
 import fathertoast.naturalabsorption.common.core.NaturalAbsorption;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.fml.DistExecutor;
 
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public class References {
@@ -47,6 +51,13 @@ public class References {
     
     public static String prettyToString( float value ) {
         return Math.round( value ) == value ? Integer.toString( Math.round( value ) ) : Float.toString( Math.round( value * 100.0F ) / 100.0F );
+    }
+    
+    //------------------ SIDED GETTERS -------------------
+    
+    @Nullable
+    public static Player getClientPlayer() {
+        return DistExecutor.unsafeRunForDist( () -> () -> Minecraft.getInstance().player, () -> () -> null );
     }
     
     
